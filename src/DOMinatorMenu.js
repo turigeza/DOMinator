@@ -29,6 +29,7 @@ export default class DOMinatorMenu {
 
         this.update();
         document.body.classList.add("dominatorMenuActive");
+
         // this.dom.addEventListener("mousedown", e => {
         //     e.preventDefault()
         //     this.editorView.focus()
@@ -49,7 +50,7 @@ export default class DOMinatorMenu {
         });
     }
 
-    update(view) {
+    update(view, lastState) {
         if(this.mousedown){
             return;
         }
@@ -62,7 +63,7 @@ export default class DOMinatorMenu {
             }
 
             // console.dir(view);
-            console.dir(view.state.selection);
+            // console.dir(view.state.selection);
 
             // make all submenues invisible then make the matching submenu visible
             Object.keys(this.submenus).forEach(key=>{
@@ -71,7 +72,7 @@ export default class DOMinatorMenu {
 
             if(view.state.selection.constructor.name === 'TextSelection'){
                 // watch out because text selection responds to none editable custom html selection as well
-                console.log('Text Selection');
+                // console.log('Text Selection');
                 if(view.state.selection.empty){
 
                 }else{
@@ -79,7 +80,7 @@ export default class DOMinatorMenu {
                     this.submenus.inline.show(view);
                 }
             }else if (view.state.selection.constructor.name === 'NodeSelection'){
-                console.log('Node Selection');
+                // console.log('Node Selection');
             }
         }
 

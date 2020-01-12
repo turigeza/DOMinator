@@ -199,7 +199,7 @@ export default {
         defining: true, // node is considered an important parent node during replace operations
         selectable: true,
         atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
-        draggable: false,
+        draggable: false, // does not work !!!
         // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
             dom: {

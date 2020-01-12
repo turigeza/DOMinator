@@ -14,6 +14,9 @@ import {schema} from "./DOMinatorSchemaBasic"
 import schemaDominator from "./DOMinatorSchemaExtended"
 import DOMinatorMenu from "./DOMinatorMenu"
 
+// node views
+import DOMinatorCustomHtmlView from "./DOMinatorCustomHtmlView"
+
 window.DOMinator = class DOMinator {
     // editorSchema
     // editorView
@@ -75,7 +78,10 @@ window.DOMinator = class DOMinator {
                     })
                 ]
 
-            })
+            }),
+            nodeViews: {
+                custom_html(node, view, getPos) { return new DOMinatorCustomHtmlView(node, view, getPos) }
+            }
         })
     }
 
