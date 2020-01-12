@@ -1,56 +1,50 @@
 import {
     // Selection,
-    // TextSelection,
+    TextSelection,
     NodeSelection
     // AllSelection
 } from "prosemirror-state"
 
 export default class DOMinatorCustomHtmlView {
+
     constructor(node, view, getPos) {
-        // We'll need these later
+
         this.node = node
         this.view = view
         this.getPos = getPos
         this.dom = node.attrs.dom.cloneNode(true);
         this.dom.addEventListener("mousedown", event => {
+            console.log(this.view);
 
+            if(event.metaKey && !this.dom.classList.contains("ProseMirror-selectednode")){
 
-            // console.log(this.view);
-            // console.log(node);
-            // // console.log(NodeSelection.create(this.node.nodeSize));
-            // // console.log(this.node.resolve(0))
-            // // console.log(new NodeSelection(this.node.resolve(0)));
-            //
-            //
-            //
-            // // console.log(node.resolve());
-            // // console.log(this.getPos());
-            // // tr.insert(tr.doc.content.size, node)
-            // // console.log(NodeSelection.create(this.getPos(), this.node.nodeSize))
-            //
-            // // this.view.dispatch();
-            //
-            // // NodeSelection
-            // // this.view.state.tr.setSelection(
-            // //     NodeSelection.create(this.view.state.doc, )
-            // // );
+                console.log('I AM DOING IT');
+                const selection = NodeSelection.create(
+                    this.view.state.doc,
+                    this.getPos()
+                );
 
+                this.view.dispatch(this.view.state.tr.setSelection(selection));
+            }else{
+                console.log('DESELECTING');
 
+                const selection = TextSelection.create(
+                    this.view.state.doc,
+                    0
+                );
 
-            this.view.dispatch(this.view.state.tr.setSelection(
-                NodeSelection.create(
-                this.view.state.doc,
-                this.getPos()
-            )));
+                this.view.dispatch(this.view.state.tr.setSelection(selection));
+            }
 
             console.log('mousedown');
 
         });
+
         // this.dom.querySelectorAll('.someclass')[0].addEventListener("mouseup", event => {
         //     console.log('.someclass');
         // }),
         // console.log(this.dom.querySelectorAll('.someclass'));
-        // this.dom.classList.add('someshit')
+        // this.dom.classList.add('something')
     }
 
     selectNode() {
@@ -66,9 +60,22 @@ export default class DOMinatorCustomHtmlView {
     }
 
     stopEvent(event) {
-        if(event.type === 'mousedown'){
+        const blacklisted = [
+            'dragstart',
+            'dragenter',
+            'dragover',
+            'dragend',
+            'drop',
+            'mousedown',
+        ];
+
+
+
+        if( blacklisted.indexOf(event.type) > -1 ){
             return true;
         }
+
+        console.log(event.type);
         return false;
         // console.log(event.type);
 
