@@ -1,20 +1,20 @@
 {
-    "name": "prosemirror-starter-app",
-    "version": "1.0.1",
-    "description": "An example for how to set up a ProseMirror editor",
-    "main": "dist/index.js",
-    "style": "style/style.css",
+    "name": "DOMinator",
+    "version": "0.0.1",
+    "description": "Just a vague attempt at taming the ProseMirror editor",
+    "main": "dist/DOMinator.js",
+    "style": "style/DOMinator.css",
     "license": "MIT",
     "maintainers": [
         {
-            "name": "Marijn Haverbeke",
-            "email": "marijnh@gmail.com",
-            "web": "http://marijnhaverbeke.nl"
+            "name": "Geza Turi",
+            "email": "geza@turigeza.com",
+            "web": "https://turigeza.com"
         }
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/prosemirror/prosemirror.git"
+        "url": "git://github.com/turigeza/DOMinator.git"
     },
     "dependencies": {
         "prosemirror-keymap": "^1.0.0",

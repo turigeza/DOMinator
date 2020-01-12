@@ -196,11 +196,11 @@ export default {
     custom_html: {
         content: "block+",
         group: "block",
-        defining: true,
+        defining: true, // node is considered an important parent node during replace operations
         selectable: true,
-        // atom: true,
+        atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
         draggable: false,
-        // isolating: true,
+        // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
             dom: {
                 default: {}

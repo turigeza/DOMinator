@@ -3468,6 +3468,7 @@
     // declare global: window
     return options.document || window.document
   }
+  //# sourceMappingURL=index.es.js.map
 
   // Mappable:: interface
   // There are several things that positions can be mapped through.
@@ -5153,6 +5154,7 @@
     }
     return result
   }
+  //# sourceMappingURL=index.es.js.map
 
   var classesById = Object.create(null);
 
@@ -6273,6 +6275,7 @@
   // :: (EditorState) → ?any
   // Get the plugin's state from an editor state.
   PluginKey.prototype.getState = function getState (state) { return state[this.key] };
+  //# sourceMappingURL=index.es.js.map
 
   var result = {};
 
@@ -11055,6 +11058,7 @@
     for (var _ in b) { nB++; }
     return nA != nB
   }
+  //# sourceMappingURL=index.es.js.map
 
   var olDOM = ["ol", 0], ulDOM = ["ul", 0], liDOM = ["li", 0];
 
@@ -11293,6 +11297,7 @@
       return true
     }
   }
+  //# sourceMappingURL=index.es.js.map
 
   var base = {
     8: "Backspace",
@@ -11513,6 +11518,7 @@
       return false
     }
   }
+  //# sourceMappingURL=index.es.js.map
 
   var GOOD_LEAF_SIZE = 200;
 
@@ -12138,6 +12144,7 @@
     if (dispatch) { histTransaction(hist, state, dispatch, true); }
     return true
   }
+  //# sourceMappingURL=index.es.js.map
 
   // :: (options: ?Object) → Plugin
   // Create a plugin that, when added to a ProseMirror instance,
@@ -12270,6 +12277,7 @@
     if (event.target == this.editorView.dom || !this.editorView.dom.contains(event.relatedTarget))
       { this.setCursor(null); }
   };
+  //# sourceMappingURL=index.es.js.map
 
   // ::- Gap cursor selections are represented using this class. Its
   // `$anchor` and `$head` properties both point at the cursor position.
@@ -12452,6 +12460,7 @@
     node.className = "ProseMirror-gapcursor";
     return DecorationSet.create(state.doc, [Decoration.widget(state.selection.head, node, {key: "gapcursor"})])
   }
+  //# sourceMappingURL=index.es.js.map
 
   // :: (EditorState, ?(tr: Transaction)) → bool
   // Delete the selection, if there is one.
@@ -13243,6 +13252,7 @@
         .setBlockType(start, start, nodeType, attrs)
     })
   }
+  //# sourceMappingURL=index.es.js.map
 
   const mac$3 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false;
 
@@ -13421,6 +13431,7 @@
       // :: NodeSpec A plain paragraph textblock. Represented in the DOM
       // as a `<p>` element.
       paragraph: {
+          draggable: false,
           content: "inline*",
           group: "block",
           attrs: {
@@ -13925,11 +13936,11 @@
       custom_html: {
           content: "block+",
           group: "block",
-          defining: true,
+          defining: true, // node is considered an important parent node during replace operations
           selectable: true,
-          // atom: true,
+          atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
           draggable: false,
-          // isolating: true,
+          // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
               dom: {
                   default: {}
