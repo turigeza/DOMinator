@@ -55,33 +55,42 @@ export default class DOMinatorMenu {
             return;
         }
 
-        // console.dir(view);
-        // traverse(view)
+        let blockName = null;
         if(view){
             if(!view){
                 return;
             }
 
-            // console.dir(view);
-            // console.dir(view.state.selection);
+            const selection = view.state.selection;
 
-            // make all submenues invisible then make the matching submenu visible
+            // make all submenues invisible
             Object.keys(this.submenus).forEach(key=>{
                 this.submenus[key].hide();
             });
 
-            if(view.state.selection.constructor.name === 'TextSelection'){
-                // watch out because text selection responds to none editable custom html selection as well
+            if(selection.constructor.name === 'TextSelection'){
+                // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved
                 // console.log('Text Selection');
-                if(view.state.selection.empty){
-
+                if(selection.empty){
+                    // console.log(selection);
+                    // console.log(selection.$head.parent.type.name);
+                    // console.log(selection.$head.path);
+                    blockName = selection.$head.parent.type.name;
                 }else{
                     // there is a selection show inline menu
                     this.submenus.inline.show(view);
                 }
-            }else if (view.state.selection.constructor.name === 'NodeSelection'){
+            }else if (selection.constructor.name === 'NodeSelection'){
                 // console.log('Node Selection');
+
             }
+        }
+
+        if(blockName){
+            if(this.submenus[blockName]){
+
+            }
+
         }
 
         // console.log(JSON.stringify(view.state,  null, 4));
@@ -279,7 +288,52 @@ export default class DOMinatorMenu {
                         icon: 'columns',
                         command: toggleMark(this.editorSchema.marks.strong)
                     }),
-                ]
+                ],
+            }),
+            heading: new DOMinatorSubMenu({
+                key: 'heading',
+                items: [
+                    new DOMinatorMenuButton ({
+                        key: 'outdent',
+                        icon: 'outdent',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'indent',
+                        icon: 'indent',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'list_ul',
+                        icon: 'list-ul',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'list_ol',
+                        icon: 'list-ol',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'paragraph',
+                        icon: 'paragraph',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'undo',
+                        icon: 'undo',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'redo',
+                        icon: 'repeat',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'layouts',
+                        icon: 'columns',
+                        command: toggleMark(this.editorSchema.marks.strong)
+                    }),
+                ],
             })
         }
 

@@ -199,38 +199,34 @@ export default {
         defining: true, // node is considered an important parent node during replace operations
         selectable: true,
         atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
-        draggable: false, // does not work !!!
+        draggable: false, // does not work for some reason
         // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
-            dom: {
-                default: {}
-            }
+            className: {
+                default: ''
+            },
+            html: {
+                default: ''
+            },
         },
         parseDOM: [{
             tag: 'div',
             getAttrs: dom => {
-                return { dom: dom };
+                // let attributes = Array.prototype.slice.call(dom.attributes);
+                return {
+                    className: dom.className,
+                    html: dom.innerHTML
+                };
             }
-            // ignore: true,
-            // getAttrs: dom => {
-            //     console.log(dom);
-            //     // let type = dom.getAttribute("dino-type")
-            //     // return dinos.indexOf(type) > -1 ? {type} : false
-            // }
-            // getContent: dom => {
-            //     return 'This is the content of it.'
-            // }
         }],
         toDOM(node) {
-            // console.log('node');
-            // console.log(node.attrs.dom);
-            // let n = document.createElement("div");
-            // n.innerHTML = '<p>Some shit</p>';
-            // n.innerHtml = 'Heyho';
-            // console.log(n)
-            let newClone = node.attrs.dom.cloneNode(true)
-            // newClone.addEventListener("click", ()=>{ console.log('mouseup');}
-            return newClone;
+            let newDiv = document.createElement("div");
+            newDiv.innerHTML = node.attrs.html;
+            if(node.attrs.className){
+                newDiv.className = node.attrs.className;
+            }
+
+            return newDiv;
 
         }
     },

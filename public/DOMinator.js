@@ -13938,38 +13938,34 @@
           defining: true, // node is considered an important parent node during replace operations
           selectable: true,
           atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
-          draggable: false, // does not work !!!
+          draggable: false, // does not work for some reason
           // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
-              dom: {
-                  default: {}
-              }
+              className: {
+                  default: ''
+              },
+              html: {
+                  default: ''
+              },
           },
           parseDOM: [{
               tag: 'div',
               getAttrs: dom => {
-                  return { dom: dom };
+                  // let attributes = Array.prototype.slice.call(dom.attributes);
+                  return {
+                      className: dom.className,
+                      html: dom.innerHTML
+                  };
               }
-              // ignore: true,
-              // getAttrs: dom => {
-              //     console.log(dom);
-              //     // let type = dom.getAttribute("dino-type")
-              //     // return dinos.indexOf(type) > -1 ? {type} : false
-              // }
-              // getContent: dom => {
-              //     return 'This is the content of it.'
-              // }
           }],
           toDOM(node) {
-              // console.log('node');
-              // console.log(node.attrs.dom);
-              // let n = document.createElement("div");
-              // n.innerHTML = '<p>Some shit</p>';
-              // n.innerHtml = 'Heyho';
-              // console.log(n)
-              let newClone = node.attrs.dom.cloneNode(true);
-              // newClone.addEventListener("click", ()=>{ console.log('mouseup');}
-              return newClone;
+              let newDiv = document.createElement("div");
+              newDiv.innerHTML = node.attrs.html;
+              if(node.attrs.className){
+                  newDiv.className = node.attrs.className;
+              }
+
+              return newDiv;
 
           }
       },
@@ -14140,29 +14136,37 @@
               return;
           }
 
-          // console.dir(view);
-          // traverse(view)
+          let blockName = null;
           if(view){
               if(!view){
                   return;
               }
 
-              // console.dir(view);
-              // console.dir(view.state.selection);
+              const selection = view.state.selection;
 
-              // make all submenues invisible then make the matching submenu visible
+              // make all submenues invisible
               Object.keys(this.submenus).forEach(key=>{
                   this.submenus[key].hide();
               });
 
-              if(view.state.selection.constructor.name === 'TextSelection'){
-                  // watch out because text selection responds to none editable custom html selection as well
+              if(selection.constructor.name === 'TextSelection'){
+                  // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved
                   // console.log('Text Selection');
-                  if(view.state.selection.empty);else{
+                  if(selection.empty){
+                      // console.log(selection);
+                      // console.log(selection.$head.parent.type.name);
+                      // console.log(selection.$head.path);
+                      blockName = selection.$head.parent.type.name;
+                  }else{
                       // there is a selection show inline menu
                       this.submenus.inline.show(view);
                   }
-              }else if (view.state.selection.constructor.name === 'NodeSelection');
+              }else if (selection.constructor.name === 'NodeSelection');
+          }
+
+          if(blockName){
+              if(this.submenus[blockName]);
+
           }
 
           // console.log(JSON.stringify(view.state,  null, 4));
@@ -14359,7 +14363,52 @@
                           icon: 'columns',
                           command: toggleMark(this.editorSchema.marks.strong)
                       }),
-                  ]
+                  ],
+              }),
+              heading: new DOMinatorSubMenu({
+                  key: 'heading',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'outdent',
+                          icon: 'outdent',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'indent',
+                          icon: 'indent',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'list_ul',
+                          icon: 'list-ul',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'list_ol',
+                          icon: 'list-ol',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'paragraph',
+                          icon: 'paragraph',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'undo',
+                          icon: 'undo',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'redo',
+                          icon: 'repeat',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'layouts',
+                          icon: 'columns',
+                          command: toggleMark(this.editorSchema.marks.strong)
+                      }),
+                  ],
               })
           };
 
@@ -14395,39 +14444,29 @@
           this.node = node;
           this.view = view;
           this.getPos = getPos;
-          this.dom = node.attrs.dom.cloneNode(true);
+
+          this.dom = document.createElement('div');
+          this.dom.innerHTML = node.attrs.html;
+          if(node.attrs.className){
+              this.dom.className = node.attrs.className;
+          }
+
           this.dom.addEventListener("mousedown", event => {
-              console.log(this.view);
 
-              if(event.metaKey && !this.dom.classList.contains("ProseMirror-selectednode")){
-
-                  console.log('I AM DOING IT');
+              // select node if not yet selected //event.metaKey &&
+              if(!this.dom.classList.contains("ProseMirror-selectednode")){
                   const selection = NodeSelection.create(
                       this.view.state.doc,
                       this.getPos()
                   );
 
                   this.view.dispatch(this.view.state.tr.setSelection(selection));
-              }else{
-                  console.log('DESELECTING');
-
-                  const selection = TextSelection.create(
-                      this.view.state.doc,
-                      0
-                  );
-
-                  this.view.dispatch(this.view.state.tr.setSelection(selection));
+                  // event.stopPropagation();
+                  // event.preventDefault();
               }
 
               console.log('mousedown');
-
           });
-
-          // this.dom.querySelectorAll('.someclass')[0].addEventListener("mouseup", event => {
-          //     console.log('.someclass');
-          // }),
-          // console.log(this.dom.querySelectorAll('.someclass'));
-          // this.dom.classList.add('something')
       }
 
       selectNode() {
@@ -14452,20 +14491,12 @@
               'mousedown',
           ];
 
-
-
           if( blacklisted.indexOf(event.type) > -1 ){
               return true;
           }
 
           console.log(event.type);
           return false;
-          // console.log(event.type);
-
-          // console.log('stopEvent --- DOMinatorCustomHtmlView');
-          // console.log(event);
-
-
           // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
           // Events for which this returns true are not handled by the editor.
       }

@@ -1,8 +1,6 @@
 import {
-    // Selection,
     TextSelection,
     NodeSelection
-    // AllSelection
 } from "prosemirror-state"
 
 export default class DOMinatorCustomHtmlView {
@@ -12,39 +10,29 @@ export default class DOMinatorCustomHtmlView {
         this.node = node
         this.view = view
         this.getPos = getPos
-        this.dom = node.attrs.dom.cloneNode(true);
+
+        this.dom = document.createElement('div');
+        this.dom.innerHTML = node.attrs.html;
+        if(node.attrs.className){
+            this.dom.className = node.attrs.className;
+        }
+
         this.dom.addEventListener("mousedown", event => {
-            console.log(this.view);
 
-            if(event.metaKey && !this.dom.classList.contains("ProseMirror-selectednode")){
-
-                console.log('I AM DOING IT');
+            // select node if not yet selected //event.metaKey &&
+            if(!this.dom.classList.contains("ProseMirror-selectednode")){
                 const selection = NodeSelection.create(
                     this.view.state.doc,
                     this.getPos()
                 );
 
                 this.view.dispatch(this.view.state.tr.setSelection(selection));
-            }else{
-                console.log('DESELECTING');
-
-                const selection = TextSelection.create(
-                    this.view.state.doc,
-                    0
-                );
-
-                this.view.dispatch(this.view.state.tr.setSelection(selection));
+                // event.stopPropagation();
+                // event.preventDefault();
             }
 
             console.log('mousedown');
-
         });
-
-        // this.dom.querySelectorAll('.someclass')[0].addEventListener("mouseup", event => {
-        //     console.log('.someclass');
-        // }),
-        // console.log(this.dom.querySelectorAll('.someclass'));
-        // this.dom.classList.add('something')
     }
 
     selectNode() {
@@ -69,20 +57,12 @@ export default class DOMinatorCustomHtmlView {
             'mousedown',
         ];
 
-
-
         if( blacklisted.indexOf(event.type) > -1 ){
             return true;
         }
 
         console.log(event.type);
         return false;
-        // console.log(event.type);
-
-        // console.log('stopEvent --- DOMinatorCustomHtmlView');
-        // console.log(event);
-
-
         // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
         // Events for which this returns true are not handled by the editor.
     }
