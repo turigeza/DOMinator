@@ -26,6 +26,7 @@ export default class DOMinatorMenu {
     // rightMenuDom
     // submenus
     // activeMark - update sets this to match the menu showing
+    // activeSubmenuKey
 
     constructor(dominator, editorView) {
         this.dominator = dominator;
@@ -72,36 +73,38 @@ export default class DOMinatorMenu {
                 this.submenus[key].hide();
             });
 
+            this.activeSubmenuKey = '';
             if(selection.constructor.name === 'TextSelection'){
                 // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
-                console.log('Text Selection');
-
                 if(selection.empty){
                     let marks = selection.$cursor.marks();
                     if(marks.length > 0){
                         for (var i = 0; i < marks.length; i++) {
                             let mark = marks[i];
                             if(this.submenus[mark.type.name]){
-                                this.submenus[mark.type.name].show(view);
+                                this.activeSubmenuKey = mark.type.name;
                                 this.activeMark = mark;
                                 break;
                             }
                         }
                     }else{
-                        const blockName = selection.$head.parent.type.name
-                        if(this.submenus[selection.$head.parent.type.name]){
-                            this.submenus[selection.$head.parent.type.name].show(view);
-                        }
+                        this.activeSubmenuKey = selection.$head.parent.type.name;
                     }
                 }else{
                     // there is a selection show inline menu
-                    this.submenus.inline.show(view);
+                    this.activeSubmenuKey = 'inline';
                 }
             }else if (selection.constructor.name === 'NodeSelection'){
                 if(this.submenus[selection.node.type.name]){
-                    this.submenus[selection.node.type.name].show(view);
+                    this.activeSubmenuKey = selection.node.type.name;
                 }
             }
+        }
+
+        // show the active submenu
+        if(this.activeSubmenuKey){
+            // this also calls the update method on each element
+            this.submenus[this.activeSubmenuKey].show(view, this);
         }
     }
 
@@ -217,25 +220,21 @@ export default class DOMinatorMenu {
                         command: toggleMark(this.editorSchema.marks.strong)
                     }),
                     new DOMinatorMenuButton ({
+                        update: (view, menu, button) => {
+                            if(this.activeMark.attrs.class && this.activeMark.attrs.class.includes('button button-info')){
+                                button.activate();
+                            }else{
+                                button.deactivate();
+                            }
+                        },
                         key: 'link_style_info',
                         icon: 'paint-brush',
-                        command: (val, view)=>{
-                            console.log(view);
-                            let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
-
-                            console.log( this.activeMark );
-                            console.log(from);
-                            console.log(to);
-                            const attr = { ...{}, ...this.activeMark.typeinstance.attrs, href: 'Na most akkor.' };
-                            attr.
-                            view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)))
-
-                            // const selection = TextSelection.create( state.doc, starts, ends);
-                            // view.dispatch(state.tr.setSelection(selection));
-
-                            //let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
-                            //console.log(range);
-
+                        command: (state, dispatch, view)=>{
+                            const attrsNow = this.activeMark.type.instance.attrs;
+                            let { from, to } = getMarkRange(state.selection.$cursor, this.activeMark);
+                            // if(attrsNow.)
+                            const attrs = { ...{}, ...attrsNow, 'class': 'button button-info' };
+                            dispatch(state.tr.addMark(from, to, this.activeMark.type.create(attrs)));
                         }
                     }),
                 ]

@@ -17,11 +17,11 @@ export default class DOMinatorSubMenu {
         });
     }
 
-    update(view){
+    update(view, menu){
         this.view = view;
         this.items.forEach(item=>{
             if(typeof item.update === 'function'){
-                item.update(view);
+                item.update(view, menu);
             }
         });
     }
@@ -30,10 +30,10 @@ export default class DOMinatorSubMenu {
         this.dom.style.display = "none";
     }
 
-    show(view){
+    show(view, menu){
         this.dom.style.display = "";
         if(view){
-            this.update(view);
+            this.update(view, menu);
         }
     }
 

@@ -210,7 +210,7 @@ export const marks = {
             title: {
                 default: null
             },
-            className: {
+            'class': {
                 default: null
             },
         },

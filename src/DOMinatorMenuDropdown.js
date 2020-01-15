@@ -15,11 +15,11 @@ export default class DOMinatorMenuDropdown {
         });
     }
 
-    update(view){
+    update(view, menu){
         this.view = view;
         this.items.forEach(item=>{
             if(typeof item.update === 'function'){
-                item.update(view);
+                item.update(view, menu);
             }
         });
     }

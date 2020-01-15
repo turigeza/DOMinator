@@ -46,7 +46,7 @@ body.dominatorMenuActive{
     color: #222;
 
 }
-.DOMinatorMenuButton:active, .DOMinatorMenuButton:hover{
+.DOMinatorMenuButton:active, .DOMinatorMenuButton:hover, .DOMinatorMenuButton.button-active{
     color: #009CDE;
     background-color: #eee;
 }

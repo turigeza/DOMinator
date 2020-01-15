@@ -13646,7 +13646,7 @@
               title: {
                   default: null
               },
-              className: {
+              'class': {
                   default: null
               },
           },
@@ -14051,16 +14051,38 @@
       }
 
       clicked(event){
+          if(this.dom.classList.contains('button-disabled')){
+              return;
+          }
           event.preventDefault();
           this.view.focus();
           this.options.command(this.view.state, this.view.dispatch, this.view);
       }
 
-      update(view){
+      update(view, menu){
           this.view = view;
           if(typeof this.options.update === 'function'){
-              this.options.update(view);
+              this.options.update(view, menu, this);
           }
+      }
+
+      enable(){
+          this.dom.disabled = false;
+          this.dom.classList.remove('button-disabled');
+      }
+
+      disable(){
+          this.dom.disabled = true;
+          this.dom.classList.add('button-disabled');
+      }
+
+      activate(){
+          this.enable();
+          this.dom.classList.add('button-active');
+      }
+
+      deactivate(){
+          this.dom.classList.remove('button-active');
       }
 
       destroy() {
@@ -14108,8 +14130,11 @@
           }
       }
 
-      update(view){
+      update(view, menu){
           this.view = view;
+          if(typeof this.options.update === 'function'){
+              this.options.update(view, menu);
+          }
       }
 
       setParent(parent){
@@ -14144,11 +14169,11 @@
           });
       }
 
-      update(view){
+      update(view, menu){
           this.view = view;
           this.items.forEach(item=>{
               if(typeof item.update === 'function'){
-                  item.update(view);
+                  item.update(view, menu);
               }
           });
       }
@@ -14157,10 +14182,10 @@
           this.dom.style.display = "none";
       }
 
-      show(view){
+      show(view, menu){
           this.dom.style.display = "";
           if(view){
-              this.update(view);
+              this.update(view, menu);
           }
       }
 
@@ -14244,6 +14269,7 @@
       // rightMenuDom
       // submenus
       // activeMark - update sets this to match the menu showing
+      // activeSubmenuKey
 
       constructor(dominator, editorView) {
           this.dominator = dominator;
@@ -14290,36 +14316,38 @@
                   this.submenus[key].hide();
               });
 
+              this.activeSubmenuKey = '';
               if(selection.constructor.name === 'TextSelection'){
                   // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
-                  console.log('Text Selection');
-
                   if(selection.empty){
                       let marks = selection.$cursor.marks();
                       if(marks.length > 0){
                           for (var i = 0; i < marks.length; i++) {
                               let mark = marks[i];
                               if(this.submenus[mark.type.name]){
-                                  this.submenus[mark.type.name].show(view);
+                                  this.activeSubmenuKey = mark.type.name;
                                   this.activeMark = mark;
                                   break;
                               }
                           }
                       }else{
-                          const blockName = selection.$head.parent.type.name;
-                          if(this.submenus[selection.$head.parent.type.name]){
-                              this.submenus[selection.$head.parent.type.name].show(view);
-                          }
+                          this.activeSubmenuKey = selection.$head.parent.type.name;
                       }
                   }else{
                       // there is a selection show inline menu
-                      this.submenus.inline.show(view);
+                      this.activeSubmenuKey = 'inline';
                   }
               }else if (selection.constructor.name === 'NodeSelection'){
                   if(this.submenus[selection.node.type.name]){
-                      this.submenus[selection.node.type.name].show(view);
+                      this.activeSubmenuKey = selection.node.type.name;
                   }
               }
+          }
+
+          // show the active submenu
+          if(this.activeSubmenuKey){
+              // this also calls the update method on each element
+              this.submenus[this.activeSubmenuKey].show(view, this);
           }
       }
 
@@ -14435,25 +14463,21 @@
                           command: toggleMark(this.editorSchema.marks.strong)
                       }),
                       new DOMinatorMenuButton ({
+                          update: (view, menu, button) => {
+                              if(this.activeMark.attrs.class && this.activeMark.attrs.class.includes('button button-info')){
+                                  button.activate();
+                              }else{
+                                  button.deactivate();
+                              }
+                          },
                           key: 'link_style_info',
                           icon: 'paint-brush',
-                          command: (val, view)=>{
-                              console.log(view);
-                              let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
-
-                              console.log( this.activeMark );
-                              console.log(from);
-                              console.log(to);
-                              const attr = { ...{}, ...this.activeMark.typeinstance.attrs, href: 'Na most akkor.' };
-                              attr.
-                              view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)));
-
-                              // const selection = TextSelection.create( state.doc, starts, ends);
-                              // view.dispatch(state.tr.setSelection(selection));
-
-                              //let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
-                              //console.log(range);
-
+                          command: (state, dispatch, view)=>{
+                              const attrsNow = this.activeMark.type.instance.attrs;
+                              let { from, to } = getMarkRange(state.selection.$cursor, this.activeMark);
+                              // if(attrsNow.)
+                              const attrs = { ...{}, ...attrsNow, 'class': 'button button-info' };
+                              dispatch(state.tr.addMark(from, to, this.activeMark.type.create(attrs)));
                           }
                       }),
                   ]

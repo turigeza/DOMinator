@@ -30,8 +30,11 @@ export default class DOMinatorMenuInput {
         }
     }
 
-    update(view){
+    update(view, menu){
         this.view = view
+        if(typeof this.options.update === 'function'){
+            this.options.update(view, menu);
+        }
     }
 
     setParent(parent){
