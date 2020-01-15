@@ -3,7 +3,7 @@ import {
     NodeSelection
 } from "prosemirror-state"
 
-export default class DOMinatorCustomHtmlView {
+export default class DOMinatorLinkView {
 
     constructor(node, view, getPos) {
 
@@ -11,11 +11,10 @@ export default class DOMinatorCustomHtmlView {
         this.view = view
         this.getPos = getPos
 
-        this.dom = document.createElement('div');
-        this.dom.innerHTML = node.attrs.html;
+        this.dom = document.createElement('a');
 
-        if(node.attrs.className){
-            this.dom.className = node.attrs.className;
+        if(node.attrs.href){
+            this.dom.setAttribute('href');
         }
 
         this.dom.addEventListener("mousedown", event => {
@@ -41,11 +40,11 @@ export default class DOMinatorCustomHtmlView {
     }
 
     selectNode() {
-        this.dom.classList.add("ProseMirror-selectednode")
+
     }
 
     deselectNode() {
-        this.dom.classList.remove("ProseMirror-selectednode")
+
     }
 
     update(node, decorations) {
@@ -53,23 +52,7 @@ export default class DOMinatorCustomHtmlView {
     }
 
     stopEvent(event) {
-        const blacklisted = [
-            'dragstart',
-            'dragenter',
-            'dragover',
-            'dragend',
-            'drop',
-            'mousedown',
-        ];
 
-        if( blacklisted.indexOf(event.type) > -1 ){
-            return true;
-        }
-
-        console.log(event.type);
-        return false;
-        // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
-        // Events for which this returns true are not handled by the editor.
     }
 
     ignoreMutation() {

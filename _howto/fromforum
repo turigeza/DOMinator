@@ -1,1 +1,0 @@
-// You can get the content of a selection by calling slice on the document and passing in the from and to from the selection.

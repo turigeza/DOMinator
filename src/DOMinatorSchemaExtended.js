@@ -226,6 +226,10 @@ export default {
                 newDiv.className = node.attrs.className;
             }
 
+            newDiv.addEventListener("mousedown", event => {
+                console.log('DANGERDANGERDANGERDANGERDANGERDANGER');
+            });
+
             return newDiv;
 
         }

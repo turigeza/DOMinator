@@ -7,7 +7,9 @@ body {
 div {
     box-sizing: border-box;
 }
-
+.text-red{
+    color: red;
+}
 #save {
     background-color: Salmon;
     position: fixed;

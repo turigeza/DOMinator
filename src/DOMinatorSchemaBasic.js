@@ -204,84 +204,38 @@ export const marks = {
     // element.
     link: {
         attrs: {
-            href: {},
+            href: {
+                default: ''
+            },
             title: {
                 default: null
-            }
+            },
+            className: {
+                default: null
+            },
         },
+        excludes: 'span link',
         inclusive: false,
         parseDOM: [{
-            tag: "a[href]",
+            tag: "a", //[href]
             getAttrs(dom) {
                 return {
                     href: dom.getAttribute("href"),
-                    title: dom.getAttribute("title")
+                    title: dom.getAttribute("title"),
+                    'class': dom.getAttribute("class")
                 }
             }
         }],
         toDOM(node) {
-            let {
-                href,
-                title
-            } = node.attrs;
-            return ["a", {
-                href,
-                title
-            }, 0]
+            return ["a", node.attrs, 0]
         }
     },
 
-    // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-    // Has parse rules that also match `<i>` and `font-style: italic`.
-    em: {
-        parseDOM: [{
-            tag: "i"
-        }, {
-            tag: "em"
-        }, {
-            style: "font-style=italic"
-        }],
-        toDOM() {
-            return ["em", 0];
-        }
-    },
-
-    // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
-    // also match `<b>` and `font-weight: bold`.
-    strong: {
-        parseDOM: [{
-                tag: "strong"
-            },
-            // This works around a Google Docs misbehavior where
-            // pasted content will be inexplicably wrapped in `<b>`
-            // tags with a font-weight normal.
-            {
-                tag: "b",
-                getAttrs: node => node.style.fontWeight != "normal" && null
-            },
-            {
-                style: "font-weight",
-                getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
-            }
-        ],
-        toDOM() {
-            return ["strong", 0];
-        }
-    },
-
-    // :: MarkSpec Code font mark. Represented as a `<code>` element.
-    code: {
-        parseDOM: [{
-            tag: "code"
-        }],
-        toDOM() {
-            return ["code", 0];
-        }
-    },
+    // for inline styling
     span: {
         attrs: {
             className: {
-                default: ''
+                default: 'text-red'
             }
         },
         parseDOM: [{
@@ -304,6 +258,86 @@ export const marks = {
             return ["span", attrs, 0];
         }
     },
+    // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
+    // Has parse rules that also match `<i>` and `font-style: italic`.
+    i: {
+        parseDOM: [{
+            tag: "i"
+        }, {
+            tag: "em"
+        }, {
+            style: "font-style=italic"
+        }],
+        toDOM() {
+            return ["i", 0];
+        }
+    },
+
+    // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
+    // also match `<b>` and `font-weight: bold`.
+    b: {
+        parseDOM: [{
+                tag: "strong"
+            },
+            // This works around a Google Docs misbehavior where
+            // pasted content will be inexplicably wrapped in `<b>`
+            // tags with a font-weight normal.
+            {
+                tag: "b",
+                getAttrs: node => node.style.fontWeight != "normal" && null
+            },
+            {
+                style: "font-weight",
+                getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+            }
+        ],
+        toDOM() {
+            return ["b", 0];
+        }
+    },
+
+    // :: MarkSpec Code font mark. Represented as a `<code>` element.
+    code: {
+        parseDOM: [{
+            tag: "code"
+        }],
+        toDOM() {
+            return ["code", 0];
+        }
+    },
+    del: {
+        parseDOM: [{
+            tag: "del"
+        }],
+        toDOM() {
+            return ["del", 0];
+        }
+    },
+    u: {
+        parseDOM: [{
+            tag: "u"
+        }],
+        toDOM() {
+            return ["u", 0];
+        }
+    },
+    sub: {
+        parseDOM: [{
+            tag: "sub"
+        }],
+        toDOM() {
+            return ["sub", 0];
+        }
+    },
+    sup: {
+        parseDOM: [{
+            tag: "sup"
+        }],
+        toDOM() {
+            return ["sup", 0];
+        }
+    },
+
 }
 
 // :: Schema

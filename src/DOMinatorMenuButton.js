@@ -1,7 +1,7 @@
 export default class DOMinatorMenuButton {
     // dom
     // options
-    //
+    // view
 
     constructor(options) {
         this.options = options;
@@ -16,11 +16,20 @@ export default class DOMinatorMenuButton {
                 this.dom.appendChild(icon);
             }
         }
+
+        this.dom.addEventListener('mousedown', event=>this.clicked(event))
     }
 
-    update(){
+    clicked(event){
+        event.preventDefault();
+        this.view.focus();
+        this.options.command(this.view.state, this.view.dispatch, this.view);
+    }
+
+    update(view){
+        this.view = view;
         if(typeof this.options.update === 'function'){
-            this.options.update();
+            this.options.update(view);
         }
     }
 

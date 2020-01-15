@@ -545,6 +545,23 @@ function markApplies(doc, ranges, type) {
     return false
 }
 
+export function clearFormatting(marks) {
+
+    return function(state, dispatch) {
+        // let formats = ['i', 'b', 'link', 'u', 'span', 'del', 'sub', 'sup', 'b', 'span', 'code'];
+        let { empty, from, to } = state.selection;
+        if(empty){
+            return false;
+        }
+
+        if (dispatch) {
+            dispatch(state.tr.removeMark(from, to));
+        }
+
+        return true
+    }
+}
+
 // :: (MarkType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Create a command function that toggles the given mark with the
 // given attributes. Will return `false` when the current selection
@@ -562,6 +579,7 @@ export function toggleMark(markType, attrs) {
         } = state.selection
         if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
         if (dispatch) {
+            // selection is empty
             if ($cursor) {
                 if (markType.isInSet(state.storedMarks || $cursor.marks()))
                     dispatch(state.tr.removeStoredMark(markType))

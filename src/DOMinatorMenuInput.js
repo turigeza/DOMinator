@@ -2,22 +2,36 @@ export default class DOMinatorMenuInput {
 
     // dom - the dom element for this submenu
     // options
-
+    // view
+    // val
+    // parent
     constructor(options) {
         this.options = options;
         this.dom = document.createElement("input")
         this.dom.className = "DOMinatorMenuInput DOMinatorMenuInput-"+this.options.key;
-
-
         this.dom.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
-    }
+        this.dom.addEventListener('focus', ()=>{
+            this.val = this.dom.value;
+        });
 
-    update(){
-        this.items.forEach(item=>{
-            if(typeof item.update === 'function'){
-                item.update();
+        this.dom.addEventListener('blur', ()=>{
+            if(this.val !== this.dom.value){
+                this.val = this.dom.value;
+                this.changed();
             }
         });
+    }
+
+    changed(){
+        if(this.options.command){
+            event.preventDefault();
+            this.view.focus();
+            this.options.command(this.val, this.view);
+        }
+    }
+
+    update(view){
+        this.view = view
     }
 
     setParent(parent){

@@ -1,12 +1,19 @@
 import {Plugin} from "prosemirror-state"
-import {baseKeymap, toggleMark, setBlockType, wrapIn} from "./DOMinatorCommands"
+import {baseKeymap, toggleMark, setBlockType, wrapIn, clearFormatting} from "./DOMinatorCommands"
 import {schema} from "./DOMinatorSchemaBasic"
 
 import DOMinatorMenuButton from "./DOMinatorMenuButton"
 import DOMinatorMenuDropdown from "./DOMinatorMenuDropdown"
 import DOMinatorMenuInput from "./DOMinatorMenuInput"
 import DOMinatorSubMenu from "./DOMinatorSubMenu"
+import {
+    Selection,
+    TextSelection,
+    NodeSelection,
+    AllSelection
+} from "prosemirror-state"
 
+import { getMarkRange } from "./DOMinatorUtilities"
 export default class DOMinatorMenu {
 
     // items - menu items
@@ -18,6 +25,7 @@ export default class DOMinatorMenu {
     // leftMenuDom
     // rightMenuDom
     // submenus
+    // activeMark - update sets this to match the menu showing
 
     constructor(dominator, editorView) {
         this.dominator = dominator;
@@ -51,16 +59,12 @@ export default class DOMinatorMenu {
     }
 
     update(view, lastState) {
+        this.activeMark = null;
         if(this.mousedown){
             return;
         }
 
-        let blockName = null;
         if(view){
-            if(!view){
-                return;
-            }
-
             const selection = view.state.selection;
 
             // make all submenues invisible
@@ -69,87 +73,39 @@ export default class DOMinatorMenu {
             });
 
             if(selection.constructor.name === 'TextSelection'){
-                // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved
-                // console.log('Text Selection');
+                // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
+                console.log('Text Selection');
+
                 if(selection.empty){
-                    // console.log(selection);
-                    // console.log(selection.$head.parent.type.name);
-                    // console.log(selection.$head.path);
-                    blockName = selection.$head.parent.type.name;
+                    let marks = selection.$cursor.marks();
+                    if(marks.length > 0){
+                        for (var i = 0; i < marks.length; i++) {
+                            let mark = marks[i];
+                            if(this.submenus[mark.type.name]){
+                                this.submenus[mark.type.name].show(view);
+                                this.activeMark = mark;
+                                break;
+                            }
+                        }
+                    }else{
+                        const blockName = selection.$head.parent.type.name
+                        if(this.submenus[selection.$head.parent.type.name]){
+                            this.submenus[selection.$head.parent.type.name].show(view);
+                        }
+                    }
                 }else{
                     // there is a selection show inline menu
                     this.submenus.inline.show(view);
                 }
             }else if (selection.constructor.name === 'NodeSelection'){
-                // console.log('Node Selection');
-
+                if(this.submenus[selection.node.type.name]){
+                    this.submenus[selection.node.type.name].show(view);
+                }
             }
         }
-
-        if(blockName){
-            if(this.submenus[blockName]){
-
-            }
-
-        }
-
-        // console.log(JSON.stringify(view.state,  null, 4));
-        // console.log(view.state.selection);
-
-        // node is selected selection type is NodeSelection
-        // if(view.state.selection.node){
-        //     console.log(view.state.selection.constructor.name);
-        // }
-        // if(view){
-        //     console.log(view.state.selection.constructor.name);
-        // }
-
-        // console.log(JSON.stringify(view, null, 4));
-        // view.lastClick
-        // time: 1578571884813
-        // x: 580
-        // y: 297
-        // type: "singleClick"
-
-
-
-        //console.log('update');
-        //console.log(this.editorView);
-        // this.items.forEach(({command, dom}) => {
-        //     // let active = command(this.editorView.state, null, this.editorView);
-        //     // console.log(active);
-        //     // dom.style.display = active ? "" : "none";
-        // })
     }
 
     initMenu(){
-        // this.items = [
-        //     {
-        //         command: toggleMark(this.editorSchema.marks.strong),
-        //         dom: this.icon("B", "strong")
-        //     },
-        //     {
-        //         command: toggleMark(this.editorSchema.marks.em),
-        //         dom: this.icon("i", "em")
-        //     },
-        //     {
-        //         command: setBlockType(this.editorSchema.nodes.paragraph),
-        //         dom: this.icon("p", "paragraph")
-        //     },
-        //     this.heading(1),
-        //     this.heading(2),
-        //     this.heading(3),
-        //     {
-        //         command: wrapIn(this.editorSchema.nodes.blockquote),
-        //         dom: this.icon(">", "blockquote")
-        //     }
-        // ];
-
-        let align_center = { key: 'align_center', icon: 'align-center', command: toggleMark(this.editorSchema.marks.strong) };
-        let align_left = { key: 'align_left', icon: 'align-left', command: toggleMark(this.editorSchema.marks.strong) };
-        let align_right = { key: 'align_right', icon: 'align-right', command: toggleMark(this.editorSchema.marks.strong) };
-        let devider = { key: 'devider', html: '<span class=""></span>' };
-
         this.submenus = {
             inline: new DOMinatorSubMenu({
                 key: 'inline',
@@ -157,51 +113,73 @@ export default class DOMinatorMenu {
                     new DOMinatorMenuButton ({
                         key: 'bold',
                         icon: 'bold',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.b)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'italic',
                         icon: 'italic',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.i)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'underline',
                         icon: 'underline',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.u)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'link',
                         icon: 'link',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.link)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'strikethrough',
                         icon: 'strikethrough',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.del)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'subscript',
                         icon: 'subscript',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.sub)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'superscript',
                         icon: 'superscript',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.sup)
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'pencil',
+                        icon: 'pencil',
+                        command: toggleMark(this.editorSchema.marks.span)
                     }),
                     new DOMinatorMenuButton ({
                         key: 'remove_formatting',
                         icon: 'eraser',
-
+                        command: clearFormatting(this.editorSchema.marks)
                     }),
                 ]
             }),
-            a: new DOMinatorSubMenu({
-                key: 'a',
+            link: new DOMinatorSubMenu({
+                key: 'link',
                 items: [
                     new DOMinatorMenuInput ({
                         key: 'href',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: (val, view) => {
+                            let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
+
+                            console.log( this.activeMark );
+                            console.log(from);
+                            console.log(to);
+
+                            const attr = { ...{}, ...this.activeMark.type.instance.attrs, href: val };
+
+                            // const hasMark = doc.rangeHasMark(from, to, type)
+                            //
+                            // if (hasMark) {
+                            //   tr.removeMark(from, to, type)
+                            // }
+
+                            view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)))
+                            console.log(val);
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: 'unlink',
@@ -241,7 +219,24 @@ export default class DOMinatorMenu {
                     new DOMinatorMenuButton ({
                         key: 'link_style_info',
                         icon: 'paint-brush',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: (val, view)=>{
+                            console.log(view);
+                            let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
+
+                            console.log( this.activeMark );
+                            console.log(from);
+                            console.log(to);
+                            const attr = { ...{}, ...this.activeMark.typeinstance.attrs, href: 'Na most akkor.' };
+                            attr.
+                            view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)))
+
+                            // const selection = TextSelection.create( state.doc, starts, ends);
+                            // view.dispatch(state.tr.setSelection(selection));
+
+                            //let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
+                            //console.log(range);
+
+                        }
                     }),
                 ]
             }),
@@ -296,12 +291,12 @@ export default class DOMinatorMenu {
                     new DOMinatorMenuButton ({
                         key: 'outdent',
                         icon: 'outdent',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.strong),
                     }),
                     new DOMinatorMenuButton ({
                         key: 'indent',
                         icon: 'indent',
-                        command: toggleMark(this.editorSchema.marks.strong)
+                        command: toggleMark(this.editorSchema.marks.strong),
                     }),
                     new DOMinatorMenuButton ({
                         key: 'list_ul',
@@ -334,7 +329,62 @@ export default class DOMinatorMenu {
                         command: toggleMark(this.editorSchema.marks.strong)
                     }),
                 ],
-            })
+            }),
+            custom_html: new DOMinatorSubMenu({
+                key: 'custom_html',
+                items: [
+                    new DOMinatorMenuButton ({
+                        key: 'magic',
+                        icon: 'magic',
+                        command: (state, dispatch, view)=>{
+                            dispatch(
+                                state.tr.setBlockType(
+                                    state.selection.from,
+                                    state.selection.to,
+                                    state.selection.node.type,
+                                    { className: 'SomethingNew' }
+                                )
+                            );
+                            // https://prosemirror.net/docs/ref/#transform.Transform.setBlockType
+
+                            console.log(state.selection.node);
+                            console.log(state.selection);
+
+
+                        }
+                    }),
+                ],
+            }),
+            span: new DOMinatorSubMenu({
+                key: 'span',
+                items: [
+                    new DOMinatorMenuButton ({
+                        key: 'magic',
+                        icon: 'magic',
+                        command: (state, dispatch, view)=>{
+
+                            // let { starts, ends } = getMarkRange(state.selection.$cursor, this.activeMark);
+                            let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
+                            console.log(range);
+
+                            // console.log(starts);
+                            // console.log(ends);
+                            // console.log(selection);
+                            // dispatch(
+                            //     state.tr.setBlockType(
+                            //         state.selection.from,
+                            //         state.selection.to,
+                            //         state.selection.node.type,
+                            //         { className: 'SomethingNew' }
+                            //     )
+                            // );
+
+
+
+                        }
+                    }),
+                ],
+            }),
         }
 
         this.dom = document.createElement("div")

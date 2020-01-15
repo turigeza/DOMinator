@@ -12979,6 +12979,23 @@
       return false
   }
 
+  function clearFormatting(marks) {
+
+      return function(state, dispatch) {
+          // let formats = ['i', 'b', 'link', 'u', 'span', 'del', 'sub', 'sup', 'b', 'span', 'code'];
+          let { empty, from, to } = state.selection;
+          if(empty){
+              return false;
+          }
+
+          if (dispatch) {
+              dispatch(state.tr.removeMark(from, to));
+          }
+
+          return true
+      }
+  }
+
   // :: (MarkType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
   // Create a command function that toggles the given mark with the
   // given attributes. Will return `false` when the current selection
@@ -12996,6 +13013,7 @@
           } = state.selection;
           if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
           if (dispatch) {
+              // selection is empty
               if ($cursor) {
                   if (markType.isInSet(state.storedMarks || $cursor.marks()))
                       dispatch(state.tr.removeStoredMark(markType));
@@ -13308,11 +13326,11 @@
       bind("Mod-BracketLeft", lift);
       bind("Escape", selectParentNode);
 
-      if (type = schema.marks.strong) {
+      if (type = schema.marks.b) {
           bind("Mod-b", toggleMark(type));
           bind("Mod-B", toggleMark(type));
       }
-      if (type = schema.marks.em) {
+      if (type = schema.marks.i) {
           bind("Mod-i", toggleMark(type));
           bind("Mod-I", toggleMark(type));
       }
@@ -13622,84 +13640,38 @@
       // element.
       link: {
           attrs: {
-              href: {},
+              href: {
+                  default: ''
+              },
               title: {
                   default: null
-              }
+              },
+              className: {
+                  default: null
+              },
           },
+          excludes: 'span link',
           inclusive: false,
           parseDOM: [{
-              tag: "a[href]",
+              tag: "a", //[href]
               getAttrs(dom) {
                   return {
                       href: dom.getAttribute("href"),
-                      title: dom.getAttribute("title")
+                      title: dom.getAttribute("title"),
+                      'class': dom.getAttribute("class")
                   }
               }
           }],
           toDOM(node) {
-              let {
-                  href,
-                  title
-              } = node.attrs;
-              return ["a", {
-                  href,
-                  title
-              }, 0]
+              return ["a", node.attrs, 0]
           }
       },
 
-      // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-      // Has parse rules that also match `<i>` and `font-style: italic`.
-      em: {
-          parseDOM: [{
-              tag: "i"
-          }, {
-              tag: "em"
-          }, {
-              style: "font-style=italic"
-          }],
-          toDOM() {
-              return ["em", 0];
-          }
-      },
-
-      // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
-      // also match `<b>` and `font-weight: bold`.
-      strong: {
-          parseDOM: [{
-                  tag: "strong"
-              },
-              // This works around a Google Docs misbehavior where
-              // pasted content will be inexplicably wrapped in `<b>`
-              // tags with a font-weight normal.
-              {
-                  tag: "b",
-                  getAttrs: node => node.style.fontWeight != "normal" && null
-              },
-              {
-                  style: "font-weight",
-                  getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
-              }
-          ],
-          toDOM() {
-              return ["strong", 0];
-          }
-      },
-
-      // :: MarkSpec Code font mark. Represented as a `<code>` element.
-      code: {
-          parseDOM: [{
-              tag: "code"
-          }],
-          toDOM() {
-              return ["code", 0];
-          }
-      },
+      // for inline styling
       span: {
           attrs: {
               className: {
-                  default: ''
+                  default: 'text-red'
               }
           },
           parseDOM: [{
@@ -13722,6 +13694,86 @@
               return ["span", attrs, 0];
           }
       },
+      // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
+      // Has parse rules that also match `<i>` and `font-style: italic`.
+      i: {
+          parseDOM: [{
+              tag: "i"
+          }, {
+              tag: "em"
+          }, {
+              style: "font-style=italic"
+          }],
+          toDOM() {
+              return ["i", 0];
+          }
+      },
+
+      // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
+      // also match `<b>` and `font-weight: bold`.
+      b: {
+          parseDOM: [{
+                  tag: "strong"
+              },
+              // This works around a Google Docs misbehavior where
+              // pasted content will be inexplicably wrapped in `<b>`
+              // tags with a font-weight normal.
+              {
+                  tag: "b",
+                  getAttrs: node => node.style.fontWeight != "normal" && null
+              },
+              {
+                  style: "font-weight",
+                  getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+              }
+          ],
+          toDOM() {
+              return ["b", 0];
+          }
+      },
+
+      // :: MarkSpec Code font mark. Represented as a `<code>` element.
+      code: {
+          parseDOM: [{
+              tag: "code"
+          }],
+          toDOM() {
+              return ["code", 0];
+          }
+      },
+      del: {
+          parseDOM: [{
+              tag: "del"
+          }],
+          toDOM() {
+              return ["del", 0];
+          }
+      },
+      u: {
+          parseDOM: [{
+              tag: "u"
+          }],
+          toDOM() {
+              return ["u", 0];
+          }
+      },
+      sub: {
+          parseDOM: [{
+              tag: "sub"
+          }],
+          toDOM() {
+              return ["sub", 0];
+          }
+      },
+      sup: {
+          parseDOM: [{
+              tag: "sup"
+          }],
+          toDOM() {
+              return ["sup", 0];
+          }
+      },
+
   };
 
   // :: Schema
@@ -13965,6 +14017,10 @@
                   newDiv.className = node.attrs.className;
               }
 
+              newDiv.addEventListener("mousedown", event => {
+                  console.log('DANGERDANGERDANGERDANGERDANGERDANGER');
+              });
+
               return newDiv;
 
           }
@@ -13975,7 +14031,7 @@
   class DOMinatorMenuButton {
       // dom
       // options
-      //
+      // view
 
       constructor(options) {
           this.options = options;
@@ -13990,11 +14046,20 @@
                   this.dom.appendChild(icon);
               }
           }
+
+          this.dom.addEventListener('mousedown', event=>this.clicked(event));
       }
 
-      update(){
+      clicked(event){
+          event.preventDefault();
+          this.view.focus();
+          this.options.command(this.view.state, this.view.dispatch, this.view);
+      }
+
+      update(view){
+          this.view = view;
           if(typeof this.options.update === 'function'){
-              this.options.update();
+              this.options.update(view);
           }
       }
 
@@ -14015,22 +14080,36 @@
 
       // dom - the dom element for this submenu
       // options
-
+      // view
+      // val
+      // parent
       constructor(options) {
           this.options = options;
           this.dom = document.createElement("input");
           this.dom.className = "DOMinatorMenuInput DOMinatorMenuInput-"+this.options.key;
-
-
           this.dom.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
-      }
+          this.dom.addEventListener('focus', ()=>{
+              this.val = this.dom.value;
+          });
 
-      update(){
-          this.items.forEach(item=>{
-              if(typeof item.update === 'function'){
-                  item.update();
+          this.dom.addEventListener('blur', ()=>{
+              if(this.val !== this.dom.value){
+                  this.val = this.dom.value;
+                  this.changed();
               }
           });
+      }
+
+      changed(){
+          if(this.options.command){
+              event.preventDefault();
+              this.view.focus();
+              this.options.command(this.val, this.view);
+          }
+      }
+
+      update(view){
+          this.view = view;
       }
 
       setParent(parent){
@@ -14051,6 +14130,8 @@
       // items - the menu items
       // dom - the dom element for this submenu
       // options
+      // view - the current editors view
+
       constructor(options) {
           this.options = options;
           this.items = options.items;
@@ -14063,10 +14144,11 @@
           });
       }
 
-      update(){
+      update(view){
+          this.view = view;
           this.items.forEach(item=>{
               if(typeof item.update === 'function'){
-                  item.update();
+                  item.update(view);
               }
           });
       }
@@ -14075,8 +14157,11 @@
           this.dom.style.display = "none";
       }
 
-      show(){
+      show(view){
           this.dom.style.display = "";
+          if(view){
+              this.update(view);
+          }
       }
 
       getDom(){
@@ -14086,6 +14171,65 @@
       destroy() {
           this.dom.remove();
       }
+  }
+
+  function getMarkRange(ResolvedPos, mark) {
+
+      // console.log('ResolvedPos.parentOffset');
+      // console.log(ResolvedPos.parentOffset);
+      //
+      // console.log('ResolvedPos.textOffset');
+      // console.log(ResolvedPos.textOffset);
+      //
+      // console.log('ResolvedPos.start()');
+      // console.log(ResolvedPos.start());
+      //
+      // console.log('ResolvedPos.end()');
+      // console.log(ResolvedPos.end());
+      //
+      // console.log('ResolvedPos.before()');
+      // console.log(ResolvedPos.before());
+      //
+      // console.log('ResolvedPos.after()');
+      // console.log(ResolvedPos.after());
+
+      // ResolvedPos.parent.childAfter(ResolvedPos.parentOffset)
+
+
+      let parent = ResolvedPos.parent;
+      let index = ResolvedPos.index();
+
+      // ResolvedPos is at the end of parent there are nodes with this index
+      if (parent.content.content.length === index){
+          return false;
+      }
+
+      const child = parent.content.content[index];
+
+      let from = ResolvedPos.start() + ResolvedPos.parentOffset - ResolvedPos.textOffset;
+      let to = from + child.nodeSize;
+
+      // look ahead
+      for (let i = index + 1; i < parent.content.content.length; i++) {
+          let temp = parent.content.content[i];
+          if(mark.isInSet(temp.marks)){
+              to += temp.nodeSize;
+          }else{
+              break;
+          }
+      }
+
+      // look back
+      for (let i = index - 1; i >= 0 ; i--) {
+          let temp = parent.content.content[i];
+          if(mark.isInSet(temp.marks)){
+              from -= temp.nodeSize;
+          }else{
+              break;
+          }
+      }
+
+      return { from, to };
   }
 
   class DOMinatorMenu {
@@ -14099,6 +14243,7 @@
       // leftMenuDom
       // rightMenuDom
       // submenus
+      // activeMark - update sets this to match the menu showing
 
       constructor(dominator, editorView) {
           this.dominator = dominator;
@@ -14132,16 +14277,12 @@
       }
 
       update(view, lastState) {
+          this.activeMark = null;
           if(this.mousedown){
               return;
           }
 
-          let blockName = null;
           if(view){
-              if(!view){
-                  return;
-              }
-
               const selection = view.state.selection;
 
               // make all submenues invisible
@@ -14150,81 +14291,39 @@
               });
 
               if(selection.constructor.name === 'TextSelection'){
-                  // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved
-                  // console.log('Text Selection');
+                  // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
+                  console.log('Text Selection');
+
                   if(selection.empty){
-                      // console.log(selection);
-                      // console.log(selection.$head.parent.type.name);
-                      // console.log(selection.$head.path);
-                      blockName = selection.$head.parent.type.name;
+                      let marks = selection.$cursor.marks();
+                      if(marks.length > 0){
+                          for (var i = 0; i < marks.length; i++) {
+                              let mark = marks[i];
+                              if(this.submenus[mark.type.name]){
+                                  this.submenus[mark.type.name].show(view);
+                                  this.activeMark = mark;
+                                  break;
+                              }
+                          }
+                      }else{
+                          const blockName = selection.$head.parent.type.name;
+                          if(this.submenus[selection.$head.parent.type.name]){
+                              this.submenus[selection.$head.parent.type.name].show(view);
+                          }
+                      }
                   }else{
                       // there is a selection show inline menu
                       this.submenus.inline.show(view);
                   }
-              }else if (selection.constructor.name === 'NodeSelection');
+              }else if (selection.constructor.name === 'NodeSelection'){
+                  if(this.submenus[selection.node.type.name]){
+                      this.submenus[selection.node.type.name].show(view);
+                  }
+              }
           }
-
-          if(blockName){
-              if(this.submenus[blockName]);
-
-          }
-
-          // console.log(JSON.stringify(view.state,  null, 4));
-          // console.log(view.state.selection);
-
-          // node is selected selection type is NodeSelection
-          // if(view.state.selection.node){
-          //     console.log(view.state.selection.constructor.name);
-          // }
-          // if(view){
-          //     console.log(view.state.selection.constructor.name);
-          // }
-
-          // console.log(JSON.stringify(view, null, 4));
-          // view.lastClick
-          // time: 1578571884813
-          // x: 580
-          // y: 297
-          // type: "singleClick"
-
-
-
-          //console.log('update');
-          //console.log(this.editorView);
-          // this.items.forEach(({command, dom}) => {
-          //     // let active = command(this.editorView.state, null, this.editorView);
-          //     // console.log(active);
-          //     // dom.style.display = active ? "" : "none";
-          // })
       }
 
       initMenu(){
-          // this.items = [
-          //     {
-          //         command: toggleMark(this.editorSchema.marks.strong),
-          //         dom: this.icon("B", "strong")
-          //     },
-          //     {
-          //         command: toggleMark(this.editorSchema.marks.em),
-          //         dom: this.icon("i", "em")
-          //     },
-          //     {
-          //         command: setBlockType(this.editorSchema.nodes.paragraph),
-          //         dom: this.icon("p", "paragraph")
-          //     },
-          //     this.heading(1),
-          //     this.heading(2),
-          //     this.heading(3),
-          //     {
-          //         command: wrapIn(this.editorSchema.nodes.blockquote),
-          //         dom: this.icon(">", "blockquote")
-          //     }
-          // ];
-
-          let align_center = { key: 'align_center', icon: 'align-center', command: toggleMark(this.editorSchema.marks.strong) };
-          let align_left = { key: 'align_left', icon: 'align-left', command: toggleMark(this.editorSchema.marks.strong) };
-          let align_right = { key: 'align_right', icon: 'align-right', command: toggleMark(this.editorSchema.marks.strong) };
-
           this.submenus = {
               inline: new DOMinatorSubMenu({
                   key: 'inline',
@@ -14232,51 +14331,73 @@
                       new DOMinatorMenuButton ({
                           key: 'bold',
                           icon: 'bold',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.b)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'italic',
                           icon: 'italic',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.i)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'underline',
                           icon: 'underline',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.u)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'link',
                           icon: 'link',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.link)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'strikethrough',
                           icon: 'strikethrough',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.del)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'subscript',
                           icon: 'subscript',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.sub)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'superscript',
                           icon: 'superscript',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.sup)
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'pencil',
+                          icon: 'pencil',
+                          command: toggleMark(this.editorSchema.marks.span)
                       }),
                       new DOMinatorMenuButton ({
                           key: 'remove_formatting',
                           icon: 'eraser',
-
+                          command: clearFormatting(this.editorSchema.marks)
                       }),
                   ]
               }),
-              a: new DOMinatorSubMenu({
-                  key: 'a',
+              link: new DOMinatorSubMenu({
+                  key: 'link',
                   items: [
                       new DOMinatorMenuInput ({
                           key: 'href',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: (val, view) => {
+                              let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
+
+                              console.log( this.activeMark );
+                              console.log(from);
+                              console.log(to);
+
+                              const attr = { ...{}, ...this.activeMark.type.instance.attrs, href: val };
+
+                              // const hasMark = doc.rangeHasMark(from, to, type)
+                              //
+                              // if (hasMark) {
+                              //   tr.removeMark(from, to, type)
+                              // }
+
+                              view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)));
+                              console.log(val);
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'unlink',
@@ -14316,7 +14437,24 @@
                       new DOMinatorMenuButton ({
                           key: 'link_style_info',
                           icon: 'paint-brush',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: (val, view)=>{
+                              console.log(view);
+                              let { from, to } = getMarkRange(view.state.selection.$cursor, this.activeMark);
+
+                              console.log( this.activeMark );
+                              console.log(from);
+                              console.log(to);
+                              const attr = { ...{}, ...this.activeMark.typeinstance.attrs, href: 'Na most akkor.' };
+                              attr.
+                              view.dispatch(view.state.tr.addMark(from, to, this.activeMark.type.create(attr)));
+
+                              // const selection = TextSelection.create( state.doc, starts, ends);
+                              // view.dispatch(state.tr.setSelection(selection));
+
+                              //let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
+                              //console.log(range);
+
+                          }
                       }),
                   ]
               }),
@@ -14371,12 +14509,12 @@
                       new DOMinatorMenuButton ({
                           key: 'outdent',
                           icon: 'outdent',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.strong),
                       }),
                       new DOMinatorMenuButton ({
                           key: 'indent',
                           icon: 'indent',
-                          command: toggleMark(this.editorSchema.marks.strong)
+                          command: toggleMark(this.editorSchema.marks.strong),
                       }),
                       new DOMinatorMenuButton ({
                           key: 'list_ul',
@@ -14409,7 +14547,62 @@
                           command: toggleMark(this.editorSchema.marks.strong)
                       }),
                   ],
-              })
+              }),
+              custom_html: new DOMinatorSubMenu({
+                  key: 'custom_html',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'magic',
+                          icon: 'magic',
+                          command: (state, dispatch, view)=>{
+                              dispatch(
+                                  state.tr.setBlockType(
+                                      state.selection.from,
+                                      state.selection.to,
+                                      state.selection.node.type,
+                                      { className: 'SomethingNew' }
+                                  )
+                              );
+                              // https://prosemirror.net/docs/ref/#transform.Transform.setBlockType
+
+                              console.log(state.selection.node);
+                              console.log(state.selection);
+
+
+                          }
+                      }),
+                  ],
+              }),
+              span: new DOMinatorSubMenu({
+                  key: 'span',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'magic',
+                          icon: 'magic',
+                          command: (state, dispatch, view)=>{
+
+                              // let { starts, ends } = getMarkRange(state.selection.$cursor, this.activeMark);
+                              let range = getMarkRange(state.selection.$cursor, this.activeMark.type);
+                              console.log(range);
+
+                              // console.log(starts);
+                              // console.log(ends);
+                              // console.log(selection);
+                              // dispatch(
+                              //     state.tr.setBlockType(
+                              //         state.selection.from,
+                              //         state.selection.to,
+                              //         state.selection.node.type,
+                              //         { className: 'SomethingNew' }
+                              //     )
+                              // );
+
+
+
+                          }
+                      }),
+                  ],
+              }),
           };
 
           this.dom = document.createElement("div");
@@ -14447,6 +14640,7 @@
 
           this.dom = document.createElement('div');
           this.dom.innerHTML = node.attrs.html;
+
           if(node.attrs.className){
               this.dom.className = node.attrs.className;
           }
