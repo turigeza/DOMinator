@@ -1,0 +1,174 @@
+/* margin-left: */
+.d-ml-xxs{
+    margin-left: 4px;
+}
+.d-ml-xs{
+    margin-left: 8px;
+}
+.d-ml-s{
+    margin-left: 12px;
+}
+.d-ml-m{
+    margin-left: 16px;
+}
+.d-ml-l{
+    margin-left: 24px;
+}
+.d-ml-xl{
+    margin-left: 32px;
+}
+.d-ml-xxl{
+    margin-left: 64px;
+}
+
+/* margin-right: */
+.d-mr-xxs{
+    margin-right: 4px;
+}
+.d-mr-xs{
+    margin-right: 8px;
+}
+.d-mr-s{
+    margin-right: 12px;
+}
+.d-mr-m{
+    margin-right: 16px;
+}
+.d-mr-l{
+    margin-right: 24px;
+}
+.d-mr-xl{
+    margin-right: 32px;
+}
+.d-mr-xxl{
+    margin-right: 64px;
+}
+
+/* margin-top: */
+.d-mt-xxs{
+    margin-top: 4px;
+}
+.d-mt-xs{
+    margin-top: 8px;
+}
+.d-mt-s{
+    margin-top: 12px;
+}
+.d-mt-m{
+    margin-top: 16px;
+}
+.d-mt-l{
+    margin-top: 24px;
+}
+.d-mt-xl{
+    margin-top: 32px;
+}
+.d-mt-xxl{
+    margin-top: 64px;
+}
+
+/* margin-bottom: */
+.d-mb-xxs{
+    margin-bottom: 4px;
+}
+.d-mb-xs{
+    margin-bottom: 8px;
+}
+.d-mb-s{
+    margin-bottom: 12px;
+}
+.d-mb-m{
+    margin-bottom: 16px;
+}
+.d-mb-l{
+    margin-bottom: 24px;
+}
+.d-mb-xl{
+    margin-bottom: 32px;
+}
+.d-mb-xxl{
+    margin-bottom: 64px;
+}
+
+/* margin-y: */
+.d-my-xxs{
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+.d-my-xs{
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+.d-my-s{
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+.d-my-m{
+    margin-bottom: 16px;
+    margin-top: 16px;
+}
+.d-my-l{
+    margin-bottom: 24px;
+    margin-top: 24px;
+}
+.d-my-xl{
+    margin-bottom: 32px;
+    margin-top: 32px;
+}
+.d-my-xxl{
+    margin-bottom: 64px;
+    margin-top: 64px;
+}
+
+/* margin-x: */
+.d-mx-xxs{
+    margin-left: 4px;
+    margin-right: 4px;
+}
+.d-mx-xs{
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.d-mx-s{
+    margin-left: 12px;
+    margin-right: 12px;
+}
+.d-mx-m{
+    margin-left: 16px;
+    margin-right: 16px;
+}
+.d-mx-l{
+    margin-left: 24px;
+    margin-right: 24px;
+}
+.d-mx-xl{
+    margin-left: 32px;
+    margin-right: 32px;
+}
+.d-mx-xxl{
+    margin-left: 64px;
+    margin-right: 64px;
+}
+
+/* margin-all: */
+.d-ma-xxs{
+    margin: 4px 4px 4px 4px;
+}
+.d-ma-xs{
+    margin: 8px 8px 8px 8px;
+}
+.d-ma-s{
+    margin: 12px 12px 12px 12px;
+}
+.d-ma-m{
+    margin: 16px 16px 16px 16px;
+}
+.d-ma-l{
+    margin: 24px 24px 24px 24px;
+}
+.d-ma-xl{
+    margin: 32px 32px 32px 32px;
+}
+.d-ma-xxl{
+    margin: 64px 64px 64px 64px;
+}

@@ -1,0 +1,304 @@
+@media screen and (max-width: 1400px) {
+    .floating_graphics_bottom{
+        display: none;
+    }
+    #help_page_icon,#print_list {
+        bottom: 65px;
+    }
+}
+/* ipad portrait */
+@media screen and (max-width: 1024px) {
+    #default_header{
+        height: 125px;
+    }
+
+    #default_navigation a{
+        height: 80px;
+        padding-top: 35px;
+        font-size: 12px;
+    }
+    .pot1{
+        width: 78px;
+    }
+
+    .pot2{
+        width: 65px;
+    }
+
+    .pot3{
+        width: 65px;
+    }
+
+    .pot4{
+        width: 63px;
+    }
+
+    #sgs_logo img{
+        width: 220px;
+    }
+    #sgs_logo{
+        margin-top: 12px;
+    }
+    #default_header_inner{
+        width: 768px;
+        height: 120px;
+    }
+    #default_navigation{
+        right: 20px;
+        bottom: 30px;
+    }
+    #opening_text{
+        font-size: 14px;
+    }
+    #main{
+        width: 100%;
+        box-sizing: border-box;
+        padding-left:15px;
+        padding-right:15px;
+        padding-top: 135px;
+    }
+    /* hide stuff */
+    #birds{
+        display: none;
+    }
+
+    #footer_links a {
+        margin-right: 15px;
+        font-size: 14px;
+    }
+    .charity_number{
+        font-size: 10px;
+    }
+    #footer_links{
+        padding-bottom: 0;
+        line-height: 25px;
+    }
+    #footer_links a.legal_link{
+        font-size: 10px;
+    }
+
+}
+
+@media screen and (max-width: 760px) {
+    /* MOBILE */
+    .hide_on_mobile{
+        display: none;
+    }
+    #main{
+        padding: 70px 0 140px 0;
+    }
+    #mobile_header{
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 55px;
+        background-color:#FFBF3F;
+        z-index: 101;
+    }
+    #hamburger_menu{
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 28px;
+    }
+    #mobile_menu{
+        position: fixed;
+        left: 70px;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.9);
+        overflow: auto;
+        z-index: 102;
+    }
+    #print_list{
+        display: none;
+    }
+    #mobile_menu a{
+        display: block;
+        color: white;
+        text-align: left;
+        background-position: left center;
+        font-size: 12px;
+        line-height: 1.8;
+        /* background-color: red; */
+        background-repeat: no-repeat;
+        background-size: contain;
+        margin: 0 0 0 10px;
+        padding-left: 20px;
+    }
+    #mobile_menu a.active{
+        color: #FFBF3F;
+    }
+    #mobile_pots{
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 20px;
+    }
+    #mobile_menu a.pot1,#mobile_menu a.pot2,#mobile_menu a.pot3,#mobile_menu a.pot4{
+        width: auto;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        text-transform: uppercase;
+        font-size: 14px;
+        height: 30px;
+        line-height: 2.5;
+        padding-left: 50px;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+    #mobile_menu_social_links{
+        margin-top: 0px;
+        margin-left: 30px;
+        margin-bottom: 0;
+    }
+    #mobile_menu_social_links a{
+        display: inline-block;
+        font-size: 24px;
+        margin: 0;
+        padding: 5px 10px 0px 0px;
+        line-height: 0
+    }
+    #mobile_menu_footer{
+        /* background-color: #5EA845;
+        background-color: rgba(0,0,0,0.9);
+        */
+        line-height: 0.6;
+        text-align: center;
+    }
+    #mobile_menu .charity_number{
+        font-size: 8px;
+        color: #5EA845;
+    }
+
+    #mobile_menu_exit{
+        position: absolute;
+        top: 0;
+        right: 0;
+        text-align: center;
+        font-size: 24px;
+        color: white;
+        padding: 10px 10px;
+    }
+
+    #default_header{
+        display:none;
+    }
+
+    #sgs_mobile_logo{
+        display: block;
+        position: absolute;
+        left: 15px;
+        top: 12px;
+    }
+
+    #sgs_mobile_logo img{
+        height: 34px;
+    }
+
+    #footer{
+        height: 50px;
+    }
+
+    .width-75, .width-66, .width-50, .width-33{
+        width: 100%;
+        float: none;
+        clear: both;
+    }
+
+     .width-25 {
+        width: 50%;
+    }
+
+    .cl_1,.cl_2,.cl_3,.cl_4,.cl_5,.cl_6,.cl_7,.cl_8,.cl_9,.cl_10,.cl_11,.cl_12{
+        float:none;
+        clear:both;
+        width:100%;
+    }
+
+    #help_page_icon{
+        display: none;
+    }
+
+    #footer_links, #footer_on_off{
+        display: none;
+    }
+
+
+    .tg_subwidget_photograph.pull-right, .tg_subwidget_photograph.pull-left{
+        float: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .layout_12 .carousel_wrapper {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+/* MOBILE ENDS */
+}
+/* iphone 7 and bigger */
+@media screen and (min-width: 370px) {
+    #mobile_menu a{
+        font-size: 16px;
+        line-height: 1.9;
+    }
+    #mobile_menu a.pot1,#mobile_menu a.pot2,#mobile_menu a.pot3,#mobile_menu a.pot4{
+        font-size: 20px;
+        height: 35px;
+        margin-top: 15px;
+        line-height: 2;
+    }
+    #mobile_pots{
+        margin-bottom: 20px;
+    }
+    #mobile_menu_social_links a{
+        font-size: 36px;
+        line-height: 0;
+    }
+
+    #mobile_menu .charity_number{
+        font-size: 10px;
+    }
+
+}
+@media screen and (min-width: 410px) {
+    #mobile_menu a{
+        font-size: 16px;
+        line-height: 2;
+    }
+    #mobile_menu a.pot1,#mobile_menu a.pot2,#mobile_menu a.pot3,#mobile_menu a.pot4{
+        font-size: 20px;
+        height: 35px;
+        margin-top: 15px;
+        line-height: 2;
+    }
+    #mobile_pots{
+        margin-top: 15px;
+        margin-bottom: 50px;
+    }
+    #mobile_menu_social_links a{
+        font-size: 36px;
+        line-height: 1.2;
+    }
+
+    #mobile_menu .charity_number{
+        font-size: 10px;
+
+    }
+}
+
+/* PADDING AND MARGINS zero all */
+.d-pl-xxs, .d-pl-xs, .d-pl-s, .d-pl-m, .d-pl-l, .d-pl-xl, .d-pl-xxl, .d-pr-xxs, .d-pr-xs, .d-pr-s, .d-pr-m, .d-pr-l, .d-pr-xl, .d-pr-xxl, .d-pt-xxs, .d-pt-xs, .d-pt-s, .d-pt-m, .d-pt-l, .d-pt-xl,
+.d-pt-xxl, .d-pb-xxs, .d-pb-xs, .d-pb-s, .d-pb-m, .d-pb-l, .d-pb-xl, .d-pb-xxl, .d-px-xxs, .d-px-xs, .d-px-s, .d-px-m, .d-px-l, .d-px-xl, .d-px-xxl, .d-py-xxs, .d-py-xs, .d-py-s, .d-py-m, .d-py-l,
+.d-py-xl, .d-py-xxl, .d-pa-xxs, .d-pa-xs, .d-pa-s, .d-pa-m, .d-pa-l, .d-pa-xl, .d-pa-xxl{
+    padding: 0;
+}
+
+.d-ml-xxs, .d-ml-xs, .d-ml-s, .d-ml-m, .d-ml-l, .d-ml-xl, .d-ml-xxl, .d-mr-xxs, .d-mr-xs, .d-mr-s, .d-mr-m, .d-mr-l, .d-mr-xl, .d-mr-xxl, .d-mt-xxs, .d-mt-xs, .d-mt-s, .d-mt-m, .d-mt-l, .d-mt-xl,
+.d-mt-xxl, .d-mb-xxs, .d-mb-xs, .d-mb-s, .d-mb-m, .d-mb-l, .d-mb-xl, .d-mb-xxl, .d-mx-xxs, .d-mx-xs, .d-mx-s, .d-mx-m, .d-mx-l, .d-mx-xl, .d-mx-xxl, .d-my-xxs, .d-my-xs, .d-my-s, .d-my-m, .d-my-l,
+.d-my-xl, .d-my-xxl, .d-ma-xxs, .d-ma-xs, .d-ma-s, .d-ma-m, .d-ma-l, .d-ma-xl, .d-ma-xxl{
+    margin: 0;
+}

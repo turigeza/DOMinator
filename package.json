@@ -17,13 +17,15 @@
         "url": "git://github.com/turigeza/DOMinator.git"
     },
     "dependencies": {
-        "prosemirror-keymap": "^1.0.0",
-        "prosemirror-schema-list": "^1.0.0",
         "prosemirror-dropcursor": "^1.0.0",
         "prosemirror-gapcursor": "^1.0.0",
         "prosemirror-history": "^1.0.0",
         "prosemirror-inputrules": "^1.0.0",
-        "prosemirror-state": "^1.0.0"
+        "prosemirror-keymap": "^1.0.0",
+        "prosemirror-schema-list": "^1.0.0",
+        "prosemirror-state": "^1.0.0",
+        "prosemirror-tables": "^1.0.0",
+        "prosemirror-utils": "^0.9.6"
     },
     "devDependencies": {
         "rollup": "^1.26.3",

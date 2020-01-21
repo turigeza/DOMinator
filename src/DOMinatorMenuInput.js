@@ -2,7 +2,7 @@ export default class DOMinatorMenuInput {
 
     // dom - the dom element for this submenu
     // options
-    // view
+    // menu
     // val
     // parent
     constructor(options) {
@@ -22,18 +22,23 @@ export default class DOMinatorMenuInput {
         });
     }
 
+    setValue(val){
+        this.dom.value = val;
+        this.val = val;
+    }
+
     changed(){
-        if(this.options.command){
+        if(this.options.action){
             event.preventDefault();
-            this.view.focus();
-            this.options.command(this.val, this.view);
+            this.menu.view.focus();
+            this.options.action(this.val, this);
         }
     }
 
-    update(view, menu){
-        this.view = view
+    update(menu){
+        this.menu = menu
         if(typeof this.options.update === 'function'){
-            this.options.update(view, menu);
+            this.options.update(this, menu);
         }
     }
 

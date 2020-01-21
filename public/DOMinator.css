@@ -10,7 +10,50 @@
     border-bottom: 2px solid #eee;
     box-shadow: 0 5px 10px -5px rgba(0,0,0,0.1);;
     height: 45px;
-    overflow-y: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+.DOMinatorMenu> * {
+
+}
+.DOMinatorMenu div{
+    box-sizing: border-box;
+}
+
+.DOMinatorMenuRight{
+    /* border: 1px solid red; */
+    text-align: right;
+}
+.DOMinatorMenuLeft{
+    /* border: 1px solid green; */
+    flex-grow: 1;
+    /* flex-grow: 0; */
+}
+.DOMinatorMenuSeparator{
+    background-color: #eee;
+    padding: 12px 1px;
+}
+.DOMinatorDropDown-menu .DOMinatorDropDownContainer{
+    left: auto;
+    right: 0;
+}
+.DOMinatorMenuButton.DOMinatorMenuButton-menu{
+    padding: 0 20px 0 15px;
+}
+.DOMinatorMenuButton{
+    white-space: nowrap;
+}
+.DOMinatorMenuButtonLabel{
+    font-size: 16px;
+}
+
+.DOMinatorMenuButton.labelAndIcon .DOMinatorMenuButtonLabel{
+    white-space: nowrap;
+    margin: 0 10px 0 15px;
+}
+.DOMinatorMenuButton.labelAndIcon .fa{
+    min-width: 25px;
 }
 
 body.dominatorMenuActive{
@@ -21,6 +64,14 @@ body.dominatorMenuActive{
     outline: none;
     outline-offset: -1px;
     display: flex;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.DOMinatorSubMenu-right{
+    justify-content: flex-end;
 }
 .DOMinatorMenuButton{
     pointer-events: all;
@@ -30,6 +81,7 @@ body.dominatorMenuActive{
     margin: 0;
     width: auto;
     overflow: visible;
+    position: relative;
 
     text-align: center;
     font: inherit;
@@ -44,30 +96,92 @@ body.dominatorMenuActive{
     background-color: white;
     cursor: pointer;
     color: #222;
-
+    display: flex;
+    align-items: center;
+    transition: 0.4s;
+}
+.DOMinatorDropDownCaret{
+    font-size: 12px;
+    margin-left: 5px;
 }
 .DOMinatorMenuButton:active, .DOMinatorMenuButton:hover, .DOMinatorMenuButton.button-active{
     color: #009CDE;
     background-color: #eee;
 }
+.DOMinatorMenuButton.button-disabled{
+    opacity: 0.2;
+}
 
-.DOMinatorMenuButton-link_style_default, .DOMinatorMenuButton-link_style_default:active{
+.DOMinatorMenuButton-link_style_default{
     color: #999;
 }
-.DOMinatorMenuButton-link_style_warning, .DOMinatorMenuButton-link_style_warning:active{
+.DOMinatorMenuButton-link_style_warning{
     color: #ff7518;
 }
-.DOMinatorMenuButton-link_style_danger, .DOMinatorMenuButton-link_style_danger:active{
+.DOMinatorMenuButton-link_style_danger{
     color: #b1000b;
 }
-.DOMinatorMenuButton-link_style_primary, .DOMinatorMenuButton-link_style_primary:active{
+.DOMinatorMenuButton-link_style_primary{
     color: #009CDE;
 }
-.DOMinatorMenuButton-link_style_success, .DOMinatorMenuButton-link_style_success:active{
+.DOMinatorMenuButton-link_style_success{
     color: #509E2F;
 }
-.DOMinatorMenuButton-link_style_info, .DOMinatorMenuButton-link_style_info:active{
+.DOMinatorMenuButton-link_style_info{
     color: #5936e0;
+}
+
+.DOMinatorMenuButton-link_style_default:active, .DOMinatorMenuButton-link_style_default.button-active{
+    color: white;
+    background-color: #999;
+}
+.DOMinatorMenuButton-link_style_warning:active, .DOMinatorMenuButton-link_style_warning.button-active{
+    color: white;
+    background-color: #ff7518;
+}
+.DOMinatorMenuButton-link_style_danger:active, .DOMinatorMenuButton-link_style_danger.button-active{
+    color: white;
+    background-color: #b1000b;
+}
+.DOMinatorMenuButton-link_style_primary:active, .DOMinatorMenuButton-link_style_primary.button-active{
+    color: white;
+    background-color: #009CDE;
+}
+.DOMinatorMenuButton-link_style_success:active, .DOMinatorMenuButton-link_style_success.button-active{
+    color: white;
+    background-color: #509E2F;
+}
+.DOMinatorMenuButton-link_style_info:active, .DOMinatorMenuButton-link_style_info.button-active{
+    color: white;
+    background-color: #5936e0;
+}
+
+.DOMinatorDropDown{
+    position: relative;
+    /* align-items: flex-start;
+    letter-spacing: normal;
+    text-align: center;
+    word-spacing:0px;
+    text-indent:0px;
+    text-rendering:auto;
+    text-shadow:none;
+    text-transform: none;
+    vertical-align: middle; */
+}
+.DOMinatorDropDownContainer{
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    /* border: 1px solid #eee; */
+}
+.DOMinatorButtonWithCaret{
+    padding-right: 7px;
 }
 .DOMinatorMenuInput{
     /* resets */
@@ -87,6 +201,7 @@ body.dominatorMenuActive{
     box-sizing: border-box;
     border: none;
     border-collapse: collapse;
+    border-radius: 0;
 
     padding: 0;
     height: 45px;
@@ -111,4 +226,11 @@ body.dominatorMenuActive{
 }
 .DOMinatorMenuInput:-moz-placeholder { /* Firefox 18- */
   color: #bbb;
+}
+
+.DOMinatorMenuLabel{
+    /* font-weight: bold; */
+    font-size: 14px;
+    padding-left: 13px;
+    line-height: 24px;
 }

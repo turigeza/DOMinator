@@ -3,7 +3,7 @@ export default class DOMinatorSubMenu {
     // items - the menu items
     // dom - the dom element for this submenu
     // options
-    // view - the current editors view
+    // menu - the menu
 
     constructor(options) {
         this.options = options;
@@ -17,12 +17,10 @@ export default class DOMinatorSubMenu {
         });
     }
 
-    update(view, menu){
-        this.view = view;
+    update(menu){
+        this.menu = menu;
         this.items.forEach(item=>{
-            if(typeof item.update === 'function'){
-                item.update(view, menu);
-            }
+            item.update(menu);
         });
     }
 
@@ -30,10 +28,10 @@ export default class DOMinatorSubMenu {
         this.dom.style.display = "none";
     }
 
-    show(view, menu){
+    show(menu){
         this.dom.style.display = "";
-        if(view){
-            this.update(view, menu);
+        if(menu){
+            this.update(menu);
         }
     }
 

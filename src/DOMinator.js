@@ -7,12 +7,14 @@ import {history} from "prosemirror-history"
 import {dropCursor} from "prosemirror-dropcursor"
 import {gapCursor} from "prosemirror-gapcursor"
 
-import {baseKeymap} from "./DOMinatorCommands"
+import {baseKeymap} from "./prosemirrorcommands"
 import {buildKeymap} from "./DOMinatorKeymap"
 import {buildInputRules} from "./DOMinatrorInputrules"
 import {schema} from "./DOMinatorSchemaBasic"
 import schemaDominator from "./DOMinatorSchemaExtended"
 import DOMinatorMenu from "./DOMinatorMenu"
+
+import {paddingClasses, marginClasses} from "./DOMinatorPaddingsAndMargins"
 
 // node views
 import DOMinatorCustomHtmlView from "./DOMinatorCustomHtmlView"
@@ -23,9 +25,24 @@ window.DOMinator = class DOMinator {
     // menuItems
 
     constructor(options) {
+        const implementMessage = () => alert('It is up to you to implement this.');
+
         // init options
         const defaults = {
-            container: ''
+            container: '',
+
+            // DOMinator hands over the ui which don't want to take care of. These are callback functions.
+            pageSettings: implementMessage,     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
+            showRevisions: implementMessage,    // the ui for selecting revisions saving them naming them making them live shedule delete them etc
+            shedule: implementMessage,          // the ui for saving and sheduling this revision
+            newPage: implementMessage,          // the ui for screating a new page
+            goLive: implementMessage,           // the ui for going live and saving a revision
+            exit: implementMessage,             // the ui for going live and saving a revision
+            photo: implementMessage,             // the ui for going live and saving a revision
+
+            paddingClasses: paddingClasses,
+            marginClasses: marginClasses,
+
         };
 
         this.options = {

@@ -1,3 +1,4 @@
+// temporarely copied here until we figure if we have to mod it at all
 import {
     joinPoint,
     canJoin,
@@ -19,7 +20,6 @@ import {
 
 // :: (EditorState, ?(tr: Transaction)) → bool
 // Delete the selection, if there is one.
-
 export function deleteSelection(state, dispatch) {
     if (state.selection.empty) return false
     if (dispatch) dispatch(state.tr.deleteSelection().scrollIntoView())
@@ -496,34 +496,23 @@ export function wrapIn(nodeType, attrs) {
 // given node type with the given attributes.
 export function setBlockType(nodeType, attrs) {
     return function(state, dispatch) {
-        if(!nodeType){
-            console.trace();
-            throw('nodeType missing');
-        }
-
-        let { from, to } = state.selection
+        let {
+            from,
+            to
+        } = state.selection
         let applicable = false
-
         state.doc.nodesBetween(from, to, (node, pos) => {
-            if (applicable) {
-                return false;
-            }
-            if (!node.isTextblock || node.hasMarkup(nodeType, attrs)) {
-                return;
-            }
-
+            if (applicable) return false
+            if (!node.isTextblock || node.hasMarkup(nodeType, attrs)) return
             if (node.type == nodeType) {
-                applicable = true;
+                applicable = true
             } else {
-                let $pos = state.doc.resolve(pos);
-                let index = $pos.index();
+                let $pos = state.doc.resolve(pos),
+                    index = $pos.index()
                 applicable = $pos.parent.canReplaceWith(index, index + 1, nodeType)
             }
         })
-        if (!applicable) {
-            return false
-        }
-
+        if (!applicable) return false
         if (dispatch) dispatch(state.tr.setBlockType(from, to, nodeType, attrs).scrollIntoView())
         return true
     }
@@ -545,23 +534,6 @@ function markApplies(doc, ranges, type) {
     return false
 }
 
-export function clearFormatting(marks) {
-
-    return function(state, dispatch) {
-        // let formats = ['i', 'b', 'link', 'u', 'span', 'del', 'sub', 'sup', 'b', 'span', 'code'];
-        let { empty, from, to } = state.selection;
-        if(empty){
-            return false;
-        }
-
-        if (dispatch) {
-            dispatch(state.tr.removeMark(from, to));
-        }
-
-        return true
-    }
-}
-
 // :: (MarkType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
 // Create a command function that toggles the given mark with the
 // given attributes. Will return `false` when the current selection
@@ -579,7 +551,6 @@ export function toggleMark(markType, attrs) {
         } = state.selection
         if ((empty && !$cursor) || !markApplies(state.doc, ranges, markType)) return false
         if (dispatch) {
-            // selection is empty
             if ($cursor) {
                 if (markType.isInSet(state.storedMarks || $cursor.marks()))
                     dispatch(state.tr.removeStoredMark(markType))

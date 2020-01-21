@@ -1,14 +1,16 @@
 /* align the editor content with the original text to see what the editor changes because it should not change anything ! : ) */
-body{
-    padding: 10px;
+#main_wrapper{
+    padding: 10px  40px;
 }
+
 #editor, #content{
     padding: 5px 20px 20px 20px;
+    padding: 0;
     width: 100%;
 }
 #editor{
     /* background-color: LightSeaGreen; */
-    border: 2px solid LightSeaGreen;
+    /* border: 2px solid LightSeaGreen; */
     float: left;
 }
 #content{

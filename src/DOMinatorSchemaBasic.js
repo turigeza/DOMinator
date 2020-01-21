@@ -16,29 +16,20 @@ export const nodes = {
         content: "inline*",
         group: "block",
         attrs: {
-            className: {
-                default: ''
+            class: {
+                default: null
             }
         },
         parseDOM: [{
             tag: "p",
             getAttrs: dom => {
                 let attrs = {};
-
-                // class
-                if(dom.className){
-                    attrs.className = dom.className;
-                }
+                attrs.class = dom.getAttribute("class");
                 return attrs;
             }
         }],
         toDOM(node) {
-            let attrs = {};
-            if(node.attrs.className !== ''){
-                attrs.class = node.attrs.className;
-            }
-            return ["p", attrs, 0];
-
+            return ["p", node.attrs, 0];
         }
     },
 
@@ -46,12 +37,13 @@ export const nodes = {
     blockquote: {
         content: "block+",
         group: "block",
+        excludes: '',
         defining: true,
         parseDOM: [{
             tag: "blockquote"
         }],
         toDOM() {
-            return ["blockquote", 0];
+            return ["blockquote", {}, 0];
         }
     },
 
@@ -74,8 +66,8 @@ export const nodes = {
             level: {
                 default: 1
             },
-            className: {
-                default: ''
+            'class': {
+                default: null
             }
         },
         content: "inline*",
@@ -103,18 +95,14 @@ export const nodes = {
                     console.error('No way ! ' + dom.nodeName);
                 }
 
-                // class
-                if(dom.className){
-                    attrs.className = dom.className;
-                }
-
+                attrs.class = dom.getAttribute("class") || null;
                 return attrs;
             }
         }],
         toDOM(node) {
             let attrs = {};
-            if(node.attrs.className !== ''){
-                attrs.class = node.attrs.className;
+            if(node.attrs.class !== ''){
+                attrs.class = node.attrs.class;
             }
             return ["h" + node.attrs.level, attrs, 0]
         }
@@ -210,19 +198,25 @@ export const marks = {
             title: {
                 default: null
             },
+            target: {
+                default: null
+            },
             'class': {
                 default: null
             },
+
         },
         excludes: 'span link',
         inclusive: false,
         parseDOM: [{
             tag: "a", //[href]
             getAttrs(dom) {
+
                 return {
                     href: dom.getAttribute("href"),
                     title: dom.getAttribute("title"),
-                    'class': dom.getAttribute("class")
+                    target:  dom.getAttribute("target"),
+                    'class': dom.getAttribute("class"),
                 }
             }
         }],
@@ -234,28 +228,20 @@ export const marks = {
     // for inline styling
     span: {
         attrs: {
-            className: {
-                default: 'text-red'
+            'class': {
+                default: null
             }
         },
         parseDOM: [{
             tag: "span",
             getAttrs: dom => {
                 let attrs = {};
-
-                // class
-                if(dom.className){
-                    attrs.className = dom.className;
-                }
+                attrs.class = dom.getAttribute("class") || null;
                 return attrs;
             }
         }],
         toDOM(node) {
-            let attrs = {};
-            if(node.attrs.className !== ''){
-                attrs.class = node.attrs.className;
-            }
-            return ["span", attrs, 0];
+            return ["span", node.attrs, 0];
         }
     },
     // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
@@ -325,6 +311,7 @@ export const marks = {
         parseDOM: [{
             tag: "sub"
         }],
+        excludes: 'sub sup',
         toDOM() {
             return ["sub", 0];
         }
@@ -333,6 +320,7 @@ export const marks = {
         parseDOM: [{
             tag: "sup"
         }],
+        excludes: 'sub sup',
         toDOM() {
             return ["sup", 0];
         }
