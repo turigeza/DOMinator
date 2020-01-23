@@ -42,6 +42,12 @@ window.DOMinator = class DOMinator {
 
             paddingClasses: paddingClasses,
             marginClasses: marginClasses,
+            textAlignClasses: {
+                left: 'text-left',
+                right: 'text-right',
+                center: 'text-center',
+                // justify: 'text-justify',
+            }
 
         };
 

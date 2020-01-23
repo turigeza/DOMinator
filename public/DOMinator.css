@@ -33,6 +33,7 @@
 .DOMinatorMenuSeparator{
     background-color: #eee;
     padding: 12px 1px;
+    margin: 0 5px;
 }
 .DOMinatorDropDown-menu .DOMinatorDropDownContainer{
     left: auto;
@@ -232,5 +233,8 @@ body.dominatorMenuActive{
     /* font-weight: bold; */
     font-size: 14px;
     padding-left: 13px;
+    padding-right: 6px;
     line-height: 24px;
+    /* background-color: #eee; */
+    /* height: 40px; */
 }

@@ -1,10 +1,12 @@
-// import {
-//     normalizePaddingMargin
-// } from "./../DOMinatorActions"
+import {
+    alignSelection
+} from "./../DOMinatorActions"
 
 import DOMinatorMenuButton from "./../DOMinatorMenuButton"
 import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
+import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
+import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
     convertBlock,
     toggleList,
@@ -17,6 +19,10 @@ export default function(menu) {
     return new DOMinatorSubMenu({
         key: 'paragraph',
         items: [
+            new DOMinatorMenuLabel({
+                label: 'Paragraph'
+            }),
+            new DOMinatorMenuSeparator (),
             new DOMinatorMenuButton ({
                 key: 'paragraph',
                 icon: 'paragraph',
@@ -70,6 +76,13 @@ export default function(menu) {
                     }),
                 ]
             }),
+            new DOMinatorMenuButton ({
+                key: 'align left',
+                icon: 'align-left',
+                action: (button) => {
+                    alignSelection(menu.view, 'text-right');
+                }
+            }),
             new DOMinatorMenuDropdown ({
                 key: 'alignment',
                 icon: 'align-left',
@@ -77,22 +90,22 @@ export default function(menu) {
                     new DOMinatorMenuButton ({
                         key: 'align left',
                         icon: 'align-left',
-                        action: () => {
-
+                        action: (button) => {
+                            alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
                         }
                     }),
                     new DOMinatorMenuButton ({
                         key: 'align center',
                         icon: 'align-center',
                         action: () => {
-
+                            alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
                         }
                     }),
                     new DOMinatorMenuButton ({
                         key: 'align right',
                         icon: 'align-right',
                         action: () => {
-
+                            alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                         }
                     }),
                 ]
@@ -193,6 +206,11 @@ export default function(menu) {
                         key: '2 columns',
                         icon: 'twocolumns',
                         iconType: 'dics'
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: '1 column',
+                        icon: 'onecolumn',
+                        iconType: 'dics'
                     })
                 ]
             }),
@@ -218,17 +236,50 @@ export default function(menu) {
                 }
             }),
             new DOMinatorMenuButton ({
-                key: 'padding and margin',
-                icon: 'paddingmargin',
+                key: 'paddings',
+                icon: 'padding',
                 iconType: 'dics',
                 action: (button) => {
-                    menu.activateSubmenu('paddingmargin');
+                    menu.activateSubmenu('paddings');
                 },
                 update(button, menu,){
                     if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
                         button.disable();
+                        button.deactivate();
                     }else{
                         button.enable();
+                        button.deactivate();
+                        if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
+                            button.activate();
+                            return true;
+                        }else{
+                            return false;
+                        }
+
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'margins',
+                icon: 'margin',
+                iconType: 'dics',
+                action: (button) => {
+                    menu.activateSubmenu('margins');
+                },
+                update(button, menu,){
+                    if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                        button.disable();
+                        button.deactivate();
+                    }else{
+                        button.enable();
+                        button.deactivate();
+                        if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                            button.activate();
+                            return true;
+                        }else{
+                            return false;
+                        }
+
                     }
                 }
             }),

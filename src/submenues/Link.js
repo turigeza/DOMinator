@@ -2,6 +2,8 @@ import DOMinatorMenuButton from "./../DOMinatorMenuButton"
 // import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 import DOMinatorMenuInput from "./../DOMinatorMenuInput"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
+import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
+import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
     clearFormatting,
     changeAttributeOnMark,
@@ -15,6 +17,10 @@ export default function(menu) {
     return new DOMinatorSubMenu({
         key: 'link',
         items: [
+            new DOMinatorMenuLabel({
+                label: 'Link'
+            }),
+            new DOMinatorMenuSeparator (),
             new DOMinatorMenuInput ({
                 update: (input) => {
                     input.setValue(menu.activeMark.attrs.href);

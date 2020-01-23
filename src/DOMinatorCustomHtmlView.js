@@ -14,8 +14,8 @@ export default class DOMinatorCustomHtmlView {
         this.dom = document.createElement('div');
         this.dom.innerHTML = node.attrs.html;
 
-        if(node.attrs.className){
-            this.dom.className = node.attrs.className;
+        if(node.attrs.class){
+            this.dom.setAttribute("class", node.attrs.class);
         }
 
         this.dom.addEventListener("mousedown", event => {

@@ -11,7 +11,7 @@ import DOMinatorMenuSeparator from "./DOMinatorMenuSeparator"
 import DOMinatorMenuLabel from "./DOMinatorMenuLabel"
 
 // submenues
-import smPaddingMargin from "./submenues/PaddingMargin"
+import { paddings as smPaddings, margins as smMargins} from "./submenues/PaddingMargin"
 import smParagraph from "./submenues/Paragraph"
 import smInline from "./submenues/Inline"
 import smLink from "./submenues/Link"
@@ -96,11 +96,6 @@ export default class DOMinatorMenu {
         this.activeMark = null;
         this.activeBlock = null;
 
-        // make all submenues invisible
-        // Object.keys(this.submenus).forEach(key=>{
-        //     this.submenus[key].hide();
-        // });
-
         let activeSubmenuKey = '';
 
         if(view){
@@ -133,6 +128,10 @@ export default class DOMinatorMenu {
                 }
 
                 this.activeBlock = selection.node;
+            }else if(selection.constructor.name === 'AllSelection'){
+                activeSubmenuKey = 'inline';
+            }else{
+                console.error('Uknown selection !');
             }
         }
 
@@ -144,7 +143,6 @@ export default class DOMinatorMenu {
         if(this.stayOnMenu && this.activeSubmenuKey){
             this.stayOnMenu = false;
             this.submenus[this.activeSubmenuKey].update(this);
-            console.log('false');
         }else{
             this.activeSubmenuKey = activeSubmenuKey;
             this.activateSubmenu(this.activeSubmenuKey);
@@ -166,6 +164,7 @@ export default class DOMinatorMenu {
 
         // this also calls the update method on each element
         this.submenus[key].show(this);
+        this.activeSubmenuKey = key;
     }
 
     initMenu(){
@@ -175,10 +174,15 @@ export default class DOMinatorMenu {
             link: smLink(this),
             paragraph: smParagraph(this),
             heading: smHeading(this),
-            paddingmargin: smPaddingMargin(this),
+            paddings: smPaddings(this),
+            margins: smMargins(this),
             custom_html: new DOMinatorSubMenu({
                 key: 'custom_html',
                 items: [
+                    new DOMinatorMenuLabel({
+                        label: 'Custom HTML'
+                    }),
+                    new DOMinatorMenuSeparator (),
                     new DOMinatorMenuButton ({
                         key: 'magic',
                         icon: 'magic',
@@ -191,6 +195,10 @@ export default class DOMinatorMenu {
             span: new DOMinatorSubMenu({
                 key: 'span',
                 items: [
+                    new DOMinatorMenuLabel({
+                        label: 'Style'
+                    }),
+                    new DOMinatorMenuSeparator (),
                     new DOMinatorMenuButton ({
                         key: 'magic',
                         icon: 'magic',

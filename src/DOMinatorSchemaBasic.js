@@ -15,6 +15,7 @@ export const nodes = {
     paragraph: {
         content: "inline*",
         group: "block",
+        canTakeAligment: true,
         attrs: {
             class: {
                 default: null
@@ -235,9 +236,9 @@ export const marks = {
         parseDOM: [{
             tag: "span",
             getAttrs: dom => {
-                let attrs = {};
-                attrs.class = dom.getAttribute("class") || null;
-                return attrs;
+                return {
+                    'class':  dom.getAttribute("class") || null
+                }
             }
         }],
         toDOM(node) {

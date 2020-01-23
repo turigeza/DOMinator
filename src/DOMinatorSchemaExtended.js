@@ -202,8 +202,8 @@ export default {
         draggable: false, // does not work for some reason
         // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
-            className: {
-                default: ''
+            class: {
+                default: null
             },
             html: {
                 default: ''
@@ -212,9 +212,10 @@ export default {
         parseDOM: [{
             tag: 'div',
             getAttrs: dom => {
+                // console.log(dom.getAttribute("class"));
                 // let attributes = Array.prototype.slice.call(dom.attributes);
                 return {
-                    className: dom.className,
+                    'class': dom.getAttribute("class"),
                     html: dom.innerHTML
                 };
             }
@@ -222,13 +223,10 @@ export default {
         toDOM(node) {
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
-            if(node.attrs.className){
-                newDiv.className = node.attrs.className;
+            console.log(node.attrs.class);
+            if(node.attrs){
+                newDiv.setAttribute('class', node.attrs.class);
             }
-
-            newDiv.addEventListener("mousedown", event => {
-                console.log('DANGERDANGERDANGERDANGERDANGERDANGER');
-            });
 
             return newDiv;
 

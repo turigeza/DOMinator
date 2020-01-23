@@ -32,6 +32,15 @@ div,p,h1{
     margin-top: 0;
     /* box-sizing: border-box; */
 }
+.text-left{
+    text-align: left;
+}
+.text-center{
+    text-align: center;
+}
+.text-right{
+    text-align: right;
+}
 .hidden{
     display: none;
 }
@@ -110,7 +119,6 @@ input{
 .cl_12 h1:first-child,.cl_12 h2:first-child,.cl_12 h3:first-child,.cl_12 h4:first-child,.cl_12 h5:first-child,.cl_12 h6:first-child
 {
     margin-top: 0;
-
 }
 .layout{
     overflow-y: auto;

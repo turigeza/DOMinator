@@ -1,15 +1,22 @@
 import DOMinatorMenuButton from "./../DOMinatorMenuButton"
-// import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
+import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
+import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
+import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
     toggleMark,
-    clearFormatting
+    clearFormatting,
+    alignSelection
 } from "./../DOMinatorActions"
 
 export default function(menu) {
     return new DOMinatorSubMenu({
         key: 'inline',
         items: [
+            new DOMinatorMenuLabel({
+                label: 'Selection'
+            }),
+            new DOMinatorMenuSeparator (),
             new DOMinatorMenuButton ({
                 key: 'bold',
                 icon: 'bold',
@@ -66,6 +73,33 @@ export default function(menu) {
             //         toggleMark(menu, menu.editorSchema.marks.del);
             //     }
             // }),
+            new DOMinatorMenuDropdown ({
+                key: 'alignment',
+                icon: 'align-left',
+                items: [
+                    new DOMinatorMenuButton ({
+                        key: 'align left',
+                        icon: 'align-left',
+                        action: (button) => {
+                            alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'align center',
+                        icon: 'align-center',
+                        action: () => {
+                            alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'align right',
+                        icon: 'align-right',
+                        action: () => {
+                            alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                ]
+            }),
             new DOMinatorMenuButton ({
                 key: 'remove_formatting',
                 icon: 'eraser',

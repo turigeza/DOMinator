@@ -56,6 +56,7 @@ function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
             key: 'clear',
             icon: 'eraser',
             action: () => {
+                menu.stayOnMenu = true;
                 normalizePaddingMargin(menu, paddingOrMargin, classKey);
             }
         })
@@ -92,31 +93,42 @@ function generateDropdowns(paddingOrMargin, menu){
     return items;
 }
 
-export default function(menu) {
+export function paddings(menu) {
 
     return new DOMinatorSubMenu({
-        key: 'paddingmargin',
-        icon: 'padding and margin',
+        key: 'paddings',
         items: [
             new DOMinatorMenuLabel({
-                label: 'Padding: '
+                label: 'Paddings: '
             }),
             ...generateDropdowns('padding', menu),
             new DOMinatorMenuButton({
                 key: 'clear all paddings',
                 icon: 'eraser',
                 action: () => {
+                    menu.stayOnMenu = true;
                     normalizePaddingMargin(menu, 'padding');
                 }
-            }),
+            })
+        ]
+    });
+
+}
+
+export function margins(menu) {
+
+    return new DOMinatorSubMenu({
+        key: 'margins',
+        items: [
             new DOMinatorMenuLabel({
-                label: 'Margin: '
+                label: 'Margins: '
             }),
             ...generateDropdowns('margin', menu),
             new DOMinatorMenuButton({
                 key: 'clear all margins',
                 icon: 'eraser',
                 action: () => {
+                    menu.stayOnMenu = true;
                     normalizePaddingMargin(menu, 'margin');
                 }
             }),

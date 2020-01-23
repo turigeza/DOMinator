@@ -13453,6 +13453,7 @@
       paragraph: {
           content: "inline*",
           group: "block",
+          canTakeAligment: true,
           attrs: {
               class: {
                   default: null
@@ -13673,9 +13674,9 @@
           parseDOM: [{
               tag: "span",
               getAttrs: dom => {
-                  let attrs = {};
-                  attrs.class = dom.getAttribute("class") || null;
-                  return attrs;
+                  return {
+                      'class':  dom.getAttribute("class") || null
+                  }
               }
           }],
           toDOM(node) {
@@ -13983,8 +13984,8 @@
           draggable: false, // does not work for some reason
           // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
-              className: {
-                  default: ''
+              class: {
+                  default: null
               },
               html: {
                   default: ''
@@ -13993,9 +13994,10 @@
           parseDOM: [{
               tag: 'div',
               getAttrs: dom => {
+                  // console.log(dom.getAttribute("class"));
                   // let attributes = Array.prototype.slice.call(dom.attributes);
                   return {
-                      className: dom.className,
+                      'class': dom.getAttribute("class"),
                       html: dom.innerHTML
                   };
               }
@@ -14003,13 +14005,10 @@
           toDOM(node) {
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
-              if(node.attrs.className){
-                  newDiv.className = node.attrs.className;
+              console.log(node.attrs.class);
+              if(node.attrs){
+                  newDiv.setAttribute('class', node.attrs.class);
               }
-
-              newDiv.addEventListener("mousedown", event => {
-                  console.log('DANGERDANGERDANGERDANGERDANGERDANGER');
-              });
 
               return newDiv;
 
@@ -19035,9 +19034,33 @@
       return node.node.hasMarkup(type, attrs)
   }
 
-  // comes from tiptap
-  function isList(node, schema) {
-      return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
+  function alignSelection(view, classKey, classes){
+      const selection = view.state.selection;
+
+      view.state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+
+          if(!classes[classKey]){
+              console.error(classes);
+              throw 'Class does not exist with a key: '+classKey;
+          }
+
+          if(node.type.spec.canTakeAligment){
+              // remove alignment classes
+              let className = '';
+              if(node.attrs.class){
+                  className = node.attrs.class;
+                  Object.keys(classes).forEach(key =>{
+                      className = className.replace(classes[key], '');
+                  });
+              }
+              className = className.trim();
+              className += ' '+classes[classKey];
+              className = className.trim();
+
+              let attrs = { ...node.attrs, 'class': className};
+              view.dispatch(view.state.tr.setNodeMarkup(pos, null, attrs ));
+          }
+      });
   }
 
   function stripPaddingMarginClasses(string, strip, classes){
@@ -19163,64 +19186,6 @@
       changeAttributeOnNode(menu, 'class', className);
   }
 
-  // comes from tiptap
-  function toggleWrap(nodeKey, menu) {
-      const type = menu.editorSchema.nodes[nodeKey];
-      const state = menu.view.state;
-      const dispatch = menu.view.dispatch;
-      const view = menu.view;
-
-      const isActive = nodeIsActive(state, type);
-
-      if (isActive) {
-          return lift(state, dispatch)
-      }
-
-      return wrapIn(type)(state, dispatch, view)
-  }
-
-  function toggleList(nodeKey, menu) {
-
-      const listType = menu.editorSchema.nodes[nodeKey];
-      const itemType = menu.editorSchema.nodes['list_item'];
-      const state = menu.view.state;
-      const dispatch = menu.view.dispatch;
-      const view = menu.view;
-
-      // let cmd = wrapInList(nodeType, {});
-      // cmd(menu.view.state, menu.view.dispatch);
-      const schema = menu.editorSchema;
-      const selection = menu.view.state.selection;
-      const {
-          $from,
-          $to
-      } = selection;
-      const range = $from.blockRange($to);
-
-      if (!range) {
-          return false
-      }
-
-      const parentList = dist_5(node => isList(node, schema))(selection);
-
-      if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
-          if (parentList.node.type === listType) {
-              return liftListItem(itemType)(state, dispatch, view);
-          }
-
-          if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
-              const {
-                  tr
-              } = state;
-              tr.setNodeMarkup(parentList.pos, listType);
-              dispatch(tr);
-              return false
-          }
-      }
-
-      return wrapInList(listType)(state, dispatch, view)
-  }
-
   function convertBlock(nodeKey, attrs, menu) {
       const nodeType = menu.editorSchema.nodes[nodeKey];
       const selection = menu.view.state.selection;
@@ -19343,6 +19308,68 @@
       }
   }
 
+  // the rest comes from tiptap
+  function isList(node, schema) {
+      return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
+  }
+
+  function toggleWrap(nodeKey, menu) {
+      const type = menu.editorSchema.nodes[nodeKey];
+      const state = menu.view.state;
+      const dispatch = menu.view.dispatch;
+      const view = menu.view;
+
+      const isActive = nodeIsActive(state, type);
+
+      if (isActive) {
+          return lift(state, dispatch)
+      }
+
+      return wrapIn(type)(state, dispatch, view)
+  }
+
+  function toggleList(nodeKey, menu) {
+
+      const listType = menu.editorSchema.nodes[nodeKey];
+      const itemType = menu.editorSchema.nodes['list_item'];
+      const state = menu.view.state;
+      const dispatch = menu.view.dispatch;
+      const view = menu.view;
+
+      // let cmd = wrapInList(nodeType, {});
+      // cmd(menu.view.state, menu.view.dispatch);
+      const schema = menu.editorSchema;
+      const selection = menu.view.state.selection;
+      const {
+          $from,
+          $to
+      } = selection;
+      const range = $from.blockRange($to);
+
+      if (!range) {
+          return false
+      }
+
+      const parentList = dist_5(node => isList(node, schema))(selection);
+
+      if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
+          if (parentList.node.type === listType) {
+              return liftListItem(itemType)(state, dispatch, view);
+          }
+
+          if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
+              const {
+                  tr
+              } = state;
+              tr.setNodeMarkup(parentList.pos, listType);
+              dispatch(tr);
+              return false
+          }
+      }
+
+      return wrapInList(listType)(state, dispatch, view)
+  }
+
   function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
       const sizes = [
           ['xxs', 'extra-extra small'],
@@ -19390,6 +19417,7 @@
               key: 'clear',
               icon: 'eraser',
               action: () => {
+                  menu.stayOnMenu = true;
                   normalizePaddingMargin(menu, paddingOrMargin, classKey);
               }
           })
@@ -19426,31 +19454,42 @@
       return items;
   }
 
-  function smPaddingMargin(menu) {
+  function paddings(menu) {
 
       return new DOMinatorSubMenu({
-          key: 'paddingmargin',
-          icon: 'padding and margin',
+          key: 'paddings',
           items: [
               new DOMinatorMenuLabel({
-                  label: 'Padding: '
+                  label: 'Paddings: '
               }),
               ...generateDropdowns('padding', menu),
               new DOMinatorMenuButton({
                   key: 'clear all paddings',
                   icon: 'eraser',
                   action: () => {
+                      menu.stayOnMenu = true;
                       normalizePaddingMargin(menu, 'padding');
                   }
-              }),
+              })
+          ]
+      });
+
+  }
+
+  function margins(menu) {
+
+      return new DOMinatorSubMenu({
+          key: 'margins',
+          items: [
               new DOMinatorMenuLabel({
-                  label: 'Margin: '
+                  label: 'Margins: '
               }),
               ...generateDropdowns('margin', menu),
               new DOMinatorMenuButton({
                   key: 'clear all margins',
                   icon: 'eraser',
                   action: () => {
+                      menu.stayOnMenu = true;
                       normalizePaddingMargin(menu, 'margin');
                   }
               }),
@@ -19459,13 +19498,15 @@
 
   }
 
-  // import {
-
   function smParagraph(menu) {
 
       return new DOMinatorSubMenu({
           key: 'paragraph',
           items: [
+              new DOMinatorMenuLabel({
+                  label: 'Paragraph'
+              }),
+              new DOMinatorMenuSeparator (),
               new DOMinatorMenuButton ({
                   key: 'paragraph',
                   icon: 'paragraph',
@@ -19519,6 +19560,13 @@
                       }),
                   ]
               }),
+              new DOMinatorMenuButton ({
+                  key: 'align left',
+                  icon: 'align-left',
+                  action: (button) => {
+                      alignSelection(menu.view, 'text-right');
+                  }
+              }),
               new DOMinatorMenuDropdown ({
                   key: 'alignment',
                   icon: 'align-left',
@@ -19526,22 +19574,22 @@
                       new DOMinatorMenuButton ({
                           key: 'align left',
                           icon: 'align-left',
-                          action: () => {
-
+                          action: (button) => {
+                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align center',
                           icon: 'align-center',
                           action: () => {
-
+                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align right',
                           icon: 'align-right',
                           action: () => {
-
+                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -19642,6 +19690,11 @@
                           key: '2 columns',
                           icon: 'twocolumns',
                           iconType: 'dics'
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '1 column',
+                          icon: 'onecolumn',
+                          iconType: 'dics'
                       })
                   ]
               }),
@@ -19667,17 +19720,50 @@
                   }
               }),
               new DOMinatorMenuButton ({
-                  key: 'padding and margin',
-                  icon: 'paddingmargin',
+                  key: 'paddings',
+                  icon: 'padding',
                   iconType: 'dics',
                   action: (button) => {
-                      menu.activateSubmenu('paddingmargin');
+                      menu.activateSubmenu('paddings');
                   },
                   update(button, menu,){
                       if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
                           button.disable();
+                          button.deactivate();
                       }else{
                           button.enable();
+                          button.deactivate();
+                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
+                              button.activate();
+                              return true;
+                          }else{
+                              return false;
+                          }
+
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'margins',
+                  icon: 'margin',
+                  iconType: 'dics',
+                  action: (button) => {
+                      menu.activateSubmenu('margins');
+                  },
+                  update(button, menu,){
+                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                          button.disable();
+                          button.deactivate();
+                      }else{
+                          button.enable();
+                          button.deactivate();
+                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                              button.activate();
+                              return true;
+                          }else{
+                              return false;
+                          }
+
                       }
                   }
               }),
@@ -19706,6 +19792,10 @@
       return new DOMinatorSubMenu({
           key: 'inline',
           items: [
+              new DOMinatorMenuLabel({
+                  label: 'Selection'
+              }),
+              new DOMinatorMenuSeparator (),
               new DOMinatorMenuButton ({
                   key: 'bold',
                   icon: 'bold',
@@ -19762,6 +19852,33 @@
               //         toggleMark(menu, menu.editorSchema.marks.del);
               //     }
               // }),
+              new DOMinatorMenuDropdown ({
+                  key: 'alignment',
+                  icon: 'align-left',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'align left',
+                          icon: 'align-left',
+                          action: (button) => {
+                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align center',
+                          icon: 'align-center',
+                          action: () => {
+                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align right',
+                          icon: 'align-right',
+                          action: () => {
+                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                  ]
+              }),
               new DOMinatorMenuButton ({
                   key: 'remove_formatting',
                   icon: 'eraser',
@@ -19778,6 +19895,10 @@
       return new DOMinatorSubMenu({
           key: 'link',
           items: [
+              new DOMinatorMenuLabel({
+                  label: 'Link'
+              }),
+              new DOMinatorMenuSeparator (),
               new DOMinatorMenuInput ({
                   update: (input) => {
                       input.setValue(menu.activeMark.attrs.href);
@@ -19878,6 +19999,10 @@
       return new DOMinatorSubMenu({
           key: 'heading',
           items: [
+              new DOMinatorMenuLabel({
+                  label: 'Heading'
+              }),
+              new DOMinatorMenuSeparator (),
               new DOMinatorMenuButton ({
                   key: 'paragraph',
                   icon: 'paragraph',
@@ -19923,6 +20048,54 @@
                   label: 'H6',
                   action: () => {
                       convertBlock('heading', { level: 6 }, menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'paddings',
+                  icon: 'padding',
+                  iconType: 'dics',
+                  action: (button) => {
+                      menu.activateSubmenu('paddings');
+                  },
+                  update(button, menu,){
+                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                          button.disable();
+                          button.deactivate();
+                      }else{
+                          button.enable();
+                          button.deactivate();
+                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
+                              button.activate();
+                              return true;
+                          }else{
+                              return false;
+                          }
+
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'margins',
+                  icon: 'margin',
+                  iconType: 'dics',
+                  action: (button) => {
+                      menu.activateSubmenu('margins');
+                  },
+                  update(button, menu,){
+                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                          button.disable();
+                          button.deactivate();
+                      }else{
+                          button.enable();
+                          button.deactivate();
+                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                              button.activate();
+                              return true;
+                          }else{
+                              return false;
+                          }
+
+                      }
                   }
               }),
           ],
@@ -20060,11 +20233,6 @@
           this.activeMark = null;
           this.activeBlock = null;
 
-          // make all submenues invisible
-          // Object.keys(this.submenus).forEach(key=>{
-          //     this.submenus[key].hide();
-          // });
-
           let activeSubmenuKey = '';
 
           if(view){
@@ -20097,6 +20265,10 @@
                   }
 
                   this.activeBlock = selection.node;
+              }else if(selection.constructor.name === 'AllSelection'){
+                  activeSubmenuKey = 'inline';
+              }else{
+                  console.error('Uknown selection !');
               }
           }
 
@@ -20108,7 +20280,6 @@
           if(this.stayOnMenu && this.activeSubmenuKey){
               this.stayOnMenu = false;
               this.submenus[this.activeSubmenuKey].update(this);
-              console.log('false');
           }else{
               this.activeSubmenuKey = activeSubmenuKey;
               this.activateSubmenu(this.activeSubmenuKey);
@@ -20130,6 +20301,7 @@
 
           // this also calls the update method on each element
           this.submenus[key].show(this);
+          this.activeSubmenuKey = key;
       }
 
       initMenu(){
@@ -20138,10 +20310,15 @@
               link: smLink(this),
               paragraph: smParagraph(this),
               heading: smHeading(this),
-              paddingmargin: smPaddingMargin(this),
+              paddings: paddings(this),
+              margins: margins(this),
               custom_html: new DOMinatorSubMenu({
                   key: 'custom_html',
                   items: [
+                      new DOMinatorMenuLabel({
+                          label: 'Custom HTML'
+                      }),
+                      new DOMinatorMenuSeparator (),
                       new DOMinatorMenuButton ({
                           key: 'magic',
                           icon: 'magic',
@@ -20154,6 +20331,10 @@
               span: new DOMinatorSubMenu({
                   key: 'span',
                   items: [
+                      new DOMinatorMenuLabel({
+                          label: 'Style'
+                      }),
+                      new DOMinatorMenuSeparator (),
                       new DOMinatorMenuButton ({
                           key: 'magic',
                           icon: 'magic',
@@ -20344,8 +20525,8 @@
           this.dom = document.createElement('div');
           this.dom.innerHTML = node.attrs.html;
 
-          if(node.attrs.className){
-              this.dom.className = node.attrs.className;
+          if(node.attrs.class){
+              this.dom.setAttribute("class", node.attrs.class);
           }
 
           this.dom.addEventListener("mousedown", event => {
@@ -20436,6 +20617,12 @@
 
               paddingClasses: paddingClasses,
               marginClasses: marginClasses,
+              textAlignClasses: {
+                  left: 'text-left',
+                  right: 'text-right',
+                  center: 'text-center',
+                  // justify: 'text-justify',
+              }
 
           };
 

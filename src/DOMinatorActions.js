@@ -17,9 +17,33 @@ import {
     lift
 } from "./prosemirrorcommands"
 
-// comes from tiptap
-function isList(node, schema) {
-    return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
+export function alignSelection(view, classKey, classes){
+    const selection = view.state.selection;
+
+    view.state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+
+        if(!classes[classKey]){
+            console.error(classes);
+            throw 'Class does not exist with a key: '+classKey;
+        }
+
+        if(node.type.spec.canTakeAligment){
+            // remove alignment classes
+            let className = '';
+            if(node.attrs.class){
+                className = node.attrs.class;
+                Object.keys(classes).forEach(key =>{
+                    className = className.replace(classes[key], '');
+                });
+            }
+            className = className.trim();
+            className += ' '+classes[classKey];
+            className = className.trim();
+
+            let attrs = { ...node.attrs, 'class': className};
+            view.dispatch(view.state.tr.setNodeMarkup(pos, null, attrs ));
+        }
+    });
 }
 
 export function stripPaddingMarginClasses(string, strip, classes){
@@ -145,64 +169,6 @@ export function normalizePaddingMargin(menu, paddingOrMargin, side, size){
     changeAttributeOnNode(menu, 'class', className);
 }
 
-// comes from tiptap
-export function toggleWrap(nodeKey, menu) {
-    const type = menu.editorSchema.nodes[nodeKey];
-    const state = menu.view.state;
-    const dispatch = menu.view.dispatch;
-    const view = menu.view;
-
-    const isActive = nodeIsActive(state, type)
-
-    if (isActive) {
-        return lift(state, dispatch)
-    }
-
-    return wrapIn(type)(state, dispatch, view)
-}
-
-export function toggleList(nodeKey, menu) {
-
-    const listType = menu.editorSchema.nodes[nodeKey];
-    const itemType = menu.editorSchema.nodes['list_item'];
-    const state = menu.view.state;
-    const dispatch = menu.view.dispatch;
-    const view = menu.view;
-
-    // let cmd = wrapInList(nodeType, {});
-    // cmd(menu.view.state, menu.view.dispatch);
-    const schema = menu.editorSchema;
-    const selection = menu.view.state.selection;
-    const {
-        $from,
-        $to
-    } = selection;
-    const range = $from.blockRange($to)
-
-    if (!range) {
-        return false
-    }
-
-    const parentList = findParentNode(node => isList(node, schema))(selection);
-
-    if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
-        if (parentList.node.type === listType) {
-            return liftListItem(itemType)(state, dispatch, view);
-        }
-
-        if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
-            const {
-                tr
-            } = state
-            tr.setNodeMarkup(parentList.pos, listType)
-            dispatch(tr)
-            return false
-        }
-    }
-
-    return wrapInList(listType)(state, dispatch, view)
-}
-
 export function convertBlock(nodeKey, attrs, menu) {
     const nodeType = menu.editorSchema.nodes[nodeKey];
     const selection = menu.view.state.selection;
@@ -323,4 +289,66 @@ export function updateLinkStyleButton(style, button, menu) {
     } else {
         button.deactivate();
     }
+}
+
+// the rest comes from tiptap
+function isList(node, schema) {
+    return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
+}
+
+export function toggleWrap(nodeKey, menu) {
+    const type = menu.editorSchema.nodes[nodeKey];
+    const state = menu.view.state;
+    const dispatch = menu.view.dispatch;
+    const view = menu.view;
+
+    const isActive = nodeIsActive(state, type)
+
+    if (isActive) {
+        return lift(state, dispatch)
+    }
+
+    return wrapIn(type)(state, dispatch, view)
+}
+
+export function toggleList(nodeKey, menu) {
+
+    const listType = menu.editorSchema.nodes[nodeKey];
+    const itemType = menu.editorSchema.nodes['list_item'];
+    const state = menu.view.state;
+    const dispatch = menu.view.dispatch;
+    const view = menu.view;
+
+    // let cmd = wrapInList(nodeType, {});
+    // cmd(menu.view.state, menu.view.dispatch);
+    const schema = menu.editorSchema;
+    const selection = menu.view.state.selection;
+    const {
+        $from,
+        $to
+    } = selection;
+    const range = $from.blockRange($to)
+
+    if (!range) {
+        return false
+    }
+
+    const parentList = findParentNode(node => isList(node, schema))(selection);
+
+    if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
+        if (parentList.node.type === listType) {
+            return liftListItem(itemType)(state, dispatch, view);
+        }
+
+        if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
+            const {
+                tr
+            } = state
+            tr.setNodeMarkup(parentList.pos, listType)
+            dispatch(tr)
+            return false
+        }
+    }
+
+    return wrapInList(listType)(state, dispatch, view)
 }
