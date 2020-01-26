@@ -17,7 +17,10 @@ import smInline from "./Submenues/Inline"
 import smLink from "./Submenues/Link"
 import smHeading from "./Submenues/Heading"
 import smPhotograph from "./Submenues/Photograph"
+import smCarousel from "./Submenues/Carousel"
+
 import smRightMenu from "./Submenues/RightMenu"
+
 
 import {
     Selection,
@@ -187,6 +190,7 @@ export default class DOMinatorMenu {
             paddings: smPaddings(this),
             margins: smMargins(this),
             photograph:smPhotograph(this),
+            carousel:smCarousel(this),
             custom_html: new DOMinatorSubMenu({
                 key: 'custom_html',
                 items: [

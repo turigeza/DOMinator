@@ -14047,8 +14047,44 @@
               ]
           }
       },
+      carousel: {
+          group: "block",
+          defining: true, // node is considered an important parent node during replace operations
+          selectable: true,
+          atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
+          draggable: false,
+          // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
+          attrs: {
+              class: {
+                  default: null
+              },
+              html: {
+                  default: ''
+              },
+          },
+          parseDOM: [{
+              tag: 'div.tg_subwidget_carousel',
+              getAttrs: dom => {
+                  // console.log(dom.getAttribute("class"));
+                  // let attributes = Array.prototype.slice.call(dom.attributes);
+                  return {
+                      'class': dom.getAttribute("class"),
+                      html: dom.innerHTML
+                  };
+              }
+          }],
+          toDOM(node) {
+              let newDiv = document.createElement("div");
+              newDiv.innerHTML = node.attrs.html;
+              if(node.attrs){
+                  newDiv.setAttribute('class', node.attrs.class);
+              }
+
+              return newDiv;
+
+          }
+      },
       custom_html: {
-          // content: "block+",
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
           selectable: true,
@@ -20518,6 +20554,86 @@
       });
   }
 
+  // closest('.carousel_wrapper').find('.flickity_json').text(JSON.stringify(json));
+  // function get_carousel(){
+  //     return priv.tooltips.carousel.$attached_to.find('.flickity-carousel').flickity();
+  // }
+  // var $carousel = get_carousel();
+  // var text = $carousel.closest('.carousel_wrapper').find('.flickity_json').text();
+  // carousel.closest('.carousel_wrapper').find('.toggle-fullscreen').hide();
+
+  function see(menu){
+      let selection = menu.view.state.selection;
+      let pos = selection.from;
+      let node = menu.view.state.doc.nodeAt(pos);
+      let dom = menu.view.domAtPos(pos);
+
+      console.log(node);
+      console.log(dom);
+
+
+  }
+
+  function smCarousel(menu) {
+
+      return new DOMinatorSubMenu({
+          key: 'carousel',
+          items: [
+              new DOMinatorMenuLabel({
+                  label: 'Carousel'
+              }),
+              new DOMinatorMenuSeparator (),
+              new DOMinatorMenuButton ({
+                  key: 'paragraph',
+                  icon: 'paragraph',
+                  action: () => {
+                      see(menu);
+                  }
+              }),
+              new DOMinatorMenuInput ({
+                  update: (input) => {
+
+                  },
+                  key: 'href',
+                  action: (val) => {
+
+                  }
+              }),
+          ]
+      });
+  }
+  //
+  // var $remove = $('<button class="btn btn-default btn" title="Remove this carousel cell"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
+  // $remove.on('click', function(event){
+  //     var $carousel = get_carousel();
+  //     var flickity = $carousel.data('flickity');
+  //     if(flickity.cells.length === 1){
+  //         editable_toast('editor_last_carousel_el');
+  //         return;
+  //     }
+  //     $carousel.flickity( 'remove',  flickity.selectedElement);
+  //     $carousel.flickity('reloadCells').flickity('resize');
+  // });
+  //
+  // var $move_left = $('<button class="btn btn-default btn" title="Move cell to left"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
+  // $move_left.on('click', function(event){
+  //     var $carousel = get_carousel();
+  //     var flickity = $carousel.data('flickity');
+  //     var selected_el = flickity.selectedElement;
+  //     var selected_index = flickity.selectedIndex;
+  //
+  //     if(selected_index > 0){
+  //         var new_index =  flickity.selectedIndex-1;
+  //     }else{
+  //         var new_index = flickity.cells.length-1;
+  //     }
+  //
+  //     $carousel.flickity( 'remove',  flickity.selectedElement);
+  //     $carousel.flickity( 'insert',  selected_el, new_index);
+  //     $carousel.flickity( 'selectCell', new_index, false, true);
+  //
+  // });
+
   function smRightMenu(menu) {
       return new DOMinatorSubMenu({
           key: 'right',
@@ -20738,6 +20854,7 @@
               paddings: paddings(this),
               margins: margins(this),
               photograph:smPhotograph(this),
+              carousel:smCarousel(this),
               custom_html: new DOMinatorSubMenu({
                   key: 'custom_html',
                   items: [

@@ -252,8 +252,44 @@ export default {
             ]
         }
     },
+    carousel: {
+        group: "block",
+        defining: true, // node is considered an important parent node during replace operations
+        selectable: true,
+        atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
+        draggable: false,
+        // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
+        attrs: {
+            class: {
+                default: null
+            },
+            html: {
+                default: ''
+            },
+        },
+        parseDOM: [{
+            tag: 'div.tg_subwidget_carousel',
+            getAttrs: dom => {
+                // console.log(dom.getAttribute("class"));
+                // let attributes = Array.prototype.slice.call(dom.attributes);
+                return {
+                    'class': dom.getAttribute("class"),
+                    html: dom.innerHTML
+                };
+            }
+        }],
+        toDOM(node) {
+            let newDiv = document.createElement("div");
+            newDiv.innerHTML = node.attrs.html;
+            if(node.attrs){
+                newDiv.setAttribute('class', node.attrs.class);
+            }
+
+            return newDiv;
+
+        }
+    },
     custom_html: {
-        // content: "block+",
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
         selectable: true,
