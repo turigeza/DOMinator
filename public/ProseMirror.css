@@ -89,6 +89,10 @@
     outline: 4px dashed orange;
     outline-offset: -4px;
 }
+.ProseMirror-selectednode.tg_subwidget_carousel{
+    outline-offset: 0px;
+}
+
 
 /* Make sure li selections wrap around markers */
 li.ProseMirror-selectednode {

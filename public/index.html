@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="ProseMirror.css">
     <link rel="stylesheet" type="text/css" href="DOMinator.css">
     <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
     <link rel="stylesheet" type="text/css" href="website.css">
     <link rel="stylesheet" type="text/css" href="DOMinatorFonts.css">
 
@@ -25,9 +26,34 @@
 
             <!-- element to store the HTML representation of your content Ohhh Dear! this needs to be separate ? style="display: none;" -->
             <div id="content">
-                <!-- PHOTOS -->
-                <!-- classes width-75 width-66 width-50 width-33 width-25 pull-right pull-left-->
-                <h2 class="fancy danger">Lorem Ipsum</h2>
+
+                <h2 class="fancy danger">Carousel</h2>
+
+                <div class="tg_subwidget tg_subwidget_carousel" data-tooltip_key="carousel" data-window_key="tg_carousel">
+                    <div class="carousel_wrapper">
+                        <div class="flickity-carousel">
+                            <div class="carousel-cell" style="" aria-hidden="true">
+                                <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
+                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                                    <h3>Title of image</h3>
+                                    <p>Description on the image</p>
+                                </div>
+                            </div>
+                            <div class="carousel-cell" style="" aria-hidden="true">
+                                <img src="https://i.picsum.photos/id/365/900/600.jpg?grayscale" alt="Branklyn">
+                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                                    <h3>Title of image</h3>
+                                    <p>Description on the image</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="toggle-fullscreen" style="display:none"> <i class="fa fa-arrows-alt" aria-hidden="true"></i> </a>
+                        <div class="flickity_json">{"wrapAround":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
+                        <a class="flickity_link" href="#"></a>
+                    </div>
+                </div>
+
+                <h2 class="fancy danger">Photos</h2>
                 <div
                     class="tg_subwidget tg_subwidget_photograph width-66 pull-left"
                     data-tooltip_key="photograph"
@@ -212,6 +238,10 @@
 
         </div>
     </div>
+
+    <!-- flickity -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 
     <script src='DOMinator.js'></script>
     <script src='index.js'></script>
