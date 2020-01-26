@@ -136,39 +136,52 @@ export const nodes = {
     // `alt`, and `href` attributes. The latter two default to the empty
     // string.
     image: {
-        inline: true,
+        inline: false,
         attrs: {
-            src: {},
+            id: {
+                default: null
+            },
+            src: {
+                default: null
+            },
             alt: {
                 default: null
             },
             title: {
                 default: null
+            },
+            'data-photograph_id': {
+                default: null
+            },
+            'data-photograph_medium': {
+                default: null
+            },
+            'data-photograph_large': {
+                default: null
+            },
+            draggable: {
+                default: false
             }
+
         },
-        group: "inline",
-        draggable: true,
+        group: "block",
+        draggable: false,
+        selectable: false,
         parseDOM: [{
             tag: "img[src]",
             getAttrs(dom) {
                 return {
                     src: dom.getAttribute("src"),
                     title: dom.getAttribute("title"),
-                    alt: dom.getAttribute("alt")
+                    alt: dom.getAttribute("alt"),
+                    'data-photograph_id': dom.getAttribute('data-photograph_id'),
+                    'data-photograph_medium': dom.getAttribute('data-photograph_medium'),
+                    'data-photograph_large': dom.getAttribute('data-photograph_large'),
                 }
             }
         }],
         toDOM(node) {
-            let {
-                src,
-                alt,
-                title
-            } = node.attrs;
-            return ["img", {
-                src,
-                alt,
-                title
-            }]
+            return ["img", node.attrs];
         }
     },
 

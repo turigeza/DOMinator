@@ -13574,39 +13574,52 @@
       // `alt`, and `href` attributes. The latter two default to the empty
       // string.
       image: {
-          inline: true,
+          inline: false,
           attrs: {
-              src: {},
+              id: {
+                  default: null
+              },
+              src: {
+                  default: null
+              },
               alt: {
                   default: null
               },
               title: {
                   default: null
+              },
+              'data-photograph_id': {
+                  default: null
+              },
+              'data-photograph_medium': {
+                  default: null
+              },
+              'data-photograph_large': {
+                  default: null
+              },
+              draggable: {
+                  default: false
               }
+
           },
-          group: "inline",
-          draggable: true,
+          group: "block",
+          draggable: false,
+          selectable: false,
           parseDOM: [{
               tag: "img[src]",
               getAttrs(dom) {
                   return {
                       src: dom.getAttribute("src"),
                       title: dom.getAttribute("title"),
-                      alt: dom.getAttribute("alt")
+                      alt: dom.getAttribute("alt"),
+                      'data-photograph_id': dom.getAttribute('data-photograph_id'),
+                      'data-photograph_medium': dom.getAttribute('data-photograph_medium'),
+                      'data-photograph_large': dom.getAttribute('data-photograph_large'),
                   }
               }
           }],
           toDOM(node) {
-              let {
-                  src,
-                  alt,
-                  title
-              } = node.attrs;
-              return ["img", {
-                  src,
-                  alt,
-                  title
-              }]
+              return ["img", node.attrs];
           }
       },
 
@@ -13975,13 +13988,72 @@
               ]
           }
       },
+      photograph: {
+          content: "image{1} photograph_caption{1}",
+          group: "block",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {
+              class: {
+                  default: null
+              },
+              id: {
+                  default: null
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_subwidget_photograph',
+              getAttrs: dom => {
+                  return {
+                      id: dom.getAttribute("id"),
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      photograph_caption: {
+          menu: 'photograph',
+          content: "inline*",
+          group: "block",
+          defining: true,
+          selectable: false,
+          draggable: false,
+          attrs: {
+              class: {
+                  default: 'tg_subwidget_photograph_text'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_subwidget_photograph_text',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
       custom_html: {
-          content: "block+",
+          // content: "block+",
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
           selectable: true,
           atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
-          draggable: false, // does not work for some reason
+          draggable: false,
           // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
               class: {
@@ -14005,7 +14077,6 @@
           toDOM(node) {
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
-              console.log(node.attrs.class);
               if(node.attrs){
                   newDiv.setAttribute('class', node.attrs.class);
               }
@@ -14021,7 +14092,8 @@
       // dom
       // options
       // menu
-
+      // icon
+      // tempIcon = the last icon which was appended to the dropdown is kept for reference so we can swap it
       constructor(options) {
           this.options = options;
           this.dom = document.createElement("button");
@@ -14038,16 +14110,16 @@
           //document.createTextNode("Hello World");
           if(this.options.icon){
               if(!this.options.iconType){
-                  let icon = document.createElement("i");
-                  icon.className = 'fa fa-'+this.options.icon;
-                  icon.setAttribute('aria-hidden', 'true');
-                  this.dom.appendChild(icon);
+                  this.icon = document.createElement("i");
+                  this.icon.className = 'fa fa-'+this.options.icon;
+                  this.icon.setAttribute('aria-hidden', 'true');
+                  this.dom.appendChild(this.icon);
               }else if(this.options.iconType === 'dics'){
                   // the default icons boundled with dominator
-                  let icon = document.createElement("span");
-                  icon.className = 'dics dominator-icon-'+this.options.icon;
-                  icon.setAttribute('aria-hidden', 'true');
-                  this.dom.appendChild(icon);
+                  this.icon = document.createElement("span");
+                  this.icon.className = 'dics dominator-icon-'+this.options.icon;
+                  this.icon.setAttribute('aria-hidden', 'true');
+                  this.dom.appendChild(this.icon);
               }
           }
 
@@ -14104,6 +14176,31 @@
           this.dom.classList.remove('button-active');
       }
 
+      swapIcon(icon){
+          // the icon has already been changed to something else
+          if(this.tempIcon && icon){
+              this.dom.replaceChild(icon, this.tempIcon);
+              this.tempIcon = icon;
+          }else if(this.icon && icon){
+              this.dom.replaceChild(icon, this.icon);
+              this.tempIcon = icon;
+          }
+      }
+
+      reinstateIcon(){
+          if(this.icon && this.tempIcon){
+              this.dom.replaceChild(this.icon, this.tempIcon);
+              this.tempIcon = null;
+          }
+      }
+
+      getIcon(){
+          if(this.icon){
+              return this.icon.cloneNode(true);
+          }
+          return null;
+      }
+
       destroy() {
 
       }
@@ -14125,7 +14222,7 @@
       // dropdownButton - object
       // dropdownCaret - the small triangle on the right indicating the dropdown
       // activeItems = array of the active menu items
-
+      // originalDropdownIcon
       constructor(options) {
           const settings = {
               autoclose: true
@@ -14159,8 +14256,13 @@
                   }else if(this.options.update === 'appendToDropDownLabel');else{
                       if(this.activeItems && this.activeItems.length > 0){
                           this.dropdownButton.activate();
+                          if(this.activeItems.length === 1){
+                              const i = this.activeItems[0].getIcon();
+                              this.dropdownButton.swapIcon(i);
+                          }
                       }else{
                           this.dropdownButton.deactivate();
+                          this.dropdownButton.reinstateIcon();
                       }
                   }
               }
@@ -19047,6 +19149,7 @@
           }
 
           if(node.type.spec.canTakeAligment){
+              
               // remove alignment classes
               let className = '';
               if(node.attrs.class){
@@ -19601,13 +19704,6 @@
                       }),
                   ]
               }),
-              new DOMinatorMenuButton ({
-                  key: 'align left',
-                  icon: 'align-left',
-                  action: (button) => {
-                      alignSelection(menu.view, 'text-right');
-                  }
-              }),
               new DOMinatorMenuDropdown ({
                   key: 'alignment',
                   icon: 'align-left',
@@ -20143,6 +20239,285 @@
       });
   }
 
+  function getPosition(selection){
+      let pos;
+      // the selction must be in the photo text area
+      if(selection.constructor.name === 'TextSelection'){
+          pos = selection.$head.before()-2;
+      }else if(selection.constructor.name === 'NodeSelection'){
+          pos = selection.from;
+      }
+
+      return pos;
+  }
+
+  function changeSize(sizeKey, menu){
+      const selection = menu.view.state.selection;
+      // console.log(menu.activeBlock);
+      // console.log(selection);
+      // console.log(selection.$head.before())
+      // console.log(pos);
+      // console.log(menu.view.state.doc.nodeAt(from-2));
+      // console.log(menu.view.state.doc.nodeAt(from-1));
+      // console.log(menu.view.state.doc.nodeAt(from));
+      // // console.log(menu.view.state.doc);
+      // console.log('from');
+      // console.log(from);
+      // console.log('to');
+      // console.log(to);
+
+      // 'thumbnail_size' => 250,
+      // 'medium_size' => 665,
+      // 'large_size' => 1200,
+      // 'minimum_photo_size' => 1200,
+
+      let pos = getPosition(selection);
+
+      const photoSizeClasses = menu.dominator.options.photoSizeClasses;
+      let node = menu.view.state.doc.nodeAt(pos);
+      let classes = node.attrs.class;
+
+      Object.keys(photoSizeClasses).forEach(key => {
+          classes = classes.replace(photoSizeClasses[key], '').trim();
+      });
+
+      classes += ' ' + photoSizeClasses[sizeKey];
+      classes = classes.trim();
+
+      let attrs = { ...node.attrs, 'class': classes };
+
+      menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, attrs).scrollIntoView());
+
+      const dom = menu.view.domAtPos(pos+2);
+      const img = dom.node.children.item(0);
+      const imageNode = menu.view.state.doc.nodeAt(pos+1);
+
+      let newSrc;
+      if(img.offsetWidth < 650 && img.dataset['photograph_medium'] && img.dataset['photograph_medium'] !== imageNode.attrs['src']){
+          newSrc = img.dataset['photograph_medium'];
+      }else if(img.offsetWidth >= 650 && img.dataset['photograph_large'] && img.dataset['photograph_large'] !== imageNode.attrs['src']){
+          newSrc = img.dataset['photograph_large'];
+      }
+
+      let tr;
+
+      if(newSrc){
+          tr = menu.view.state.tr;
+          tr.setMeta("addToHistory", false);
+          menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos+1, null, { ...imageNode.attrs, src: newSrc }));
+      }
+
+      tr = menu.view.state.tr;
+      tr.setMeta("addToHistory", false);
+      const newSelection = NodeSelection.create(menu.view.state.doc, pos);
+      menu.view.dispatch(tr.setSelection(newSelection));
+  }
+
+  function imageFloat(floatKey, menu){
+      const selection = menu.view.state.selection;
+      const floatClasses = menu.dominator.options.photoFloatClasses;
+
+      let pos = getPosition(selection);
+
+      let node = menu.view.state.doc.nodeAt(pos);
+      let classes = node.attrs.class;
+
+      let removed = '';
+      Object.keys(floatClasses).forEach(key => {
+          if(classes.includes(floatClasses[key])){
+              removed = floatClasses[key];
+          }
+          classes = classes.replace(floatClasses[key], '').trim();
+      });
+
+      if(removed !== floatClasses[floatKey] ){
+          classes += ' ' + floatClasses[floatKey];
+          classes = classes.trim();
+      }
+
+      let attrs = { ...node.attrs, 'class': classes };
+
+      menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, attrs).scrollIntoView());
+
+      let tr = menu.view.state.tr;
+      tr.setMeta("addToHistory", false);
+      const newSelection = NodeSelection.create(menu.view.state.doc, pos);
+      menu.view.dispatch(tr.setSelection(newSelection));
+  }
+
+  function getNode(menu){
+      let pos = getPosition(menu.view.state.selection);
+      let node = menu.view.state.doc.nodeAt(pos);
+      return node;
+  }
+
+  function getImage(menu){
+      let pos = getPosition(menu.view.state.selection);
+      pos += 1;
+      return { img: menu.view.state.doc.nodeAt(pos), pos: pos};
+  }
+
+  function setAlt(menu, alt){
+      const { img, pos } = getImage(menu);
+      menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, { ...img.attrs, alt: alt }));
+  }
+
+  function floatButtonActivate(floatKey, menu, btn){
+      const className = menu.dominator.options.photoFloatClasses[floatKey];
+      const node = getNode(menu);
+
+      if(node.attrs.class && node.attrs.class.includes(className)){
+          btn.activate();
+          return true;
+      }else{
+          btn.deactivate();
+          return false;
+      }
+  }
+
+  function sizeButtonActivate(sizeKey, menu, btn){
+      const className = menu.dominator.options.photoSizeClasses[sizeKey];
+      const node = getNode(menu);
+
+      if(node.attrs.class && node.attrs.class.includes(className)){
+          btn.activate();
+          return true;
+      }else{
+          btn.deactivate();
+          return false;
+      }
+  }
+
+  function smPhotograph(menu) {
+
+      return new DOMinatorSubMenu({
+          key: 'photograph',
+          items: [
+              new DOMinatorMenuLabel({
+                  label: 'Photograph'
+              }),
+              new DOMinatorMenuSeparator (),
+
+              new DOMinatorMenuDropdown ({
+                  key: 'change image size',
+                  icon: 'expand',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'full size',
+                          label: '100%',
+                          update: (button) => {
+                              return sizeButtonActivate('100', menu, button);
+                          },
+                          action: () => {
+                              changeSize('100', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '75 percent',
+                          label: '75%',
+                          update: (button) => {
+                              return sizeButtonActivate('75', menu, button);
+                          },
+                          action: () => {
+                              changeSize('75', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '66 percent',
+                          label: '66%',
+                          update: (button) => {
+                              return sizeButtonActivate('66', menu, button);
+                          },
+                          action: () => {
+                              changeSize('66', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '50 percent',
+                          label: '50%',
+                          update: (button) => {
+                              return sizeButtonActivate('50', menu, button);
+                          },
+                          action: () => {
+                              changeSize('50', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '33 percent',
+                          label: '33%',
+                          update: (button) => {
+                              return sizeButtonActivate('33', menu, button);
+                          },
+                          action: () => {
+                              changeSize('33', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: '25 percent',
+                          label: '25%',
+                          update: (button) => {
+                              return sizeButtonActivate('25', menu, button);
+                          },
+                          action: () => {
+                              changeSize('25', menu);
+                          }
+                      }),
+                  ]
+              }),
+              new DOMinatorMenuDropdown ({
+                  key: 'alignment',
+                  icon: 'align-left',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'align left',
+                          icon: 'align-left',
+                          update: (button) => {
+                              return floatButtonActivate('left', menu, button);
+                          },
+                          action: (button) => {
+                              imageFloat('left', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align center',
+                          icon: 'align-center',
+                          update: (button) => {
+                              return floatButtonActivate('center', menu, button);
+                          },
+                          action: () => {
+                              imageFloat('center', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align right',
+                          icon: 'align-right',
+                          update: (button) => {
+                              return floatButtonActivate('right', menu, button);
+                          },
+                          action: () => {
+                              imageFloat('right', menu);
+                          }
+                      }),
+                  ]
+              }),
+              new DOMinatorMenuLabel({
+                  label: 'Alt tag:'
+              }),
+              new DOMinatorMenuInput ({
+                  update: (input) => {
+                      const {img} = getImage(menu);
+                      const alt = img.attrs.alt || '';
+                      input.setValue(alt);
+                  },
+                  key: 'href',
+                  action: (val) => {
+                      setAlt(menu, val);
+                  }
+              }),
+          ]
+      });
+  }
+
   function smRightMenu(menu) {
       return new DOMinatorSubMenu({
           key: 'right',
@@ -20277,6 +20652,11 @@
           let activeSubmenuKey = '';
 
           if(view){
+              // console.log('view');
+              // console.log(view.state);
+              // console.log('lastState');
+              // console.log(lastState);
+              // console.log('UPDATE');
               const selection = view.state.selection;
               if(selection.constructor.name === 'TextSelection'){
                   // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
@@ -20292,7 +20672,11 @@
                               }
                           }
                       }else{
-                          activeSubmenuKey = selection.$head.parent.type.name;
+                          if(selection.$head.parent.type.spec.menu){
+                              activeSubmenuKey = selection.$head.parent.type.spec.menu;
+                          }else{
+                              activeSubmenuKey = selection.$head.parent.type.name;
+                          }
                       }
                   }else{
                       // there is a selection show inline menu
@@ -20353,6 +20737,7 @@
               heading: smHeading(this),
               paddings: paddings(this),
               margins: margins(this),
+              photograph:smPhotograph(this),
               custom_html: new DOMinatorSubMenu({
                   key: 'custom_html',
                   items: [
@@ -20369,6 +20754,7 @@
                       }),
                   ],
               }),
+
               span: new DOMinatorSubMenu({
                   key: 'span',
                   items: [
@@ -20555,7 +20941,7 @@
       }
   };
 
-  class DOMinatorCustomHtmlView {
+  class CustomHtmlView {
 
       constructor(node, view, getPos) {
 
@@ -20597,7 +20983,7 @@
       }
 
       update(node, decorations) {
-          console.log('update --- DOMinatorCustomHtmlView');
+          console.log('update --- CustomHtmlView');
       }
 
       stopEvent(event) {
@@ -20630,14 +21016,112 @@
       // Called when the node view is removed from the editor or the whole editor is destroyed.
       destroy() {
           this.dom.remove();
-          console.log('destroy --- DOMinatorCustomHtmlView');
+          console.log('destroy --- CustomHtmlView');
+      }
+
+  }
+
+  class PhotographCaptionView {
+
+      constructor(node, view, getPos) {
+
+          this.node = node;
+          this.view = view;
+          this.getPos = getPos;
+
+          this.dom = this.contentDOM = document.createElement('div');
+          // // this.dom.innerHTML = 'Some shit';
+          //  = document.createTextNode('Na bazmeg');
+
+          // sometimes the copyright span contains this and sometimes the dom element itself
+          // style="display: none;"
+
+          if(node.attrs.class){
+              this.dom.setAttribute("class", node.attrs.class);
+          }
+      }
+
+      selectNode() {
+
+      }
+
+      deselectNode() {
+
+      }
+
+      update(node, decorations) {
+          console.log('update --- PhotographCaption');
+          if (node.type.name != "photograph_caption") {
+              return false
+          }
+          if (node.content.size > 0) {
+              this.dom.classList.remove("empty");
+          }  else {
+              this.dom.classList.add("empty");
+          }
+
+          return true;
+      }
+
+      stopEvent(event) {
+          // const blacklisted = [
+          //     'dragstart',
+          //     'dragenter',
+          //     'dragover',
+          //     'dragend',
+          //     'drop',
+          //     'mousedown',
+          // ];
+          //
+          // if( blacklisted.indexOf(event.type) > -1 ){
+          //     return true;
+          // }
+          //
+          // console.log(event.type);
+          // return false;
+      }
+
+      ignoreMutation() {
+          // return true;
+          // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
+          // the record will have a type property of "selection" (which doesn't occur for native mutation records).
+          // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
+      }
+
+      // Called when the node view is removed from the editor or the whole editor is destroyed.
+      destroy() {
+          this.dom.remove();
+      }
+
+  }
+
+  class ImageView {
+
+      constructor(node, view, getPos) {
+
+          this.node = node;
+          this.view = view;
+          this.getPos = getPos;
+
+          this.dom = this.contentDOM = document.createElement('img');
+
+          Object.keys(node.attrs).forEach(key => {
+              if(node.attrs[key] !== null){
+                  this.dom.setAttribute(key, node.attrs[key]);
+              }
+          });
+      }
+      
+      // Called when the node view is removed from the editor or the whole editor is destroyed.
+      destroy() {
+          this.dom.remove();
       }
 
   }
 
   window.DOMinator = class DOMinator {
       // editorSchema
-      // editorView
+      // view -view editors
       // menuItems
 
       constructor(options) {
@@ -20663,7 +21147,21 @@
                   right: 'text-right',
                   center: 'text-center',
                   // justify: 'text-justify',
-              }
+              },
+              photoFloatClasses: {
+                  left: 'pull-left',
+                  right: 'pull-right',
+                  center: 'horizontal-margin-auto',
+              },
+              photoSizeClasses: {
+                 '25': 'width-25',
+                 '33': 'width-33',
+                 '50': 'width-50',
+                 '66': 'width-66',
+                 '75': 'width-75',
+                 '100': 'width-100',
+             }
+
 
           };
 
@@ -20689,7 +21187,7 @@
           var that = this;
 
           // init view
-          this.editorView = new EditorView(document.querySelector("#editor"), {
+          this.view = new EditorView(document.querySelector("#editor"), {
 
               state: EditorState.create({
                   doc: DOMParser.fromSchema(this.editorSchema).parse(document.querySelector("#content")),
@@ -20702,6 +21200,7 @@
                       gapCursor(),
                       history(),
                       new Plugin({
+                          key: 'DOMinatorMenu',
                           view(editorView) {
                               let menuView = new DOMinatorMenu(that, editorView);
                               editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
@@ -20719,61 +21218,28 @@
 
               }),
               nodeViews: {
-                  custom_html(node, view, getPos) { return new DOMinatorCustomHtmlView(node, view, getPos) }
-              }
+                  custom_html(node, view, getPos) { return new CustomHtmlView(node, view, getPos) },
+                  photograph_caption(node, view, getPos) { return new PhotographCaptionView(node, view, getPos) },
+                  image(node, view, getPos) { return new ImageView(node, view, getPos) },
+              },
+              // listen to transactions
+              // dispatchTransaction: (transaction) => {
+              //     console.log(transaction.meta);
+              //     // console.log("Document size went from", transaction.before.content.size,
+              //     // "to", transaction.doc.content.size)
+              //     let newState = this.view.state.apply(transaction)
+              //     this.view.updateState(newState)
+              // }
           });
       }
 
       addNodes(nodes, newNodes){
           Object.keys(newNodes).forEach(key => {
               nodes = nodes.addToEnd(key, newNodes[key]);
-              // console.log('adding-'+key);
           });
           return nodes;
       }
-
-
-
   };
-
-
-
-
-  // Mix the nodes from prosemirror-schema-list into the basic schema to
-  // create a schema with list support.
-
-  // 1) Put 'view' on window object just for easy inspection/debugging
-  // 2) '#editor' is the ID of the DOM element that will host the DOM.
-  // window.view = new EditorView(document.querySelector("#editor"), {
-  //
-  //     state: EditorState.create({
-  //
-  //         // Here the document state is read from the DOM, the HTML markup on
-  //         // the simple file, public/index.html page that contains the editor;
-  //         // '#content' is the ID of the DOM element that has your pre-prepared content
-  //         // to be injected into the editor.  The only reason this is done in this
-  //         // demo project is to prevent you from starting with a blank editor.
-  //         doc: DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
-  //
-  //         // Instantiate all the plugins to make a very basic editor
-  //         plugins: exampleSetup({schema: mySchema})
-  //
-  //     })//,
-  //
-  //     // The rest is commented out as you have a basic editor.
-  //     // This section uses a sort of 'wiretap' into ProseMirror's event flow to
-  //     // let you see inside the basic editor model.
-  //
-  //     //dispatchTransaction( transaction ) {
-  //         // console.log("Document size went from", transaction.before.content.size,
-  //         //            "to", transaction.doc.content.size)
-  //
-  //         // console.log( 'State', JSON.stringify( this.state.toJSON(), null, 4 ))
-  //
-  //         // let newState = window.view.state.apply(transaction)
-  //         //window.view.updateState(newState)
-  //     //}
-  // })
 
 }());
 //# sourceMappingURL=DOMinator.js.map

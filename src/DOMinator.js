@@ -17,11 +17,13 @@ import DOMinatorMenu from "./DOMinatorMenu"
 import {paddingClasses, marginClasses} from "./DOMinatorPaddingsAndMargins"
 
 // node views
-import DOMinatorCustomHtmlView from "./DOMinatorCustomHtmlView"
+import CustomHtmlView from "./NodeViews/CustomHtmlView"
+import PhotographCaptionView from "./NodeViews/PhotographCaptionView"
+import ImageView from "./NodeViews/ImageView"
 
 window.DOMinator = class DOMinator {
     // editorSchema
-    // editorView
+    // view -view editors
     // menuItems
 
     constructor(options) {
@@ -47,7 +49,21 @@ window.DOMinator = class DOMinator {
                 right: 'text-right',
                 center: 'text-center',
                 // justify: 'text-justify',
-            }
+            },
+            photoFloatClasses: {
+                left: 'pull-left',
+                right: 'pull-right',
+                center: 'horizontal-margin-auto',
+            },
+            photoSizeClasses: {
+               '25': 'width-25',
+               '33': 'width-33',
+               '50': 'width-50',
+               '66': 'width-66',
+               '75': 'width-75',
+               '100': 'width-100',
+           }
+
 
         };
 
@@ -73,7 +89,7 @@ window.DOMinator = class DOMinator {
         var that = this;
 
         // init view
-        this.editorView = new EditorView(document.querySelector("#editor"), {
+        this.view = new EditorView(document.querySelector("#editor"), {
 
             state: EditorState.create({
                 doc: DOMParser.fromSchema(this.editorSchema).parse(document.querySelector("#content")),
@@ -86,6 +102,7 @@ window.DOMinator = class DOMinator {
                     gapCursor(),
                     history(),
                     new Plugin({
+                        key: 'DOMinatorMenu',
                         view(editorView) {
                             let menuView = new DOMinatorMenu(that, editorView);
                             editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
@@ -103,58 +120,25 @@ window.DOMinator = class DOMinator {
 
             }),
             nodeViews: {
-                custom_html(node, view, getPos) { return new DOMinatorCustomHtmlView(node, view, getPos) }
-            }
+                custom_html(node, view, getPos) { return new CustomHtmlView(node, view, getPos) },
+                photograph_caption(node, view, getPos) { return new PhotographCaptionView(node, view, getPos) },
+                image(node, view, getPos) { return new ImageView(node, view, getPos) },
+            },
+            // listen to transactions
+            // dispatchTransaction: (transaction) => {
+            //     console.log(transaction.meta);
+            //     // console.log("Document size went from", transaction.before.content.size,
+            //     // "to", transaction.doc.content.size)
+            //     let newState = this.view.state.apply(transaction)
+            //     this.view.updateState(newState)
+            // }
         })
     }
 
     addNodes(nodes, newNodes){
         Object.keys(newNodes).forEach(key => {
             nodes = nodes.addToEnd(key, newNodes[key]);
-            // console.log('adding-'+key);
         });
         return nodes;
     }
-
-
-
 }
-
-
-
-
-// Mix the nodes from prosemirror-schema-list into the basic schema to
-// create a schema with list support.
-
-// 1) Put 'view' on window object just for easy inspection/debugging
-// 2) '#editor' is the ID of the DOM element that will host the DOM.
-// window.view = new EditorView(document.querySelector("#editor"), {
-//
-//     state: EditorState.create({
-//
-//         // Here the document state is read from the DOM, the HTML markup on
-//         // the simple file, public/index.html page that contains the editor;
-//         // '#content' is the ID of the DOM element that has your pre-prepared content
-//         // to be injected into the editor.  The only reason this is done in this
-//         // demo project is to prevent you from starting with a blank editor.
-//         doc: DOMParser.fromSchema(mySchema).parse(document.querySelector("#content")),
-//
-//         // Instantiate all the plugins to make a very basic editor
-//         plugins: exampleSetup({schema: mySchema})
-//
-//     })//,
-//
-//     // The rest is commented out as you have a basic editor.
-//     // This section uses a sort of 'wiretap' into ProseMirror's event flow to
-//     // let you see inside the basic editor model.
-//
-//     //dispatchTransaction( transaction ) {
-//         // console.log("Document size went from", transaction.before.content.size,
-//         //            "to", transaction.doc.content.size)
-//
-//         // console.log( 'State', JSON.stringify( this.state.toJSON(), null, 4 ))
-//
-//         // let newState = window.view.state.apply(transaction)
-//         //window.view.updateState(newState)
-//     //}
-// })

@@ -44,6 +44,9 @@ div,p,h1{
 .hidden{
     display: none;
 }
+blockquote{
+    clear: both;
+}
 .animate> * {
     -webkit-transition:all 0.4s ease 0s;
     -moz-transition:all 0.4s ease 0s;
@@ -942,6 +945,7 @@ img{
 }
 .tg_subwidget_photograph{
     margin-bottom: 10px;
+    overflow: auto;
 }
 .tg_subwidget_photograph img{
     /* border: 2px solid #eee; */
@@ -965,7 +969,7 @@ img{
     right: 0;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 5px 0px 5px 10px;
+    padding: 5px 10px 5px 10px;
 }
 .tg_subwidget_photograph .photograph_title{
     margin-right: 10px;

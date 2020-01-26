@@ -86,8 +86,8 @@
 }
 
 .ProseMirror-selectednode {
-    outline: 2px solid orange;
-    outline-offset: -2px;
+    outline: 4px dashed orange;
+    outline-offset: -4px;
 }
 
 /* Make sure li selections wrap around markers */

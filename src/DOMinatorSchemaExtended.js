@@ -193,13 +193,72 @@ export default {
             ]
         }
     },
+    photograph: {
+        content: "image{1} photograph_caption{1}",
+        group: "block",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {
+            class: {
+                default: null
+            },
+            id: {
+                default: null
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_subwidget_photograph',
+            getAttrs: dom => {
+                return {
+                    id: dom.getAttribute("id"),
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    photograph_caption: {
+        menu: 'photograph',
+        content: "inline*",
+        group: "block",
+        defining: true,
+        selectable: false,
+        draggable: false,
+        attrs: {
+            class: {
+                default: 'tg_subwidget_photograph_text'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_subwidget_photograph_text',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
     custom_html: {
-        content: "block+",
+        // content: "block+",
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
         selectable: true,
         atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
-        draggable: false, // does not work for some reason
+        draggable: false,
         // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
             class: {
@@ -223,7 +282,6 @@ export default {
         toDOM(node) {
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
-            console.log(node.attrs.class);
             if(node.attrs){
                 newDiv.setAttribute('class', node.attrs.class);
             }

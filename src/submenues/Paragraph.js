@@ -76,13 +76,6 @@ export default function(menu) {
                     }),
                 ]
             }),
-            new DOMinatorMenuButton ({
-                key: 'align left',
-                icon: 'align-left',
-                action: (button) => {
-                    alignSelection(menu.view, 'text-right');
-                }
-            }),
             new DOMinatorMenuDropdown ({
                 key: 'alignment',
                 icon: 'align-left',

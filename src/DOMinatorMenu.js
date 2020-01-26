@@ -10,13 +10,14 @@ import DOMinatorSubMenu from "./DOMinatorSubMenu"
 import DOMinatorMenuSeparator from "./DOMinatorMenuSeparator"
 import DOMinatorMenuLabel from "./DOMinatorMenuLabel"
 
-// submenues
-import { paddings as smPaddings, margins as smMargins} from "./submenues/PaddingMargin"
-import smParagraph from "./submenues/Paragraph"
-import smInline from "./submenues/Inline"
-import smLink from "./submenues/Link"
-import smHeading from "./submenues/Heading"
-import smRightMenu from "./submenues/RightMenu"
+// Submenues
+import { paddings as smPaddings, margins as smMargins} from "./Submenues/PaddingMargin"
+import smParagraph from "./Submenues/Paragraph"
+import smInline from "./Submenues/Inline"
+import smLink from "./Submenues/Link"
+import smHeading from "./Submenues/Heading"
+import smPhotograph from "./Submenues/Photograph"
+import smRightMenu from "./Submenues/RightMenu"
 
 import {
     Selection,
@@ -99,6 +100,11 @@ export default class DOMinatorMenu {
         let activeSubmenuKey = '';
 
         if(view){
+            // console.log('view');
+            // console.log(view.state);
+            // console.log('lastState');
+            // console.log(lastState);
+            // console.log('UPDATE');
             const selection = view.state.selection;
             if(selection.constructor.name === 'TextSelection'){
                 // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
@@ -114,7 +120,11 @@ export default class DOMinatorMenu {
                             }
                         }
                     }else{
-                        activeSubmenuKey = selection.$head.parent.type.name;
+                        if(selection.$head.parent.type.spec.menu){
+                            activeSubmenuKey = selection.$head.parent.type.spec.menu;
+                        }else{
+                            activeSubmenuKey = selection.$head.parent.type.name;
+                        }
                     }
                 }else{
                     // there is a selection show inline menu
@@ -176,6 +186,7 @@ export default class DOMinatorMenu {
             heading: smHeading(this),
             paddings: smPaddings(this),
             margins: smMargins(this),
+            photograph:smPhotograph(this),
             custom_html: new DOMinatorSubMenu({
                 key: 'custom_html',
                 items: [
@@ -192,6 +203,7 @@ export default class DOMinatorMenu {
                     }),
                 ],
             }),
+
             span: new DOMinatorSubMenu({
                 key: 'span',
                 items: [

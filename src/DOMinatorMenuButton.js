@@ -2,7 +2,8 @@ export default class DOMinatorMenuButton {
     // dom
     // options
     // menu
-
+    // icon
+    // tempIcon = the last icon which was appended to the dropdown is kept for reference so we can swap it
     constructor(options) {
         this.options = options;
         this.dom = document.createElement("button")
@@ -19,16 +20,16 @@ export default class DOMinatorMenuButton {
         //document.createTextNode("Hello World");
         if(this.options.icon){
             if(!this.options.iconType){
-                let icon = document.createElement("i");
-                icon.className = 'fa fa-'+this.options.icon
-                icon.setAttribute('aria-hidden', 'true');
-                this.dom.appendChild(icon);
+                this.icon = document.createElement("i");
+                this.icon.className = 'fa fa-'+this.options.icon
+                this.icon.setAttribute('aria-hidden', 'true');
+                this.dom.appendChild(this.icon);
             }else if(this.options.iconType === 'dics'){
                 // the default icons boundled with dominator
-                let icon = document.createElement("span");
-                icon.className = 'dics dominator-icon-'+this.options.icon
-                icon.setAttribute('aria-hidden', 'true');
-                this.dom.appendChild(icon);
+                this.icon = document.createElement("span");
+                this.icon.className = 'dics dominator-icon-'+this.options.icon
+                this.icon.setAttribute('aria-hidden', 'true');
+                this.dom.appendChild(this.icon);
             }
         }
 
@@ -83,6 +84,31 @@ export default class DOMinatorMenuButton {
 
     deactivate(){
         this.dom.classList.remove('button-active');
+    }
+
+    swapIcon(icon){
+        // the icon has already been changed to something else
+        if(this.tempIcon && icon){
+            this.dom.replaceChild(icon, this.tempIcon);
+            this.tempIcon = icon;
+        }else if(this.icon && icon){
+            this.dom.replaceChild(icon, this.icon);
+            this.tempIcon = icon;
+        }
+    }
+
+    reinstateIcon(){
+        if(this.icon && this.tempIcon){
+            this.dom.replaceChild(this.icon, this.tempIcon);
+            this.tempIcon = null;
+        }
+    }
+
+    getIcon(){
+        if(this.icon){
+            return this.icon.cloneNode(true);
+        }
+        return null;
     }
 
     destroy() {

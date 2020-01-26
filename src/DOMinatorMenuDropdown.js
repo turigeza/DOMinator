@@ -7,7 +7,7 @@ export default class DOMinatorMenuDropdown {
     // dropdownButton - object
     // dropdownCaret - the small triangle on the right indicating the dropdown
     // activeItems = array of the active menu items
-
+    // originalDropdownIcon
     constructor(options) {
         const settings = {
             autoclose: true
@@ -43,8 +43,13 @@ export default class DOMinatorMenuDropdown {
                 }else{
                     if(this.activeItems && this.activeItems.length > 0){
                         this.dropdownButton.activate();
+                        if(this.activeItems.length === 1){
+                            const i = this.activeItems[0].getIcon();
+                            this.dropdownButton.swapIcon(i);
+                        }
                     }else{
                         this.dropdownButton.deactivate();
+                        this.dropdownButton.reinstateIcon();
                     }
                 }
             }
