@@ -421,10 +421,79 @@ export function toggleList(nodeKey, menu) {
     return wrapInList(listType)(state, dispatch, view)
 }
 
+export function insertLayout(menu, layoutKey){
+    
+    const selection = menu.view.state.selection;
+    const state = menu.view.state;
+    const layout = state.schema.nodes[layoutKey];
+    const content = layout.spec.content;
+    const contentArray = content.split(' ');
+    // "cl_8{1} cl_4{1}"
 
-export function insertPhotograph(menu, photograph){
+    const columns = [];
+    let columnIndex = 1;
+    contentArray.forEach((column)=>{
+        const [columnKey, occurrence] = column.replace('}', '').split('{');
+        for (let j = 0; j < occurrence; j++) {
+            const columnText = state.schema.nodes.paragraph.create({}, state.schema.text('Column '+ columnIndex));
+            const columnNode = state.schema.nodes[columnKey].create({}, columnText);
+            columns.push(columnNode);
+            columnIndex++;
+            //  const columnParagraph = state.schema.text('Column '+ (i+1));
+        }
+    });
 
-    const selection = view.state.selection;
+    const layoutNode = layout.create({}, columns);
+    const tr = state.tr.insert( selection.$head.after(1), layoutNode );
+    menu.view.dispatch(tr);
 
+    // node.type.spec.canTakeAligment
 
+    // menu.dominator.options.photo(menu, menu.dominator);
+    /*
+    <div class="tg_subwidget tg_subwidget_photograph width-66 pull-left">
+        <img src="https://i.picsum.photos/id/519/600/400.jpg?grayscale"
+        alt="Some alt tag which is not the same as the caption."
+        data-photograph_id="12035" data-photograph_medium="https://i.picsum.photos/id/519/600/400.jpg?grayscale" data-photograph_large="https://i.picsum.photos/id/519/1200/800.jpg?grayscale" draggable="false"><div class="tg_subwidget_photograph_text"><span class="photograph_title">Picsum Photos random images</span> <span class="copyright">©</span>picsum.photos</div></div>
+    */
+    // const photographAttrs = {
+    //     alt: 'Placeholder',
+    //     src: 'https://picsum.photos/600/900?grayscale',
+    //
+    // };
+    // photograph_caption
+    // const image = view.state.schema.nodes.image.create({
+    //     src: 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+    //     alt: 'Placeholder'
+    //     'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+    //     'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+    // });
+
+    // // caption
+    // const captionText = menu.view.state.schema.text('Image from picsum.photos');
+    // const photographCaption = menu.view.state.schema.nodes.photograph_caption.create({}, captionText);
+    //
+    // // image
+    // const image = menu.view.state.schema.nodes.image.create({
+    //     src: 'https://picsum.photos/600/400?grayscale',
+    //     alt: 'A placeholder image from picsum.photos',
+    //     // 'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+    //     // 'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+    // });
+    //
+    // const photograph = menu.view.state.schema.nodes.photograph.create({}, [ image, photographCaption ]);
+    //
+    //
+    // // console.log(photograph);
+    // // console.log(selection.from);
+    // // menu.view.state.tr.replaceWith( selection.from, selection.from, photograph );
+    // // menu.view.state.tr.replaceWith( 0, 0, photograph );
+    //
+    // const tr = menu.view.state.tr.insert( selection.from, photograph );
+    // menu.view.dispatch(tr);
+    // if(selection.constructor.name === 'TextSelection'){
+    //     pos = selection.$head.before()-2;
+    // }else if(selection.constructor.name === 'NodeSelection'){
+    //     pos = selection.from;
+    // }
 }

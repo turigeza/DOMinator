@@ -11,7 +11,8 @@ import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
     convertBlock,
     toggleList,
-    toggleWrap
+    toggleWrap,
+    insertLayout
 } from "./../DOMinatorActions"
 
 export default function(menu) {
@@ -249,32 +250,50 @@ export default function(menu) {
                     new DOMinatorMenuButton ({
                         key: 'column 1 third - 2 third',
                         icon: 'columns12',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_48');
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: 'column 2 third - 1 third',
                         icon: 'columns21',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_84');
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: '4 columns',
                         icon: 'fourcolumns',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_3333');
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: '3 columns',
                         icon: 'threecolumns',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_444');
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: '2 columns',
                         icon: 'twocolumns',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_66');
+                        }
                     }),
                     new DOMinatorMenuButton ({
                         key: '1 column',
                         icon: 'onecolumn',
-                        iconType: 'dics'
+                        iconType: 'dics',
+                        action:(button) => {
+                            insertLayout(menu, 'layout_12');
+                        }
                     })
                 ]
             }),

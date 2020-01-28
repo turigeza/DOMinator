@@ -19166,7 +19166,7 @@
       return false;
   }
 
-  function alignSelection$1(view, classKey, classes){
+  function alignSelection(view, classKey, classes){
 
       const selection = view.state.selection;
 
@@ -19549,6 +19549,83 @@
       return wrapInList(listType)(state, dispatch, view)
   }
 
+  function insertLayout(menu, layoutKey){
+      
+      const selection = menu.view.state.selection;
+      const state = menu.view.state;
+      const layout = state.schema.nodes[layoutKey];
+      const content = layout.spec.content;
+      const contentArray = content.split(' ');
+      // "cl_8{1} cl_4{1}"
+
+      const columns = [];
+      let columnIndex = 1;
+      contentArray.forEach((column)=>{
+          const [columnKey, occurrence] = column.replace('}', '').split('{');
+          for (let j = 0; j < occurrence; j++) {
+              const columnText = state.schema.nodes.paragraph.create({}, state.schema.text('Column '+ columnIndex));
+              const columnNode = state.schema.nodes[columnKey].create({}, columnText);
+              columns.push(columnNode);
+              columnIndex++;
+              //  const columnParagraph = state.schema.text('Column '+ (i+1));
+          }
+      });
+
+      const layoutNode = layout.create({}, columns);
+      const tr = state.tr.insert( selection.$head.after(1), layoutNode );
+      menu.view.dispatch(tr);
+
+      // node.type.spec.canTakeAligment
+
+      // menu.dominator.options.photo(menu, menu.dominator);
+      /*
+      <div class="tg_subwidget tg_subwidget_photograph width-66 pull-left">
+          <img src="https://i.picsum.photos/id/519/600/400.jpg?grayscale"
+          alt="Some alt tag which is not the same as the caption."
+          data-photograph_id="12035" data-photograph_medium="https://i.picsum.photos/id/519/600/400.jpg?grayscale" data-photograph_large="https://i.picsum.photos/id/519/1200/800.jpg?grayscale" draggable="false"><div class="tg_subwidget_photograph_text"><span class="photograph_title">Picsum Photos random images</span> <span class="copyright">©</span>picsum.photos</div></div>
+      */
+      // const photographAttrs = {
+      //     alt: 'Placeholder',
+      //     src: 'https://picsum.photos/600/900?grayscale',
+      //
+      // };
+      // photograph_caption
+      // const image = view.state.schema.nodes.image.create({
+      //     src: 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+      //     alt: 'Placeholder'
+      //     'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+      //     'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+      // });
+
+      // // caption
+      // const captionText = menu.view.state.schema.text('Image from picsum.photos');
+      // const photographCaption = menu.view.state.schema.nodes.photograph_caption.create({}, captionText);
+      //
+      // // image
+      // const image = menu.view.state.schema.nodes.image.create({
+      //     src: 'https://picsum.photos/600/400?grayscale',
+      //     alt: 'A placeholder image from picsum.photos',
+      //     // 'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+      //     // 'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+      // });
+      //
+      // const photograph = menu.view.state.schema.nodes.photograph.create({}, [ image, photographCaption ]);
+      //
+      //
+      // // console.log(photograph);
+      // // console.log(selection.from);
+      // // menu.view.state.tr.replaceWith( selection.from, selection.from, photograph );
+      // // menu.view.state.tr.replaceWith( 0, 0, photograph );
+      //
+      // const tr = menu.view.state.tr.insert( selection.from, photograph );
+      // menu.view.dispatch(tr);
+      // if(selection.constructor.name === 'TextSelection'){
+      //     pos = selection.$head.before()-2;
+      // }else if(selection.constructor.name === 'NodeSelection'){
+      //     pos = selection.from;
+      // }
+  }
+
   function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
       const sizes = [
           ['xxs', 'extra-extra small'],
@@ -19759,7 +19836,7 @@
                               return updateAlignmentButton(button, menu, 'left');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -19769,7 +19846,7 @@
                               return updateAlignmentButton(button, menu, 'center');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -19779,7 +19856,7 @@
                               return updateAlignmentButton(button, menu, 'right');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -19787,7 +19864,7 @@
                           icon: 'clearalignment',
                           iconType: 'dics',
                           action: () => {
-                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -19914,32 +19991,50 @@
                       new DOMinatorMenuButton ({
                           key: 'column 1 third - 2 third',
                           icon: 'columns12',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_48');
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'column 2 third - 1 third',
                           icon: 'columns21',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_84');
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: '4 columns',
                           icon: 'fourcolumns',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_3333');
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: '3 columns',
                           icon: 'threecolumns',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_444');
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: '2 columns',
                           icon: 'twocolumns',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_66');
+                          }
                       }),
                       new DOMinatorMenuButton ({
                           key: '1 column',
                           icon: 'onecolumn',
-                          iconType: 'dics'
+                          iconType: 'dics',
+                          action:(button) => {
+                              insertLayout(menu, 'layout_12');
+                          }
                       })
                   ]
               }),
@@ -20105,21 +20200,21 @@
                           key: 'align left',
                           icon: 'align-left',
                           action: (button) => {
-                              alignSelection$1(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align center',
                           icon: 'align-center',
                           action: () => {
-                              alignSelection$1(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align right',
                           icon: 'align-right',
                           action: () => {
-                              alignSelection$1(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -20127,7 +20222,7 @@
                           icon: 'clearalignment',
                           iconType: 'dics',
                           action: () => {
-                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -20340,7 +20435,7 @@
                               return updateAlignmentButton(button, menu, 'left');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -20350,7 +20445,7 @@
                               return updateAlignmentButton(button, menu, 'center');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -20360,7 +20455,7 @@
                               return updateAlignmentButton(button, menu, 'right');
                           },
                           action: (button) => {
-                              alignSelection$1(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
@@ -20368,7 +20463,7 @@
                           icon: 'clearalignment',
                           iconType: 'dics',
                           action: () => {
-                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
+                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -20688,15 +20783,7 @@
                           action: () => {
                               imageFloat('right', menu);
                           }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'clear alignment',
-                          icon: 'clearalignment',
-                          iconType: 'dics',
-                          action: () => {
-                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
-                          }
-                      }),
+                      })
                   ]
               }),
               new DOMinatorMenuLabel({
@@ -21445,7 +21532,7 @@
                  '66': 'width-66',
                  '75': 'width-75',
                  '100': 'width-100',
-             }
+             },
 
           };
 

@@ -66,7 +66,7 @@ window.DOMinator = class DOMinator {
                '66': 'width-66',
                '75': 'width-75',
                '100': 'width-100',
-           }
+           },
 
         };
 

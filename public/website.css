@@ -953,11 +953,11 @@ img{
     box-sizing: border-box;
 }
 .tg_subwidget_photograph.pull-left{
-    margin-right: 15px;
+    margin-right: 20px;
     margin-bottom: 15px;
 }
 .tg_subwidget_photograph.pull-right{
-    margin-left: 15px;
+    margin-left: 20px;
     margin-bottom: 15px;
 }
 .tg_subwidget_photograph img{

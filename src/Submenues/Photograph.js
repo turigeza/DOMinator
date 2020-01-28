@@ -279,15 +279,7 @@ export default function(menu) {
                         action: () => {
                             imageFloat('right', menu);
                         }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: 'clear alignment',
-                        icon: 'clearalignment',
-                        iconType: 'dics',
-                        action: () => {
-                            alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
-                        }
-                    }),
+                    })
                 ]
             }),
             new DOMinatorMenuLabel({
