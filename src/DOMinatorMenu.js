@@ -1,7 +1,7 @@
 import {Plugin} from "prosemirror-state"
 import {baseKeymap, setBlockType, wrapIn} from "./prosemirrorcommands"
 
-import {schema} from "./DOMinatorSchemaBasic"
+import {schema} from "./DOMinatorSchema"
 
 import DOMinatorMenuButton from "./DOMinatorMenuButton"
 import DOMinatorMenuDropdown from "./DOMinatorMenuDropdown"

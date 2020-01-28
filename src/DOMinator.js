@@ -16,8 +16,7 @@ import {gapCursor} from "prosemirror-gapcursor"
 import {baseKeymap} from "./prosemirrorcommands"
 import {buildKeymap} from "./DOMinatorKeymap"
 import {buildInputRules} from "./DOMinatrorInputrules"
-import {schema} from "./DOMinatorSchemaBasic"
-import schemaDominator from "./DOMinatorSchemaExtended"
+import {schema} from "./DOMinatorSchema"
 import DOMinatorMenu from "./DOMinatorMenu"
 
 import {paddingClasses, marginClasses} from "./DOMinatorPaddingsAndMargins"
@@ -83,7 +82,6 @@ window.DOMinator = class DOMinator {
         // init editorSchema
         let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
         nodes = addListNodes(nodes, "paragraph block*", "block");
-        nodes = this.addNodes(nodes, schemaDominator);
 
         this.editorSchema = new Schema({
             nodes: nodes,

@@ -13465,7 +13465,7 @@
   const nodes = {
       // :: NodeSpec The top level document node.
       doc: {
-          content: "block+"
+          content: "(block | layout)+"
       },
 
       // :: NodeSpec A plain paragraph textblock. Represented in the DOM
@@ -13654,169 +13654,10 @@
           toDOM() {
               return ["br"];
           }
-      }
-  };
-
-  // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
-  const marks = {
-      // :: MarkSpec A link. Has `href` and `title` attributes. `title`
-      // defaults to the empty string. Rendered and parsed as an `<a>`
-      // element.
-      link: {
-          attrs: {
-              href: {
-                  default: ''
-              },
-              title: {
-                  default: null
-              },
-              target: {
-                  default: null
-              },
-              'class': {
-                  default: null
-              },
-
-          },
-          excludes: 'span link',
-          inclusive: false,
-          parseDOM: [{
-              tag: "a", //[href]
-              getAttrs(dom) {
-
-                  return {
-                      href: dom.getAttribute("href"),
-                      title: dom.getAttribute("title"),
-                      target:  dom.getAttribute("target"),
-                      'class': dom.getAttribute("class"),
-                  }
-              }
-          }],
-          toDOM(node) {
-              return ["a", node.attrs, 0]
-          }
       },
-
-      // for inline styling
-      span: {
-          attrs: {
-              'class': {
-                  default: null
-              }
-          },
-          parseDOM: [{
-              tag: "span",
-              getAttrs: dom => {
-                  return {
-                      'class':  dom.getAttribute("class") || null
-                  }
-              }
-          }],
-          toDOM(node) {
-              return ["span", node.attrs, 0];
-          }
-      },
-      // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-      // Has parse rules that also match `<i>` and `font-style: italic`.
-      i: {
-          parseDOM: [{
-              tag: "i"
-          }, {
-              tag: "em"
-          }, {
-              style: "font-style=italic"
-          }],
-          toDOM() {
-              return ["i", 0];
-          }
-      },
-
-      // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
-      // also match `<b>` and `font-weight: bold`.
-      b: {
-          parseDOM: [{
-                  tag: "strong"
-              },
-              // This works around a Google Docs misbehavior where
-              // pasted content will be inexplicably wrapped in `<b>`
-              // tags with a font-weight normal.
-              {
-                  tag: "b",
-                  getAttrs: node => node.style.fontWeight != "normal" && null
-              },
-              {
-                  style: "font-weight",
-                  getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
-              }
-          ],
-          toDOM() {
-              return ["b", 0];
-          }
-      },
-
-      // :: MarkSpec Code font mark. Represented as a `<code>` element.
-      code: {
-          parseDOM: [{
-              tag: "code"
-          }],
-          toDOM() {
-              return ["code", 0];
-          }
-      },
-      del: {
-          parseDOM: [{
-              tag: "del"
-          }],
-          toDOM() {
-              return ["del", 0];
-          }
-      },
-      u: {
-          parseDOM: [{
-              tag: "u"
-          }],
-          toDOM() {
-              return ["u", 0];
-          }
-      },
-      sub: {
-          parseDOM: [{
-              tag: "sub"
-          }],
-          excludes: 'sub sup',
-          toDOM() {
-              return ["sub", 0];
-          }
-      },
-      sup: {
-          parseDOM: [{
-              tag: "sup"
-          }],
-          excludes: 'sub sup',
-          toDOM() {
-              return ["sup", 0];
-          }
-      },
-
-  };
-
-  // :: Schema
-  // This schema roughly corresponds to the document schema used by
-  // [CommonMark](http://commonmark.org/), minus the list elements,
-  // which are defined in the [`prosemirror-schema-list`](#schema-list)
-  // module.
-  //
-  // To reuse elements from this schema, extend or read from its
-  // `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
-  const schema = new Schema({
-      nodes,
-      marks
-  });
-
-  var schemaDominator = {
       layout_12: {
           content: "cl_12{1}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           selectable: true,
           parseDOM: [{
@@ -13834,7 +13675,7 @@
       },
       layout_48: {
           content: "cl_4{1} cl_8{1}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           parseDOM: [{
               tag: 'div.layout_48'
@@ -13851,7 +13692,7 @@
       },
       layout_66: {
           content: "cl_6{2}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           parseDOM: [{
               tag: 'div.layout_66'
@@ -13868,7 +13709,7 @@
       },
       layout_84: {
           content: "cl_8{1} cl_4{1}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           parseDOM: [{
               tag: 'div.layout_84'
@@ -13885,7 +13726,7 @@
       },
       layout_444: {
           content: "cl_4{3}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           parseDOM: [{
               tag: 'div.layout_444'
@@ -13902,7 +13743,7 @@
       },
       layout_3333: {
           content: "cl_3{4}",
-          group: "block layout",
+          group: "layout",
           defining: true,
           parseDOM: [{
               tag: 'div.layout_3333'
@@ -14143,6 +13984,162 @@
       },
 
   };
+
+  // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
+  const marks = {
+      // :: MarkSpec A link. Has `href` and `title` attributes. `title`
+      // defaults to the empty string. Rendered and parsed as an `<a>`
+      // element.
+      link: {
+          attrs: {
+              href: {
+                  default: ''
+              },
+              title: {
+                  default: null
+              },
+              target: {
+                  default: null
+              },
+              'class': {
+                  default: null
+              },
+
+          },
+          excludes: 'span link',
+          inclusive: false,
+          parseDOM: [{
+              tag: "a", //[href]
+              getAttrs(dom) {
+
+                  return {
+                      href: dom.getAttribute("href"),
+                      title: dom.getAttribute("title"),
+                      target:  dom.getAttribute("target"),
+                      'class': dom.getAttribute("class"),
+                  }
+              }
+          }],
+          toDOM(node) {
+              return ["a", node.attrs, 0]
+          }
+      },
+
+      // for inline styling
+      span: {
+          attrs: {
+              'class': {
+                  default: null
+              }
+          },
+          parseDOM: [{
+              tag: "span",
+              getAttrs: dom => {
+                  return {
+                      'class':  dom.getAttribute("class") || null
+                  }
+              }
+          }],
+          toDOM(node) {
+              return ["span", node.attrs, 0];
+          }
+      },
+      // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
+      // Has parse rules that also match `<i>` and `font-style: italic`.
+      i: {
+          parseDOM: [{
+              tag: "i"
+          }, {
+              tag: "em"
+          }, {
+              style: "font-style=italic"
+          }],
+          toDOM() {
+              return ["i", 0];
+          }
+      },
+
+      // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
+      // also match `<b>` and `font-weight: bold`.
+      b: {
+          parseDOM: [{
+                  tag: "strong"
+              },
+              // This works around a Google Docs misbehavior where
+              // pasted content will be inexplicably wrapped in `<b>`
+              // tags with a font-weight normal.
+              {
+                  tag: "b",
+                  getAttrs: node => node.style.fontWeight != "normal" && null
+              },
+              {
+                  style: "font-weight",
+                  getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+              }
+          ],
+          toDOM() {
+              return ["b", 0];
+          }
+      },
+
+      // :: MarkSpec Code font mark. Represented as a `<code>` element.
+      code: {
+          parseDOM: [{
+              tag: "code"
+          }],
+          toDOM() {
+              return ["code", 0];
+          }
+      },
+      del: {
+          parseDOM: [{
+              tag: "del"
+          }],
+          toDOM() {
+              return ["del", 0];
+          }
+      },
+      u: {
+          parseDOM: [{
+              tag: "u"
+          }],
+          toDOM() {
+              return ["u", 0];
+          }
+      },
+      sub: {
+          parseDOM: [{
+              tag: "sub"
+          }],
+          excludes: 'sub sup',
+          toDOM() {
+              return ["sub", 0];
+          }
+      },
+      sup: {
+          parseDOM: [{
+              tag: "sup"
+          }],
+          excludes: 'sub sup',
+          toDOM() {
+              return ["sup", 0];
+          }
+      },
+
+  };
+
+  // :: Schema
+  // This schema roughly corresponds to the document schema used by
+  // [CommonMark](http://commonmark.org/), minus the list elements,
+  // which are defined in the [`prosemirror-schema-list`](#schema-list)
+  // module.
+  //
+  // To reuse elements from this schema, extend or read from its
+  // `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
+  const schema = new Schema({
+      nodes,
+      marks
+  });
 
   class DOMinatorMenuButton {
       // dom
@@ -21366,7 +21363,6 @@
           // init editorSchema
           let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
           nodes = addListNodes(nodes, "paragraph block*", "block");
-          nodes = this.addNodes(nodes, schemaDominator);
 
           this.editorSchema = new Schema({
               nodes: nodes,

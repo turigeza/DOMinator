@@ -16,7 +16,7 @@ import {gapCursor} from "prosemirror-gapcursor"
 import {baseKeymap} from "./prosemirrorcommands"
 import {buildKeymap} from "./DOMinatorKeymap"
 import {buildInputRules} from "./DOMinatrorInputrules"
-import {schema} from "./DOMinatorSchemaBasic"
+import {schema} from "./DOMinatorSchema"
 import schemaDominator from "./DOMinatorSchemaExtended"
 import DOMinatorMenu from "./DOMinatorMenu"
 
@@ -137,7 +137,7 @@ window.DOMinator = class DOMinator {
 
                                             const pos = selection.$cursor.end()+3;
                                             const p = this.editorSchema.nodes.paragraph.createAndFill();
-                                            
+
                                             view.dispatch(view.state.tr.insert( pos, p ));
                                             view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos)).scrollIntoView());
                                             // view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos-5, pos-2)).scrollIntoView());
