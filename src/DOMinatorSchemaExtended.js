@@ -201,7 +201,7 @@ export default {
         draggable: false,
         attrs: {
             class: {
-                default: null
+                default: 'tg_subwidget_photograph'
             },
             id: {
                 default: null

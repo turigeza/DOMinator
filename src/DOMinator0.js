@@ -134,31 +134,14 @@ window.DOMinator = class DOMinator {
                                             // view.dispatch(tr.scrollIntoView());
                                             return true;
                                         }else if(!selection.$cursor.nodeAfter && !selection.$cursor.nodeBefore&& selection.$cursor.depth > 2){
-                                            const depth = selection.$cursor.depth;
-                                            const thirdParent = selection.$cursor.node(depth-2);
+
                                             const pos = selection.$cursor.end()+3;
-
-                                            if(!thirdParent || !thirdParent.type.name.includes('layout_')){
-                                                return false;
-                                            }
-
-                                            if(selection.$cursor.after(depth-2) !== pos){
-                                                return false;
-                                            }
-
                                             const p = this.editorSchema.nodes.paragraph.createAndFill();
-
-                                            let transaction;
+                                            
                                             view.dispatch(view.state.tr.insert( pos, p ));
-
-                                            transaction = view.state.tr;
-                                            transaction.setMeta("addToHistory", false);
-                                            view.dispatch(transaction.setSelection(TextSelection.create(view.state.doc, pos)).scrollIntoView());
-
+                                            view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos)).scrollIntoView());
                                             // view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos-5, pos-2)).scrollIntoView());
-                                            transaction = view.state.tr;
-                                            transaction.setMeta("addToHistory", false);
-                                            view.dispatch(transaction.delete( pos-5, pos-2));
+                                            view.dispatch(view.state.tr.delete( pos-5, pos-2));
                                             return true;
                                         }
                                     }

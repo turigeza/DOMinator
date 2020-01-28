@@ -46,6 +46,8 @@ export default class PhotographCaptionView {
     }
 
     stopEvent(event) {
+
+        // console.log(event);
         // const blacklisted = [
         //     'dragstart',
         //     'dragenter',

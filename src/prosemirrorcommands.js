@@ -651,6 +651,26 @@ export function chainCommands(...commands) {
 let backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward)
 let del = chainCommands(deleteSelection, joinForward, selectNodeForward)
 
+// function tryThis (state, dispatch){
+//
+//     const selection = state.selection;
+//     if(selection.empty && selection.$cursor){
+//         const parent = selection.$cursor.parent.type.name;
+//         // create a new paragraph after the photograph
+//         if(parent === "photograph_caption"){
+//             const pos = selection.$cursor.end()+2;
+//             const p = state.schema.nodes.paragraph.createAndFill();
+//             const tr = state.tr.insert( pos, p );
+//             tr.setSelection(TextSelection.create(tr.doc, pos-1));
+//             if(dispatch){
+//                 dispatch(tr.scrollIntoView());
+//             }
+//             return true;
+//         }
+//     }
+//
+//     return false;
+// }
 // :: Object
 // A basic keymap containing bindings not specific to any schema.
 // Binds the following keys (when multiple commands are listed, they

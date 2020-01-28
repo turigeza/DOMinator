@@ -13060,6 +13060,26 @@
   let backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
   let del = chainCommands(deleteSelection, joinForward, selectNodeForward);
 
+  // function tryThis (state, dispatch){
+  //
+  //     const selection = state.selection;
+  //     if(selection.empty && selection.$cursor){
+  //         const parent = selection.$cursor.parent.type.name;
+  //         // create a new paragraph after the photograph
+  //         if(parent === "photograph_caption"){
+  //             const pos = selection.$cursor.end()+2;
+  //             const p = state.schema.nodes.paragraph.createAndFill();
+  //             const tr = state.tr.insert( pos, p );
+  //             tr.setSelection(TextSelection.create(tr.doc, pos-1));
+  //             if(dispatch){
+  //                 dispatch(tr.scrollIntoView());
+  //             }
+  //             return true;
+  //         }
+  //     }
+  //
+  //     return false;
+  // }
   // :: Object
   // A basic keymap containing bindings not specific to any schema.
   // Binds the following keys (when multiple commands are listed, they
@@ -13996,7 +14016,7 @@
           draggable: false,
           attrs: {
               class: {
-                  default: null
+                  default: 'tg_subwidget_photograph'
               },
               id: {
                   default: null
@@ -19185,7 +19205,7 @@
           }
 
           if(node.type.spec.canTakeAligment){
-              
+
               // remove alignment classes
               let className = '';
               if(node.attrs.class){
@@ -19799,7 +19819,54 @@
                   key: 'photo',
                   icon: 'camera-retro',
                   action: (button) => {
-                      menu.dominator.options.photo(menu, menu.dominator);
+                      const selection = menu.view.state.selection;
+                      // menu.dominator.options.photo(menu, menu.dominator);
+                      /*
+                      <div class="tg_subwidget tg_subwidget_photograph width-66 pull-left">
+                          <img src="https://i.picsum.photos/id/519/600/400.jpg?grayscale"
+                          alt="Some alt tag which is not the same as the caption."
+                          data-photograph_id="12035" data-photograph_medium="https://i.picsum.photos/id/519/600/400.jpg?grayscale" data-photograph_large="https://i.picsum.photos/id/519/1200/800.jpg?grayscale" draggable="false"><div class="tg_subwidget_photograph_text"><span class="photograph_title">Picsum Photos random images</span> <span class="copyright">©</span>picsum.photos</div></div>
+                      */
+                      // const photographAttrs = {
+                      //     alt: 'Placeholder',
+                      //     src: 'https://picsum.photos/600/900?grayscale',
+                      //
+                      // };
+                      // photograph_caption
+                      // const image = view.state.schema.nodes.image.create({
+                      //     src: 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+                      //     alt: 'Placeholder'
+                      //     'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+                      //     'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+                      // });
+
+                      // caption
+                      const captionText = menu.view.state.schema.text('Image from picsum.photos');
+                      const photographCaption = menu.view.state.schema.nodes.photograph_caption.create({}, captionText);
+
+                      // image
+                      const image = menu.view.state.schema.nodes.image.create({
+                          src: 'https://picsum.photos/600/400?grayscale',
+                          alt: 'A placeholder image from picsum.photos',
+                          // 'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
+                          // 'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
+                      });
+
+                      const photograph = menu.view.state.schema.nodes.photograph.create({}, [ image, photographCaption ]);
+
+
+                      // console.log(photograph);
+                      // console.log(selection.from);
+                      // menu.view.state.tr.replaceWith( selection.from, selection.from, photograph );
+                      // menu.view.state.tr.replaceWith( 0, 0, photograph );
+
+                      const tr = menu.view.state.tr.insert( selection.from, photograph );
+                      menu.view.dispatch(tr);
+                      // if(selection.constructor.name === 'TextSelection'){
+                      //     pos = selection.$head.before()-2;
+                      // }else if(selection.constructor.name === 'NodeSelection'){
+                      //     pos = selection.from;
+                      // }
                   }
               }),
               new DOMinatorMenuButton ({
@@ -20395,13 +20462,14 @@
 
   function setAlt(menu, alt){
       const { img, pos } = getImage(menu);
+      if(!img){ return; }
       menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, { ...img.attrs, alt: alt }));
   }
 
   function floatButtonActivate(floatKey, menu, btn){
       const className = menu.dominator.options.photoFloatClasses[floatKey];
       const node = getNode(menu);
-
+      if(!node) { return; }
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
@@ -20414,7 +20482,7 @@
   function sizeButtonActivate(sizeKey, menu, btn){
       const className = menu.dominator.options.photoSizeClasses[sizeKey];
       const node = getNode(menu);
-
+      if(!node) { return; }
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
@@ -20542,6 +20610,7 @@
               new DOMinatorMenuInput ({
                   update: (input) => {
                       const {img} = getImage(menu);
+                      if(!img){ return true; }
                       const alt = img.attrs.alt || '';
                       input.setValue(alt);
                   },
@@ -20768,11 +20837,12 @@
           let activeSubmenuKey = '';
 
           if(view){
+
               // console.log('view');
               // console.log(view.state);
               // console.log('lastState');
               // console.log(lastState);
-              // console.log('UPDATE');
+
               const selection = view.state.selection;
               if(selection.constructor.name === 'TextSelection'){
                   // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
@@ -20813,7 +20883,7 @@
               }
           }
 
-          if( !activeSubmenuKey ){
+          if( !activeSubmenuKey || activeSubmenuKey === 'doc'){
               activeSubmenuKey = "paragraph";
           }
 
@@ -20831,9 +20901,10 @@
       }
 
       activateSubmenu(key){
+
           if(!this.submenus[key]){
               console.error(this.submenus);
-              throw 'Submenu does no texist with a key' + key;
+              throw 'Submenu does no texist with a key: ' + key;
           }
 
           Object.keys(this.submenus).forEach(key=>{
@@ -20918,7 +20989,6 @@
               dom: this.icon("H" + level, "heading")
           }
       }
-
       destroy() {
           this.view.dom.removeEventListener("mouseup");
           this.view.dom.removeEventListener("mousedown");
@@ -21181,6 +21251,8 @@
       }
 
       stopEvent(event) {
+
+          // console.log(event);
           // const blacklisted = [
           //     'dragstart',
           //     'dragenter',
@@ -21236,11 +21308,12 @@
 
   }
 
+  // import {
+
   window.DOMinator = class DOMinator {
       // editorSchema
       // view -view editors
       // menuItems
-
       constructor(options) {
           const implementMessage = () => alert('It is up to you to implement this.');
 
@@ -21279,7 +21352,6 @@
                  '100': 'width-100',
              }
 
-
           };
 
           this.options = {
@@ -21311,26 +21383,86 @@
                   // plugins: exampleSetup({schema: this.editorSchema}),
                   plugins: [
                       buildInputRules(this.editorSchema),
-                      keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
-                      keymap(baseKeymap),
-                      dropCursor(),
-                      gapCursor(),
-                      history(),
                       new Plugin({
                           key: 'DOMinatorMenu',
                           view(editorView) {
                               let menuView = new DOMinatorMenu(that, editorView);
                               editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
                               return menuView;
+                          },
+                          props: {
+                              handleKeyDown: (view, event)=>{
+                                  if(event.which === 13 && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey){
+
+                                      const selection = view.state.selection;
+                                      console.log(selection.$cursor);
+
+                                      if(selection.empty && selection.$cursor){
+                                          const parent = selection.$cursor.parent.type.name;
+                                          // create a new paragraph after the photograph
+
+                                          if(parent === "photograph_caption"){
+                                              const pos = selection.$cursor.end()+2;
+                                              const p = this.editorSchema.nodes.paragraph.createAndFill();
+
+                                              view.dispatch(view.state.tr.insert( pos, p ));
+                                              view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos+1)).scrollIntoView());
+
+
+                                              // tr.setSelection(TextSelection.create(tr.doc, pos));
+                                              // view.dispatch(tr.scrollIntoView());
+
+                                              // const tr = view.state.tr.insert( pos, p );
+                                              // tr.setSelection(TextSelection.create(tr.doc, pos));
+                                              // view.dispatch(tr.scrollIntoView());
+                                              return true;
+                                          }else if(!selection.$cursor.nodeAfter && !selection.$cursor.nodeBefore&& selection.$cursor.depth > 2){
+                                              const depth = selection.$cursor.depth;
+                                              const thirdParent = selection.$cursor.node(depth-2);
+                                              const pos = selection.$cursor.end()+3;
+
+                                              if(!thirdParent || !thirdParent.type.name.includes('layout_')){
+                                                  return false;
+                                              }
+
+                                              if(selection.$cursor.after(depth-2) !== pos){
+                                                  return false;
+                                              }
+
+                                              const p = this.editorSchema.nodes.paragraph.createAndFill();
+
+                                              let transaction;
+                                              view.dispatch(view.state.tr.insert( pos, p ));
+
+                                              transaction = view.state.tr;
+                                              transaction.setMeta("addToHistory", false);
+                                              view.dispatch(transaction.setSelection(TextSelection.create(view.state.doc, pos)).scrollIntoView());
+
+                                              // view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos-5, pos-2)).scrollIntoView());
+                                              transaction = view.state.tr;
+                                              transaction.setMeta("addToHistory", false);
+                                              view.dispatch(transaction.delete( pos-5, pos-2));
+                                              return true;
+                                          }
+                                      }
+                                  }
+                                  return false;
+                              }
                           }
                       }),
+                      keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
+                      keymap(baseKeymap),
+                      dropCursor(),
+                      gapCursor(),
+                      history(),
                       new Plugin({
                           props: {
                               attributes: {
                                   class: "ProseMirror-example-setup-style"
-                              }
+                              },
+
                           }
-                      })
+                      }),
                   ]
 
               }),

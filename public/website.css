@@ -946,6 +946,7 @@ img{
 .tg_subwidget_photograph{
     margin-bottom: 10px;
     overflow: auto;
+    position: relative;
 }
 .tg_subwidget_photograph img{
     /* border: 2px solid #eee; */

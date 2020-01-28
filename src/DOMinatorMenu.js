@@ -103,11 +103,12 @@ export default class DOMinatorMenu {
         let activeSubmenuKey = '';
 
         if(view){
+
             // console.log('view');
             // console.log(view.state);
             // console.log('lastState');
             // console.log(lastState);
-            // console.log('UPDATE');
+
             const selection = view.state.selection;
             if(selection.constructor.name === 'TextSelection'){
                 // watch out because text selection responds to none editable custom html selection as well ::: this has now been solved sort of
@@ -148,7 +149,7 @@ export default class DOMinatorMenu {
             }
         }
 
-        if( !activeSubmenuKey ){
+        if( !activeSubmenuKey || activeSubmenuKey === 'doc'){
             activeSubmenuKey = "paragraph";
         }
 
@@ -166,9 +167,10 @@ export default class DOMinatorMenu {
     }
 
     activateSubmenu(key){
+
         if(!this.submenus[key]){
             console.error(this.submenus);
-            throw 'Submenu does no texist with a key' + key;
+            throw 'Submenu does no texist with a key: ' + key;
         }
 
         Object.keys(this.submenus).forEach(key=>{
@@ -254,7 +256,6 @@ export default class DOMinatorMenu {
             dom: this.icon("H" + level, "heading")
         }
     }
-
     destroy() {
         this.view.dom.removeEventListener("mouseup");
         this.view.dom.removeEventListener("mousedown");

@@ -32,7 +32,7 @@ export function alignSelection(view, classKey, classes){
         }
 
         if(node.type.spec.canTakeAligment){
-            
+
             // remove alignment classes
             let className = '';
             if(node.attrs.class){
@@ -395,4 +395,12 @@ export function toggleList(nodeKey, menu) {
     }
 
     return wrapInList(listType)(state, dispatch, view)
+}
+
+
+export function insertPhotograph(menu, photograph){
+
+    const selection = view.state.selection;
+
+
 }

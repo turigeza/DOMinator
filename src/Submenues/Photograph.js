@@ -136,13 +136,14 @@ function getImage(menu){
 
 function setAlt(menu, alt){
     const { img, pos } = getImage(menu);
+    if(!img){ return; }
     menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, { ...img.attrs, alt: alt }));
 }
 
 function floatButtonActivate(floatKey, menu, btn){
     const className = menu.dominator.options.photoFloatClasses[floatKey];
     const node = getNode(menu);
-
+    if(!node) { return; }
     if(node.attrs.class && node.attrs.class.includes(className)){
         btn.activate();
         return true;
@@ -155,7 +156,7 @@ function floatButtonActivate(floatKey, menu, btn){
 function sizeButtonActivate(sizeKey, menu, btn){
     const className = menu.dominator.options.photoSizeClasses[sizeKey];
     const node = getNode(menu);
-
+    if(!node) { return; }
     if(node.attrs.class && node.attrs.class.includes(className)){
         btn.activate();
         return true;
@@ -283,6 +284,7 @@ export default function(menu) {
             new DOMinatorMenuInput ({
                 update: (input) => {
                     const {img} = getImage(menu);
+                    if(!img){ return true; }
                     const alt = img.attrs.alt || '';
                     input.setValue(alt);
                 },
