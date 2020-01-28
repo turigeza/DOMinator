@@ -16,8 +16,27 @@ import {
     wrapIn,
     lift
 } from "./prosemirrorcommands"
-import { ReplaceAroundStep } from "prosemirror-transform"
-import {Slice, Fragment} from "prosemirror-model"
+import {
+    ReplaceAroundStep
+} from "prosemirror-transform"
+import {
+    Slice,
+    Fragment
+} from "prosemirror-model"
+
+export function updateAlignmentButton(button, menu, classKey){
+    button.deactivate();
+
+    const className = menu.dominator.options.textAlignClasses[classKey];
+    if(!className){
+        return false;
+    }
+    if(menu.activeBlock && menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes(className)){
+        button.activate();
+        return true;
+    }
+    return false;
+}
 
 export function alignSelection(view, classKey, classes){
 
@@ -25,8 +44,10 @@ export function alignSelection(view, classKey, classes){
 
     let transaction = view.state.tr;
     view.state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-
-        if(!classes[classKey]){
+        let clearOnly = false;
+        if(!classKey){
+            clearOnly = true
+        } else if(!classes[classKey]) {
             console.error(classes);
             throw 'Class does not exist with a key: '+classKey;
         }
@@ -42,8 +63,11 @@ export function alignSelection(view, classKey, classes){
                 });
             }
             className = className.trim();
-            className += ' '+classes[classKey];
-            className = className.trim();
+
+            if(!clearOnly){
+                className += ' '+classes[classKey];
+                className = className.trim();
+            }
 
             let attrs = { ...node.attrs, 'class': className};
             const type = node.type

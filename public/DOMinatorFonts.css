@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'DOMinator';
   src:
-    url('fonts/DOMinator.ttf?wlptrn') format('truetype'),
-    url('fonts/DOMinator.woff?wlptrn') format('woff'),
-    url('fonts/DOMinator.svg?wlptrn#DOMinator') format('svg');
+    url('fonts/DOMinator.ttf?f0lfr8') format('truetype'),
+    url('fonts/DOMinator.woff?f0lfr8') format('woff'),
+    url('fonts/DOMinator.svg?f0lfr8#DOMinator') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -24,6 +24,24 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dominator-icon-clearmargin:before {
+  content: "\e915";
+}
+.dominator-icon-clearpadding:before {
+  content: "\e91c";
+}
+.dominator-icon-floatimage-none:before {
+  content: "\e917";
+}
+.dominator-icon-floatimage-right:before {
+  content: "\e918";
+}
+.dominator-icon-floatimage-left:before {
+  content: "\e919";
+}
+.dominator-icon-clearalignment:before {
+  content: "\e914";
+}
 .dominator-icon-allsides:before {
   content: "\e910";
 }

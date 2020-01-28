@@ -98,6 +98,14 @@ export default function(menu) {
                             alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                         }
                     }),
+                    new DOMinatorMenuButton ({
+                        key: 'clear alignment',
+                        icon: 'clearalignment',
+                        iconType: 'dics',
+                        action: () => {
+                            alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
+                        }
+                    }),
                 ]
             }),
             new DOMinatorMenuButton ({

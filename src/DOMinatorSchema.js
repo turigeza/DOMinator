@@ -63,6 +63,7 @@ export const nodes = {
         content: "inline*",
         group: "block",
         defining: true,
+        canTakeAligment: true,
         parseDOM: [{
             tag: "h1, h2, h3, h4, h5, h6",
             getAttrs: dom => {

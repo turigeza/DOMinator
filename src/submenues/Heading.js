@@ -2,8 +2,11 @@ import DOMinatorMenuButton from "./../DOMinatorMenuButton"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
+import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 import {
-    convertBlock
+    convertBlock,
+    alignSelection,
+    updateAlignmentButton
 } from "./../DOMinatorActions"
 
 function activateHeaderButton(level, menu, button){
@@ -87,6 +90,50 @@ export default function(menu) {
                 action: () => {
                     convertBlock('heading', { level: 6 }, menu);
                 }
+            }),
+            new DOMinatorMenuDropdown ({
+                key: 'alignment',
+                icon: 'align-left',
+                items: [
+                    new DOMinatorMenuButton ({
+                        key: 'align left',
+                        icon: 'align-left',
+                        update(button){
+                            return updateAlignmentButton(button, menu, 'left');
+                        },
+                        action: (button) => {
+                            alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'align center',
+                        icon: 'align-center',
+                        update(button){
+                            return updateAlignmentButton(button, menu, 'center');
+                        },
+                        action: (button) => {
+                            alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'align right',
+                        icon: 'align-right',
+                        update(button){
+                            return updateAlignmentButton(button, menu, 'right');
+                        },
+                        action: (button) => {
+                            alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'clear alignment',
+                        icon: 'clearalignment',
+                        iconType: 'dics',
+                        action: () => {
+                            alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
+                        }
+                    }),
+                ]
             }),
             new DOMinatorMenuButton ({
                 key: 'paddings',

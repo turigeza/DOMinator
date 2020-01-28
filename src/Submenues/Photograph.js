@@ -244,11 +244,13 @@ export default function(menu) {
             }),
             new DOMinatorMenuDropdown ({
                 key: 'alignment',
-                icon: 'align-left',
+                icon: 'floatimage-left',
+                iconType: 'dics',
                 items: [
                     new DOMinatorMenuButton ({
-                        key: 'align left',
-                        icon: 'align-left',
+                        key: 'float left of text',
+                        icon: 'floatimage-left',
+                        iconType: 'dics',
                         update: (button) => {
                             return floatButtonActivate('left', menu, button);
                         },
@@ -257,8 +259,9 @@ export default function(menu) {
                         }
                     }),
                     new DOMinatorMenuButton ({
-                        key: 'align center',
-                        icon: 'align-center',
+                        key: 'align center and clear both side',
+                        icon: 'floatimage-none',
+                        iconType: 'dics',
                         update: (button) => {
                             return floatButtonActivate('center', menu, button);
                         },
@@ -267,13 +270,22 @@ export default function(menu) {
                         }
                     }),
                     new DOMinatorMenuButton ({
-                        key: 'align right',
-                        icon: 'align-right',
+                        key: 'float right of text',
+                        icon: 'floatimage-right',
+                        iconType: 'dics',
                         update: (button) => {
                             return floatButtonActivate('right', menu, button);
                         },
                         action: () => {
                             imageFloat('right', menu);
+                        }
+                    }),
+                    new DOMinatorMenuButton ({
+                        key: 'clear alignment',
+                        icon: 'clearalignment',
+                        iconType: 'dics',
+                        action: () => {
+                            alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
                         }
                     }),
                 ]

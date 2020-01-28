@@ -13521,6 +13521,7 @@
           content: "inline*",
           group: "block",
           defining: true,
+          canTakeAligment: true,
           parseDOM: [{
               tag: "h1, h2, h3, h4, h5, h6",
               getAttrs: dom => {
@@ -14176,6 +14177,10 @@
       disable(){
           this.dom.disabled = true;
           this.dom.classList.add('button-disabled');
+      }
+
+      isActive(){
+          return this.dom.className.includes('button-active')
       }
 
       activate(){
@@ -19147,14 +19152,30 @@
       return node.node.hasMarkup(type, attrs)
   }
 
-  function alignSelection(view, classKey, classes){
+  function updateAlignmentButton(button, menu, classKey){
+      button.deactivate();
+
+      const className = menu.dominator.options.textAlignClasses[classKey];
+      if(!className){
+          return false;
+      }
+      if(menu.activeBlock && menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes(className)){
+          button.activate();
+          return true;
+      }
+      return false;
+  }
+
+  function alignSelection$1(view, classKey, classes){
 
       const selection = view.state.selection;
 
       let transaction = view.state.tr;
       view.state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-
-          if(!classes[classKey]){
+          let clearOnly = false;
+          if(!classKey){
+              clearOnly = true;
+          } else if(!classes[classKey]) {
               console.error(classes);
               throw 'Class does not exist with a key: '+classKey;
           }
@@ -19170,8 +19191,11 @@
                   });
               }
               className = className.trim();
-              className += ' '+classes[classKey];
-              className = className.trim();
+
+              if(!clearOnly){
+                  className += ' '+classes[classKey];
+                  className = className.trim();
+              }
 
               let attrs = { ...node.attrs, 'class': className};
               const type = node.type;
@@ -19620,7 +19644,8 @@
               ...generateDropdowns('padding', menu),
               new DOMinatorMenuButton({
                   key: 'clear all paddings',
-                  icon: 'eraser',
+                  icon: 'clearpadding',
+                  iconType: 'dics',
                   action: () => {
                       menu.stayOnMenu = true;
                       normalizePaddingMargin(menu, 'padding');
@@ -19642,7 +19667,8 @@
               ...generateDropdowns('margin', menu),
               new DOMinatorMenuButton({
                   key: 'clear all margins',
-                  icon: 'eraser',
+                  icon: 'clearmargin',
+                  iconType: 'dics',
                   action: () => {
                       menu.stayOnMenu = true;
                       normalizePaddingMargin(menu, 'margin');
@@ -19729,22 +19755,39 @@
                       new DOMinatorMenuButton ({
                           key: 'align left',
                           icon: 'align-left',
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'left');
+                          },
                           action: (button) => {
-                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                              alignSelection$1(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align center',
                           icon: 'align-center',
-                          action: () => {
-                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'center');
+                          },
+                          action: (button) => {
+                              alignSelection$1(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align right',
                           icon: 'align-right',
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'right');
+                          },
+                          action: (button) => {
+                              alignSelection$1(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'clear alignment',
+                          icon: 'clearalignment',
+                          iconType: 'dics',
                           action: () => {
-                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -20062,21 +20105,29 @@
                           key: 'align left',
                           icon: 'align-left',
                           action: (button) => {
-                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                              alignSelection$1(menu.view, 'left', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align center',
                           icon: 'align-center',
                           action: () => {
-                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                              alignSelection$1(menu.view, 'center', menu.dominator.options.textAlignClasses);
                           }
                       }),
                       new DOMinatorMenuButton ({
                           key: 'align right',
                           icon: 'align-right',
                           action: () => {
-                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                              alignSelection$1(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'clear alignment',
+                          icon: 'clearalignment',
+                          iconType: 'dics',
+                          action: () => {
+                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]
@@ -20277,6 +20328,50 @@
                   action: () => {
                       convertBlock('heading', { level: 6 }, menu);
                   }
+              }),
+              new DOMinatorMenuDropdown ({
+                  key: 'alignment',
+                  icon: 'align-left',
+                  items: [
+                      new DOMinatorMenuButton ({
+                          key: 'align left',
+                          icon: 'align-left',
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'left');
+                          },
+                          action: (button) => {
+                              alignSelection$1(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align center',
+                          icon: 'align-center',
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'center');
+                          },
+                          action: (button) => {
+                              alignSelection$1(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'align right',
+                          icon: 'align-right',
+                          update(button){
+                              return updateAlignmentButton(button, menu, 'right');
+                          },
+                          action: (button) => {
+                              alignSelection$1(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'clear alignment',
+                          icon: 'clearalignment',
+                          iconType: 'dics',
+                          action: () => {
+                              alignSelection$1(menu.view, null, menu.dominator.options.textAlignClasses);
+                          }
+                      }),
+                  ]
               }),
               new DOMinatorMenuButton ({
                   key: 'paddings',
@@ -20558,11 +20653,13 @@
               }),
               new DOMinatorMenuDropdown ({
                   key: 'alignment',
-                  icon: 'align-left',
+                  icon: 'floatimage-left',
+                  iconType: 'dics',
                   items: [
                       new DOMinatorMenuButton ({
-                          key: 'align left',
-                          icon: 'align-left',
+                          key: 'float left of text',
+                          icon: 'floatimage-left',
+                          iconType: 'dics',
                           update: (button) => {
                               return floatButtonActivate('left', menu, button);
                           },
@@ -20571,8 +20668,9 @@
                           }
                       }),
                       new DOMinatorMenuButton ({
-                          key: 'align center',
-                          icon: 'align-center',
+                          key: 'align center and clear both side',
+                          icon: 'floatimage-none',
+                          iconType: 'dics',
                           update: (button) => {
                               return floatButtonActivate('center', menu, button);
                           },
@@ -20581,13 +20679,22 @@
                           }
                       }),
                       new DOMinatorMenuButton ({
-                          key: 'align right',
-                          icon: 'align-right',
+                          key: 'float right of text',
+                          icon: 'floatimage-right',
+                          iconType: 'dics',
                           update: (button) => {
                               return floatButtonActivate('right', menu, button);
                           },
                           action: () => {
                               imageFloat('right', menu);
+                          }
+                      }),
+                      new DOMinatorMenuButton ({
+                          key: 'clear alignment',
+                          icon: 'clearalignment',
+                          iconType: 'dics',
+                          action: () => {
+                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
                           }
                       }),
                   ]

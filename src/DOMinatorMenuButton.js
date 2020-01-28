@@ -77,6 +77,10 @@ export default class DOMinatorMenuButton {
         this.dom.classList.add('button-disabled');
     }
 
+    isActive(){
+        return this.dom.className.includes('button-active')
+    }
+
     activate(){
         this.enable();
         this.dom.classList.add('button-active');

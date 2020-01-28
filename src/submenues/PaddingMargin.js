@@ -104,7 +104,8 @@ export function paddings(menu) {
             ...generateDropdowns('padding', menu),
             new DOMinatorMenuButton({
                 key: 'clear all paddings',
-                icon: 'eraser',
+                icon: 'clearpadding',
+                iconType: 'dics',
                 action: () => {
                     menu.stayOnMenu = true;
                     normalizePaddingMargin(menu, 'padding');
@@ -126,7 +127,8 @@ export function margins(menu) {
             ...generateDropdowns('margin', menu),
             new DOMinatorMenuButton({
                 key: 'clear all margins',
-                icon: 'eraser',
+                icon: 'clearmargin',
+                iconType: 'dics',
                 action: () => {
                     menu.stayOnMenu = true;
                     normalizePaddingMargin(menu, 'margin');
