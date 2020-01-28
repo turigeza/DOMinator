@@ -13459,17 +13459,14 @@
       })
   }
 
-  // The basic shema got a from prosemirror-schema-basic and then modified to our needs
+  // The basic shema got a from prosemirror-schema-basic and then modified to my needs
 
-  // [Specs](#model.NodeSpec) for the nodes defined in this schema.
   const nodes = {
-      // :: NodeSpec The top level document node.
+
       doc: {
           content: "(block | layout)+"
       },
 
-      // :: NodeSpec A plain paragraph textblock. Represented in the DOM
-      // as a `<p>` element.
       paragraph: {
           content: "inline*",
           group: "block",
@@ -13491,8 +13488,6 @@
               return ["p", node.attrs, 0];
           }
       },
-
-      // :: NodeSpec A blockquote (`<blockquote>`) wrapping one or more blocks.
       blockquote: {
           content: "block+",
           group: "block",
@@ -13505,8 +13500,6 @@
               return ["blockquote", {}, 0];
           }
       },
-
-      // :: NodeSpec A horizontal rule (`<hr>`).
       horizontal_rule: {
           group: "block",
           parseDOM: [{
@@ -13516,10 +13509,6 @@
               return ["hr"];
           }
       },
-
-      // :: NodeSpec A heading textblock, with a `level` attribute that
-      // should hold the number 1 to 6. Parsed and serialized as `<h1>` to
-      // `<h6>` elements.
       heading: {
           attrs: {
               level: {
@@ -13566,10 +13555,6 @@
               return ["h" + node.attrs.level, attrs, 0]
           }
       },
-
-      // :: NodeSpec A code listing. Disallows marks or non-text inline
-      // nodes by default. Represented as a `<pre>` element with a
-      // `<code>` element inside of it.
       code_block: {
           content: "text*",
           marks: "",
@@ -13584,15 +13569,9 @@
               return ["pre", ["code", 0]];
           }
       },
-
-      // :: NodeSpec The text node.
       text: {
           group: "inline"
       },
-
-      // :: NodeSpec An inline image (`<img>`) node. Supports `src`,
-      // `alt`, and `href` attributes. The latter two default to the empty
-      // string.
       image: {
           inline: false,
           attrs: {
@@ -13642,8 +13621,6 @@
               return ["img", node.attrs];
           }
       },
-
-      // :: NodeSpec A hard line break, represented in the DOM as `<br>`.
       hard_break: {
           inline: true,
           group: "inline",
@@ -13655,6 +13632,7 @@
               return ["br"];
           }
       },
+
       layout_12: {
           content: "cl_12{1}",
           group: "layout",
@@ -13849,6 +13827,7 @@
               ]
           }
       },
+
       photograph: {
           content: "image{1} photograph_caption{1}",
           group: "block",
@@ -13985,11 +13964,7 @@
 
   };
 
-  // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
   const marks = {
-      // :: MarkSpec A link. Has `href` and `title` attributes. `title`
-      // defaults to the empty string. Rendered and parsed as an `<a>`
-      // element.
       link: {
           attrs: {
               href: {
@@ -14024,8 +13999,6 @@
               return ["a", node.attrs, 0]
           }
       },
-
-      // for inline styling
       span: {
           attrs: {
               'class': {
@@ -14044,8 +14017,6 @@
               return ["span", node.attrs, 0];
           }
       },
-      // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-      // Has parse rules that also match `<i>` and `font-style: italic`.
       i: {
           parseDOM: [{
               tag: "i"
@@ -14058,9 +14029,6 @@
               return ["i", 0];
           }
       },
-
-      // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
-      // also match `<b>` and `font-weight: bold`.
       b: {
           parseDOM: [{
                   tag: "strong"
@@ -14081,8 +14049,6 @@
               return ["b", 0];
           }
       },
-
-      // :: MarkSpec Code font mark. Represented as a `<code>` element.
       code: {
           parseDOM: [{
               tag: "code"
@@ -14128,14 +14094,6 @@
 
   };
 
-  // :: Schema
-  // This schema roughly corresponds to the document schema used by
-  // [CommonMark](http://commonmark.org/), minus the list elements,
-  // which are defined in the [`prosemirror-schema-list`](#schema-list)
-  // module.
-  //
-  // To reuse elements from this schema, extend or read from its
-  // `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
   const schema = new Schema({
       nodes,
       marks
