@@ -19707,6 +19707,13 @@
               new DOMinatorMenuButton ({
                   key: 'paragraph',
                   icon: 'paragraph',
+                  update: (button) => {
+                      if(menu.activeBlock && menu.activeBlock.type.name === 'paragraph'){
+                          button.activate();
+                      }else{
+                          button.deactivate();
+                      }
+                  },
                   action: () => { convertBlock('paragraph', {}, menu); }
               }),
               new DOMinatorMenuDropdown ({
@@ -20231,6 +20238,14 @@
       });
   }
 
+  function activateHeaderButton(level, menu, button){
+      if(menu.activeBlock && menu.activeBlock.attrs.level === level){
+          button.activate();
+      }else{
+          button.deactivate();
+      }
+  }
+
   function smHeading(menu) {
 
       return new DOMinatorSubMenu({
@@ -20248,6 +20263,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 1',
                   label: 'H1',
+                  update: (button) => {
+                      return activateHeaderButton(1, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 1 }, menu);
                   }
@@ -20255,6 +20273,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 2',
                   label: 'H2',
+                  update: (button) => {
+                      return activateHeaderButton(2, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 2 }, menu);
                   }
@@ -20262,6 +20283,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 3',
                   label: 'H3',
+                  update: (button) => {
+                      return activateHeaderButton(3, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 3 }, menu);
                   }
@@ -20269,6 +20293,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 4',
                   label: 'H4',
+                  update: (button) => {
+                      return activateHeaderButton(4, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 4 }, menu);
                   }
@@ -20276,6 +20303,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 5',
                   label: 'H5',
+                  update: (button) => {
+                      return activateHeaderButton(5, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 5 }, menu);
                   }
@@ -20283,6 +20313,9 @@
               new DOMinatorMenuButton ({
                   key: 'heading 6',
                   label: 'H6',
+                  update: (button) => {
+                      return activateHeaderButton(6, menu, button);
+                  },
                   action: () => {
                       convertBlock('heading', { level: 6 }, menu);
                   }

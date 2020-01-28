@@ -26,6 +26,13 @@ export default function(menu) {
             new DOMinatorMenuButton ({
                 key: 'paragraph',
                 icon: 'paragraph',
+                update: (button) => {
+                    if(menu.activeBlock && menu.activeBlock.type.name === 'paragraph'){
+                        button.activate();
+                    }else{
+                        button.deactivate();
+                    }
+                },
                 action: () => { convertBlock('paragraph', {}, menu); }
             }),
             new DOMinatorMenuDropdown ({
