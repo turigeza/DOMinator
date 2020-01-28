@@ -13471,6 +13471,8 @@
           content: "inline*",
           group: "block",
           canTakeAligment: true,
+          canTakeMargin: true,
+          canTakePadding: true,
           attrs: {
               class: {
                   default: null
@@ -13522,6 +13524,8 @@
           group: "block",
           defining: true,
           canTakeAligment: true,
+          canTakeMargin: true,
+          canTakePadding: true,
           parseDOM: [{
               tag: "h1, h2, h3, h4, h5, h6",
               getAttrs: dom => {
@@ -13639,15 +13643,24 @@
           group: "layout",
           defining: true,
           selectable: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_12'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_12'
+              tag: 'div.layout_12',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_12"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13656,15 +13669,24 @@
           content: "cl_4{1} cl_8{1}",
           group: "layout",
           defining: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_48'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_48'
+              tag: 'div.layout_48',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_48"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13673,15 +13695,24 @@
           content: "cl_6{2}",
           group: "layout",
           defining: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_66'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_66'
+              tag: 'div.layout_66',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_66"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13690,15 +13721,24 @@
           content: "cl_8{1} cl_4{1}",
           group: "layout",
           defining: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_84'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_84'
+              tag: 'div.layout_84',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_84"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13707,15 +13747,24 @@
           content: "cl_4{3}",
           group: "layout",
           defining: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_444'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_444'
+              tag: 'div.layout_444',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_444"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13724,15 +13773,24 @@
           content: "cl_3{4}",
           group: "layout",
           defining: true,
+          canTakeMargin: true,
+          attrs: {
+              class: {
+                  default: 'layout layout_3333'
+              }
+          },
           parseDOM: [{
-              tag: 'div.layout_3333'
+              tag: 'div.layout_3333',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"layout layout_3333"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13743,15 +13801,24 @@
           group: "layout_columns",
           defining: true,
           selectable: false,
+          canTakePadding: true,
+          attrs: {
+              class: {
+                  default: 'cl_3'
+              }
+          },
           parseDOM: [{
-              tag: 'div.cl_3'
+              tag: 'div.cl_3',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"cl_3"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13761,15 +13828,24 @@
           group: "layout_columns",
           defining: true,
           selectable: false,
+          canTakePadding: true,
+          attrs: {
+              class: {
+                  default: 'cl_4'
+              }
+          },
           parseDOM: [{
-              tag: 'div.cl_4'
+              tag: 'div.cl_4',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"cl_4"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13779,15 +13855,24 @@
           group: "layout_columns",
           defining: true,
           selectable: false,
+          canTakePadding: true,
+          attrs: {
+              class: {
+                  default: 'cl_6'
+              }
+          },
           parseDOM: [{
-              tag: 'div.cl_6'
+              tag: 'div.cl_6',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"cl_6"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13797,15 +13882,24 @@
           group: "layout_columns",
           defining: true,
           selectable: false,
+          canTakePadding: true,
+          attrs: {
+              class: {
+                  default: 'cl_8'
+              }
+          },
           parseDOM: [{
-              tag: 'div.cl_8'
+              tag: 'div.cl_8',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"cl_8"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -13815,15 +13909,24 @@
           group: "layout_columns",
           defining: true,
           selectable: false,
+          canTakePadding: true,
+          attrs: {
+              class: {
+                  default: 'cl_12'
+              }
+          },
           parseDOM: [{
-              tag: 'div.cl_12'
+              tag: 'div.cl_12',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
           }],
-          toDOM() {
+          toDOM(node) {
               return [
                   "div",
-                  {
-                      class:"cl_12"
-                  },
+                  node.attrs,
                   0
               ]
           }
@@ -20067,19 +20170,17 @@
                       menu.activateSubmenu('paddings');
                   },
                   update(button, menu,){
-                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                      const block = menu.activeBlock;
+                      if(block && block.type.spec.canTakePadding){
+                          button.enable();
+                          if(block.attrs.class && block.attrs.class.includes('d-p')){
+                              button.activate();
+                          }else{
+                              button.deactivate();
+                          }
+                      }else{
                           button.disable();
                           button.deactivate();
-                      }else{
-                          button.enable();
-                          button.deactivate();
-                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
-                              button.activate();
-                              return true;
-                          }else{
-                              return false;
-                          }
-
                       }
                   }
               }),
@@ -20091,19 +20192,17 @@
                       menu.activateSubmenu('margins');
                   },
                   update(button, menu,){
-                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                      const block = menu.activeBlock;
+                      if(block && block.type.spec.canTakeMargin){
+                          button.enable();
+                          if(block.attrs.class && block.attrs.class.includes('d-m')){
+                              button.activate();
+                          }else{
+                              button.deactivate();
+                          }
+                      }else{
                           button.disable();
                           button.deactivate();
-                      }else{
-                          button.enable();
-                          button.deactivate();
-                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
-                              button.activate();
-                              return true;
-                          }else{
-                              return false;
-                          }
-
                       }
                   }
               }),
@@ -20893,10 +20992,22 @@
               new DOMinatorMenuButton ({
                   key: 'undo',
                   icon: 'undo',
+                  action: (button)=> {
+                      undo(menu.view.state, menu.view.dispatch);
+                  },
+                  update: (button) => {
+                      undo(menu.view.state) ? button.enable() : button.disable();
+                  }
               }),
               new DOMinatorMenuButton ({
                   key: 'redo',
                   icon: 'repeat',
+                  action: (button)=> {
+                      redo(menu.view.state, menu.view.dispatch);
+                  },
+                  update: (button) => {
+                      redo(menu.view.state) ? button.enable() : button.disable();
+                  }
               }),
               new DOMinatorMenuDropdown ({
                   key: 'menu',

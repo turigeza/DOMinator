@@ -8,6 +8,7 @@ import {
     clearFormatting
 } from "./../DOMinatorActions"
 
+import {undo, redo} from "prosemirror-history"
 export default function(menu) {
     return new DOMinatorSubMenu({
         key: 'right',
@@ -16,10 +17,22 @@ export default function(menu) {
             new DOMinatorMenuButton ({
                 key: 'undo',
                 icon: 'undo',
+                action: (button)=> {
+                    undo(menu.view.state, menu.view.dispatch);
+                },
+                update: (button) => {
+                    undo(menu.view.state) ? button.enable() : button.disable();
+                }
             }),
             new DOMinatorMenuButton ({
                 key: 'redo',
                 icon: 'repeat',
+                action: (button)=> {
+                    redo(menu.view.state, menu.view.dispatch);
+                },
+                update: (button) => {
+                    redo(menu.view.state) ? button.enable() : button.disable();
+                }
             }),
             new DOMinatorMenuDropdown ({
                 key: 'menu',
