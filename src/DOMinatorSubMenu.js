@@ -7,6 +7,7 @@ export default class DOMinatorSubMenu {
 
     constructor(options) {
         this.options = options;
+        
         this.items = options.items;
         this.dom = document.createElement("div");
         this.dom.className = "DOMinatorSubMenu DOMinatorSubMenu-"+this.options.key;

@@ -1,29 +1,43 @@
 export default class DOMinatorMenuInput {
 
-    // dom - the dom element for this submenu
+    // dom - the dom element for everything
     // options
     // menu
     // val
     // parent
+    // input
+    // label
+
     constructor(options) {
         this.options = options;
-        this.dom = document.createElement("input")
+
+        this.dom = document.createElement("label");
         this.dom.className = "DOMinatorMenuInput DOMinatorMenuInput-"+this.options.key;
-        this.dom.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
-        this.dom.addEventListener('focus', ()=>{
-            this.val = this.dom.value;
+
+        if(this.options.label){
+            const span = document.createElement("span");
+            span.appendChild(document.createTextNode(this.options.label))
+            this.dom.append(span);
+        }
+
+        this.input = document.createElement("input")
+
+        this.input.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
+        this.input.addEventListener('focus', ()=>{
+            this.val = this.input.value;
         });
 
-        this.dom.addEventListener('blur', ()=>{
-            if(this.val !== this.dom.value){
-                this.val = this.dom.value;
+        this.input.addEventListener('blur', ()=>{
+            if(this.val !== this.input.value){
+                this.val = this.input.value;
                 this.changed();
             }
         });
+        this.dom.appendChild(this.input);
     }
 
     setValue(val){
-        this.dom.value = val;
+        this.input.value = val;
         this.val = val;
     }
 

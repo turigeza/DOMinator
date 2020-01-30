@@ -14028,6 +14028,100 @@
 
           }
       },
+      downloads: {
+          content: "download_title{1} download_link+",
+          group: "block",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {
+              class: {
+                  default: 'tg_subwidget list-group tg_subwidget_download'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_subwidget_download',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      download_title: {
+          content: "inline*",
+          group: "",
+          defining: true,
+          selectable: false,
+          draggable: false,
+          attrs: {
+              class: {
+                  default: 'text-muted tg_subwidget_download_title'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_subwidget_download_title',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "p",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      download_link: {
+          content: "text*",
+          marks: 'b i sub sup',
+          group: "",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {
+              href: {
+                  default: ''
+              },
+              title: {
+                  default: null
+              },
+              target: {
+                  default: null
+              },
+              'class': {
+                  default: 'list-group-item geza'
+              }
+          },
+          parseDOM: [{
+              tag: 'a.list-group-item',
+              getAttrs: dom => {
+                  return {
+                      href: dom.getAttribute("href"),
+                      title: dom.getAttribute("title"),
+                      target:  dom.getAttribute("target"),
+                      'class': dom.getAttribute("class"),
+                  }
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "a",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
       custom_html: {
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
@@ -14088,9 +14182,8 @@
           excludes: 'span link',
           inclusive: false,
           parseDOM: [{
-              tag: "a", //[href]
+              tag: "a:not(.list-group-item)", //[href]
               getAttrs(dom) {
-
                   return {
                       href: dom.getAttribute("href"),
                       title: dom.getAttribute("title"),
@@ -14475,30 +14568,44 @@
 
   class DOMinatorMenuInput {
 
-      // dom - the dom element for this submenu
+      // dom - the dom element for everything
       // options
       // menu
       // val
       // parent
+      // input
+      // label
+
       constructor(options) {
           this.options = options;
-          this.dom = document.createElement("input");
+
+          this.dom = document.createElement("label");
           this.dom.className = "DOMinatorMenuInput DOMinatorMenuInput-"+this.options.key;
-          this.dom.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
-          this.dom.addEventListener('focus', ()=>{
-              this.val = this.dom.value;
+
+          if(this.options.label){
+              const span = document.createElement("span");
+              span.appendChild(document.createTextNode(this.options.label));
+              this.dom.append(span);
+          }
+
+          this.input = document.createElement("input");
+
+          this.input.setAttribute('placeholder', options.placeholder || 'More tea Vicar ... ?');
+          this.input.addEventListener('focus', ()=>{
+              this.val = this.input.value;
           });
 
-          this.dom.addEventListener('blur', ()=>{
-              if(this.val !== this.dom.value){
-                  this.val = this.dom.value;
+          this.input.addEventListener('blur', ()=>{
+              if(this.val !== this.input.value){
+                  this.val = this.input.value;
                   this.changed();
               }
           });
+          this.dom.appendChild(this.input);
       }
 
       setValue(val){
-          this.dom.value = val;
+          this.input.value = val;
           this.val = val;
       }
 
@@ -14539,6 +14646,7 @@
 
       constructor(options) {
           this.options = options;
+          
           this.items = options.items;
           this.dom = document.createElement("div");
           this.dom.className = "DOMinatorSubMenu DOMinatorSubMenu-"+this.options.key;
@@ -19238,11 +19346,11 @@
       } else {
           return false;
       }
-      
+
       return {from, to};
   }
 
-  // the rest comes from tiptap
+  // comes from TIPTAP https://tiptap.scrumpy.io/
   function nodeIsActive(state, type, attrs = {}) {
       const predicate = node => node.type === type;
       const node = dist_13(type)(state.selection)
@@ -19314,36 +19422,6 @@
           view.dispatch(transaction);
       }
   }
-
-  // export function alignSelectionOld(view, classKey, classes){
-  //     const selection = view.state.selection;
-  //
-  //     view.state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-  //
-  //         if(!classes[classKey]){
-  //             console.error(classes);
-  //             throw 'Class does not exist with a key: '+classKey;
-  //         }
-  //
-  //         let trans = view.state.tr();
-  //         if(node.type.spec.canTakeAligment){
-  //             // remove alignment classes
-  //             let className = '';
-  //             if(node.attrs.class){
-  //                 className = node.attrs.class;
-  //                 Object.keys(classes).forEach(key =>{
-  //                     className = className.replace(classes[key], '');
-  //                 });
-  //             }
-  //             className = className.trim();
-  //             className += ' '+classes[classKey];
-  //             className = className.trim();
-  //
-  //             let attrs = { ...node.attrs, 'class': className};
-  //             view.dispatch(view.state.tr.setNodeMarkup(pos, null, attrs ));
-  //         }
-  //     });
-  // }
 
   function stripPaddingMarginClasses(string, strip, classes){
       let stripped = {};
@@ -19590,11 +19668,78 @@
       }
   }
 
-  // the rest comes from tiptap
+  function insertLayout(menu, layoutKey){
+
+      const selection = menu.view.state.selection;
+      const state = menu.view.state;
+      const layout = state.schema.nodes[layoutKey];
+      const content = layout.spec.content;
+      const contentArray = content.split(' ');
+      // "cl_8{1} cl_4{1}"
+
+      const columns = [];
+      let columnIndex = 1;
+      contentArray.forEach((column)=>{
+          const [columnKey, occurrence] = column.replace('}', '').split('{');
+          for (let j = 0; j < occurrence; j++) {
+              const columnText = state.schema.nodes.paragraph.create({}, state.schema.text('Column '+ columnIndex));
+              const columnNode = state.schema.nodes[columnKey].create({}, columnText);
+              columns.push(columnNode);
+              columnIndex++;
+              //  const columnParagraph = state.schema.text('Column '+ (i+1));
+          }
+      });
+
+      const layoutNode = layout.create({}, columns);
+      const tr = state.tr.insert( selection.$head.after(1), layoutNode );
+      menu.view.dispatch(tr);
+  }
+
+  function canInsertDownloads(menu){
+      if(!menu.view.state.selection.empty || !menu.view.state.selection.$cursor){
+          return false;
+      }
+      return true;
+  }
+
+  function insertDownloads(menu, items){
+      if(!canInsertDownloads(menu)){
+          return false;
+      }
+
+      // see if we are adding to an existing list or it is a new list
+      const state = menu.view.state;
+      const $cursor = menu.view.state.selection.$cursor;
+
+      const grandParent = $cursor.node($cursor.depth-1);
+      let links = [];
+
+      items.forEach(item => {
+          links.push( state.schema.nodes.download_link.create(item, state.schema.text(item.title)) );
+      });
+
+      let append = null;
+      const after = $cursor.after();
+
+      // we are within a download
+      if(grandParent && grandParent.type.name === 'downloads'){
+          append = links;
+      }else{
+          const title = state.schema.nodes.download_title.create({}, state.schema.text('Download'));
+          links.unshift(title);
+          append = state.schema.nodes.downloads.create({}, links);
+      }
+
+      const tr = state.tr.insert( after, append );
+      menu.view.dispatch(tr);
+  }
+
+  // comes from TIPTAP https://tiptap.scrumpy.io/
   function isList(node, schema) {
       return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
   }
 
+  // comes from TIPTAP https://tiptap.scrumpy.io/
   function toggleWrap(nodeKey, menu) {
       const type = menu.editorSchema.nodes[nodeKey];
       const state = menu.view.state;
@@ -19610,6 +19755,7 @@
       return wrapIn(type)(state, dispatch, view)
   }
 
+  // comes from TIPTAP https://tiptap.scrumpy.io/
   function toggleList(nodeKey, menu) {
 
       const listType = menu.editorSchema.nodes[nodeKey];
@@ -19650,83 +19796,6 @@
       }
 
       return wrapInList(listType)(state, dispatch, view)
-  }
-
-  function insertLayout(menu, layoutKey){
-      
-      const selection = menu.view.state.selection;
-      const state = menu.view.state;
-      const layout = state.schema.nodes[layoutKey];
-      const content = layout.spec.content;
-      const contentArray = content.split(' ');
-      // "cl_8{1} cl_4{1}"
-
-      const columns = [];
-      let columnIndex = 1;
-      contentArray.forEach((column)=>{
-          const [columnKey, occurrence] = column.replace('}', '').split('{');
-          for (let j = 0; j < occurrence; j++) {
-              const columnText = state.schema.nodes.paragraph.create({}, state.schema.text('Column '+ columnIndex));
-              const columnNode = state.schema.nodes[columnKey].create({}, columnText);
-              columns.push(columnNode);
-              columnIndex++;
-              //  const columnParagraph = state.schema.text('Column '+ (i+1));
-          }
-      });
-
-      const layoutNode = layout.create({}, columns);
-      const tr = state.tr.insert( selection.$head.after(1), layoutNode );
-      menu.view.dispatch(tr);
-
-      // node.type.spec.canTakeAligment
-
-      // menu.dominator.options.photo(menu, menu.dominator);
-      /*
-      <div class="tg_subwidget tg_subwidget_photograph width-66 pull-left">
-          <img src="https://i.picsum.photos/id/519/600/400.jpg?grayscale"
-          alt="Some alt tag which is not the same as the caption."
-          data-photograph_id="12035" data-photograph_medium="https://i.picsum.photos/id/519/600/400.jpg?grayscale" data-photograph_large="https://i.picsum.photos/id/519/1200/800.jpg?grayscale" draggable="false"><div class="tg_subwidget_photograph_text"><span class="photograph_title">Picsum Photos random images</span> <span class="copyright">©</span>picsum.photos</div></div>
-      */
-      // const photographAttrs = {
-      //     alt: 'Placeholder',
-      //     src: 'https://picsum.photos/600/900?grayscale',
-      //
-      // };
-      // photograph_caption
-      // const image = view.state.schema.nodes.image.create({
-      //     src: 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-      //     alt: 'Placeholder'
-      //     'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
-      //     'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-      // });
-
-      // // caption
-      // const captionText = menu.view.state.schema.text('Image from picsum.photos');
-      // const photographCaption = menu.view.state.schema.nodes.photograph_caption.create({}, captionText);
-      //
-      // // image
-      // const image = menu.view.state.schema.nodes.image.create({
-      //     src: 'https://picsum.photos/600/400?grayscale',
-      //     alt: 'A placeholder image from picsum.photos',
-      //     // 'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
-      //     // 'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-      // });
-      //
-      // const photograph = menu.view.state.schema.nodes.photograph.create({}, [ image, photographCaption ]);
-      //
-      //
-      // // console.log(photograph);
-      // // console.log(selection.from);
-      // // menu.view.state.tr.replaceWith( selection.from, selection.from, photograph );
-      // // menu.view.state.tr.replaceWith( 0, 0, photograph );
-      //
-      // const tr = menu.view.state.tr.insert( selection.from, photograph );
-      // menu.view.dispatch(tr);
-      // if(selection.constructor.name === 'TextSelection'){
-      //     pos = selection.$head.before()-2;
-      // }else if(selection.constructor.name === 'NodeSelection'){
-      //     pos = selection.from;
-      // }
   }
 
   function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
@@ -19814,630 +19883,619 @@
   }
 
   function paddings(menu) {
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Paddings: '
+          }),
+          ...generateDropdowns('padding', menu),
+          new DOMinatorMenuButton({
+              key: 'clear all paddings',
+              icon: 'clearpadding',
+              iconType: 'dics',
+              action: () => {
+                  menu.stayOnMenu = true;
+                  normalizePaddingMargin(menu, 'padding');
+              }
+          })
+      ];
+
+      if( typeof menu.dominator.options.menu.paddings ===  'function'){
+          menu.dominator.options.menu.paddings(items, menu);
+      }
 
       return new DOMinatorSubMenu({
           key: 'paddings',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Paddings: '
-              }),
-              ...generateDropdowns('padding', menu),
-              new DOMinatorMenuButton({
-                  key: 'clear all paddings',
-                  icon: 'clearpadding',
-                  iconType: 'dics',
-                  action: () => {
-                      menu.stayOnMenu = true;
-                      normalizePaddingMargin(menu, 'padding');
-                  }
-              })
-          ]
+          items: items
       });
 
   }
 
   function margins(menu) {
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Margins: '
+          }),
+          ...generateDropdowns('margin', menu),
+          new DOMinatorMenuButton({
+              key: 'clear all margins',
+              icon: 'clearmargin',
+              iconType: 'dics',
+              action: () => {
+                  menu.stayOnMenu = true;
+                  normalizePaddingMargin(menu, 'margin');
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.margins ===  'function'){
+          menu.dominator.options.menu.margins(items, menu);
+      }
 
       return new DOMinatorSubMenu({
           key: 'margins',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Margins: '
-              }),
-              ...generateDropdowns('margin', menu),
-              new DOMinatorMenuButton({
-                  key: 'clear all margins',
-                  icon: 'clearmargin',
-                  iconType: 'dics',
-                  action: () => {
-                      menu.stayOnMenu = true;
-                      normalizePaddingMargin(menu, 'margin');
-                  }
-              }),
-          ]
+          items: items
       });
 
   }
 
-  function smParagraph(menu) {
+  function _Paragraph(menu) {
+
+      const items = [
+          // label
+          new DOMinatorMenuLabel({
+              label: 'Paragraph'
+          }),
+          new DOMinatorMenuSeparator(),
+
+          // paragraph
+          new DOMinatorMenuButton({
+              key: 'paragraph',
+              icon: 'paragraph',
+              update: (button) => {
+                  if (menu.activeBlock && menu.activeBlock.type.name === 'paragraph') {
+                      button.activate();
+                  } else {
+                      button.deactivate();
+                  }
+              },
+              action: () => {
+                  convertBlock('paragraph', {}, menu);
+              }
+          }),
+          // heading
+          new DOMinatorMenuDropdown({
+              key: 'heading',
+              icon: 'header',
+              items: [
+                  new DOMinatorMenuButton({
+                      key: 'heading 1',
+                      label: 'H1',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 1
+                          }, menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'heading 2',
+                      label: 'H2',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 2
+                          }, menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'heading 3',
+                      label: 'H3',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 3
+                          }, menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'heading 4',
+                      label: 'H4',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 4
+                          }, menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'heading 5',
+                      label: 'H5',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 5
+                          }, menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'heading 6',
+                      label: 'H6',
+                      action: () => {
+                          convertBlock('heading', {
+                              level: 6
+                          }, menu);
+                      }
+                  }),
+              ]
+          }),
+          // alignment
+          new DOMinatorMenuDropdown({
+              key: 'alignment',
+              icon: 'align-left',
+              items: [
+                  new DOMinatorMenuButton({
+                      key: 'align left',
+                      icon: 'align-left',
+                      update(button) {
+                          return updateAlignmentButton(button, menu, 'left');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '' : 'left', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'align center',
+                      icon: 'align-center',
+                      update(button) {
+                          return updateAlignmentButton(button, menu, 'center');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '' : 'center', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'align right',
+                      icon: 'align-right',
+                      update(button) {
+                          return updateAlignmentButton(button, menu, 'right');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '' : 'right', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'clear alignment',
+                      icon: 'clearalignment',
+                      iconType: 'dics',
+                      action: () => {
+                          alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+              ]
+          }),
+          // ul
+          new DOMinatorMenuButton({
+              key: 'unordered list',
+              icon: 'list-ul',
+              action: () => {
+                  toggleList('bullet_list', menu);
+              }
+          }),
+          // ol
+          new DOMinatorMenuButton({
+              key: 'ordered list',
+              icon: 'list-ol',
+              action: () => {
+                  toggleList('ordered_list', menu);
+              }
+          }),
+          // indent
+          new DOMinatorMenuButton({
+              key: 'indent',
+              icon: 'indent',
+              action: () => {
+                  toggleWrap('blockquote', menu);
+              }
+          }),
+          // photo
+          new DOMinatorMenuButton({
+              key: 'photo',
+              icon: 'camera-retro',
+              action: (button) => {
+                  menu.dominator.options.photograph(menu.dominator);
+              }
+          }),
+          // video
+          new DOMinatorMenuButton({
+              key: 'video',
+              icon: 'film',
+              action: (button) => {
+                  menu.dominator.options.video(menu.dominator);
+              }
+          }),
+          // carousel
+          new DOMinatorMenuButton({
+              key: 'carousel',
+              icon: 'carousel',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.dominator.options.carousel(menu.dominator);
+              }
+          }),
+          // cards
+          new DOMinatorMenuDropdown({
+              key: 'cards',
+              icon: 'card',
+              iconType: 'dics',
+              items: [
+                  new DOMinatorMenuButton({
+                      key: 'big card',
+                      icon: 'card',
+                      iconType: 'dics'
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'small card',
+                      icon: 'smallcard',
+                      iconType: 'dics'
+                  })
+              ]
+          }),
+          // layouts
+          new DOMinatorMenuDropdown({
+              key: 'layouts',
+              icon: 'columns12',
+              iconType: 'dics',
+              items: [
+                  new DOMinatorMenuButton({
+                      key: 'column 1 third - 2 third',
+                      icon: 'columns12',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_48');
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'column 2 third - 1 third',
+                      icon: 'columns21',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_84');
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: '4 columns',
+                      icon: 'fourcolumns',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_3333');
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: '3 columns',
+                      icon: 'threecolumns',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_444');
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: '2 columns',
+                      icon: 'twocolumns',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_66');
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: '1 column',
+                      icon: 'onecolumn',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertLayout(menu, 'layout_12');
+                      }
+                  })
+              ]
+          }),
+          // download
+          new DOMinatorMenuButton({
+              key: 'download',
+              icon: 'download',
+              action: () => {
+                  menu.dominator.options.downloads(menu.dominator);
+              }
+          }),
+          // element id
+          new DOMinatorMenuButton({
+              key: 'element id',
+              icon: 'hashtag',
+              action: () => {
+
+              }
+          }),
+          // custom html
+          new DOMinatorMenuButton({
+              key: 'custom html',
+              icon: 'code',
+              action: (button) => {
+                  menu.dominator.options.photo(menu, menu.dominator);
+              }
+          }),
+          // paddings
+          new DOMinatorMenuButton({
+              key: 'paddings',
+              icon: 'padding',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('paddings');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakePadding) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-p')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
+                      button.deactivate();
+                  }
+              }
+          }),
+          // margins
+          new DOMinatorMenuButton({
+              key: 'margins',
+              icon: 'margin',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('margins');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakeMargin) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
+                      button.deactivate();
+                  }
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.paragraph ===  'function'){
+          menu.dominator.options.menu.paragraph(items);
+      }
 
       return new DOMinatorSubMenu({
           key: 'paragraph',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Paragraph'
-              }),
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuButton ({
-                  key: 'paragraph',
-                  icon: 'paragraph',
-                  update: (button) => {
-                      if(menu.activeBlock && menu.activeBlock.type.name === 'paragraph'){
-                          button.activate();
-                      }else{
-                          button.deactivate();
-                      }
-                  },
-                  action: () => { convertBlock('paragraph', {}, menu); }
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'heading',
-                  icon: 'header',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'heading 1',
-                          label: 'H1',
-                          action: () => {
-                              convertBlock('heading', { level: 1 }, menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'heading 2',
-                          label: 'H2',
-                          action: () => {
-                              convertBlock('heading', { level: 2 }, menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'heading 3',
-                          label: 'H3',
-                          action: () => {
-                              convertBlock('heading', { level: 3 }, menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'heading 4',
-                          label: 'H4',
-                          action: () => {
-                              convertBlock('heading', { level: 4 }, menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'heading 5',
-                          label: 'H5',
-                          action: () => {
-                              convertBlock('heading', { level: 5 }, menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'heading 6',
-                          label: 'H6',
-                          action: () => {
-                              convertBlock('heading', { level: 6 }, menu);
-                          }
-                      }),
-                  ]
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'alignment',
-                  icon: 'align-left',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'align left',
-                          icon: 'align-left',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'left');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align center',
-                          icon: 'align-center',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'center');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align right',
-                          icon: 'align-right',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'right');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'clear alignment',
-                          icon: 'clearalignment',
-                          iconType: 'dics',
-                          action: () => {
-                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                  ]
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'unordered list',
-                  icon: 'list-ul',
-                  action: () => {
-                      toggleList('bullet_list' , menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'ordered list',
-                  icon: 'list-ol',
-                  action: () => {
-                      toggleList('ordered_list' , menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'indent',
-                  icon: 'indent',
-                  action: () => {
-                      toggleWrap('blockquote' , menu);
-                  }
-              }),
-              // new DOMinatorMenuButton ({
-              //     key: 'outdent',
-              //     icon: 'outdent',
-              //     action: () => {
-              //         toggleWrap('blockquote' , menu);
-              //     }
-              // }),
-              new DOMinatorMenuButton ({
-                  key: 'photo',
-                  icon: 'camera-retro',
-                  action: (button) => {
-                      const selection = menu.view.state.selection;
-                      // menu.dominator.options.photo(menu, menu.dominator);
-                      /*
-                      <div class="tg_subwidget tg_subwidget_photograph width-66 pull-left">
-                          <img src="https://i.picsum.photos/id/519/600/400.jpg?grayscale"
-                          alt="Some alt tag which is not the same as the caption."
-                          data-photograph_id="12035" data-photograph_medium="https://i.picsum.photos/id/519/600/400.jpg?grayscale" data-photograph_large="https://i.picsum.photos/id/519/1200/800.jpg?grayscale" draggable="false"><div class="tg_subwidget_photograph_text"><span class="photograph_title">Picsum Photos random images</span> <span class="copyright">©</span>picsum.photos</div></div>
-                      */
-                      // const photographAttrs = {
-                      //     alt: 'Placeholder',
-                      //     src: 'https://picsum.photos/600/900?grayscale',
-                      //
-                      // };
-                      // photograph_caption
-                      // const image = view.state.schema.nodes.image.create({
-                      //     src: 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-                      //     alt: 'Placeholder'
-                      //     'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
-                      //     'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-                      // });
-
-                      // caption
-                      const captionText = menu.view.state.schema.text('Image from picsum.photos');
-                      const photographCaption = menu.view.state.schema.nodes.photograph_caption.create({}, captionText);
-
-                      // image
-                      const image = menu.view.state.schema.nodes.image.create({
-                          src: 'https://picsum.photos/600/400?grayscale',
-                          alt: 'A placeholder image from picsum.photos',
-                          // 'data-photograph_medium': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale',
-                          // 'data-photograph_large': 'https://i.picsum.photos/id/177/600/400.jpg?grayscale'
-                      });
-
-                      const photograph = menu.view.state.schema.nodes.photograph.create({}, [ image, photographCaption ]);
-
-
-                      // console.log(photograph);
-                      // console.log(selection.from);
-                      // menu.view.state.tr.replaceWith( selection.from, selection.from, photograph );
-                      // menu.view.state.tr.replaceWith( 0, 0, photograph );
-
-                      const tr = menu.view.state.tr.insert( selection.from, photograph );
-                      menu.view.dispatch(tr);
-                      // if(selection.constructor.name === 'TextSelection'){
-                      //     pos = selection.$head.before()-2;
-                      // }else if(selection.constructor.name === 'NodeSelection'){
-                      //     pos = selection.from;
-                      // }
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'video',
-                  icon: 'film',
-                  action: (button) => {
-                      menu.dominator.options.photo(menu, menu.dominator);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'carousel',
-                  icon: 'carousel',
-                  iconType: 'dics',
-                  action: (button) => {
-                      menu.dominator.options.photo(menu, menu.dominator);
-                  }
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'cards',
-                  icon: 'card',
-                  iconType: 'dics',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'big card',
-                          icon: 'card',
-                          iconType: 'dics'
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'small card',
-                          icon: 'smallcard',
-                          iconType: 'dics'
-                      })
-                  ]
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'layouts',
-                  icon: 'columns12',
-                  iconType: 'dics',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'column 1 third - 2 third',
-                          icon: 'columns12',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_48');
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'column 2 third - 1 third',
-                          icon: 'columns21',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_84');
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '4 columns',
-                          icon: 'fourcolumns',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_3333');
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '3 columns',
-                          icon: 'threecolumns',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_444');
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '2 columns',
-                          icon: 'twocolumns',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_66');
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '1 column',
-                          icon: 'onecolumn',
-                          iconType: 'dics',
-                          action:(button) => {
-                              insertLayout(menu, 'layout_12');
-                          }
-                      })
-                  ]
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'download',
-                  icon: 'download',
-                  action: () => {
-
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'element id',
-                  icon: 'hashtag',
-                  action: () => {
-
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'custom html',
-                  icon: 'code',
-                  action: (button) => {
-                      menu.dominator.options.photo(menu, menu.dominator);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'paddings',
-                  icon: 'padding',
-                  iconType: 'dics',
-                  action: (button) => {
-                      menu.activateSubmenu('paddings');
-                  },
-                  update(button, menu,){
-                      const block = menu.activeBlock;
-                      if(block && block.type.spec.canTakePadding){
-                          button.enable();
-                          if(block.attrs.class && block.attrs.class.includes('d-p')){
-                              button.activate();
-                          }else{
-                              button.deactivate();
-                          }
-                      }else{
-                          button.disable();
-                          button.deactivate();
-                      }
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'margins',
-                  icon: 'margin',
-                  iconType: 'dics',
-                  action: (button) => {
-                      menu.activateSubmenu('margins');
-                  },
-                  update(button, menu,){
-                      const block = menu.activeBlock;
-                      if(block && block.type.spec.canTakeMargin){
-                          button.enable();
-                          if(block.attrs.class && block.attrs.class.includes('d-m')){
-                              button.activate();
-                          }else{
-                              button.deactivate();
-                          }
-                      }else{
-                          button.disable();
-                          button.deactivate();
-                      }
-                  }
-              }),
-
-              // new DOMinatorMenuButton ({
-              //     key: 'padding',
-              //     icon: 'padding',
-              //     iconType: 'dics',
-              //     action: (button) => {
-              //         menu.dominator.options.photo(menu, menu.dominator);
-              //     }
-              // }),
-              // new DOMinatorMenuButton ({
-              //     key: 'margin',
-              //     icon: 'margin',
-              //     iconType: 'dics',
-              //     action: (button) => {
-              //         menu.dominator.options.photo(menu, menu.dominator);
-              //     }
-              // }),
-          ],
+          items: items
       });
   }
 
-  function smInline(menu) {
+  function _Inline(menu) {
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Selection'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'bold',
+              icon: 'bold',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.b);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'italic',
+              icon: 'italic',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.i);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'underline',
+              icon: 'underline',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.u);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'link',
+              icon: 'link',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.link);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'strikethrough',
+              icon: 'strikethrough',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.del);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'subscript',
+              icon: 'subscript',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.sub);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'superscript',
+              icon: 'superscript',
+              action: () => {
+                  toggleMark$1(menu, menu.editorSchema.marks.sup);
+              }
+          }),
+          // new DOMinatorMenuButton ({
+          //     key: 'pencil',
+          //     icon: 'pencil',
+          //     action: () => {
+          //         toggleMark(menu, menu.editorSchema.marks.del);
+          //     }
+          // }),
+          new DOMinatorMenuDropdown ({
+              key: 'alignment',
+              icon: 'align-left',
+              items: [
+                  new DOMinatorMenuButton ({
+                      key: 'align left',
+                      icon: 'align-left',
+                      action: (button) => {
+                          alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'align center',
+                      icon: 'align-center',
+                      action: () => {
+                          alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'align right',
+                      icon: 'align-right',
+                      action: () => {
+                          alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'clear alignment',
+                      icon: 'clearalignment',
+                      iconType: 'dics',
+                      action: () => {
+                          alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+              ]
+          }),
+          new DOMinatorMenuButton ({
+              key: 'remove_formatting',
+              icon: 'eraser',
+              action: () => {
+                  clearFormatting(menu);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.inline ===  'function'){
+          menu.dominator.options.menu.inline(items, menu);
+      }
+
       return new DOMinatorSubMenu({
           key: 'inline',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Selection'
-              }),
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuButton ({
-                  key: 'bold',
-                  icon: 'bold',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.b);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'italic',
-                  icon: 'italic',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.i);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'underline',
-                  icon: 'underline',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.u);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'link',
-                  icon: 'link',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.link);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'strikethrough',
-                  icon: 'strikethrough',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.del);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'subscript',
-                  icon: 'subscript',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.sub);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'superscript',
-                  icon: 'superscript',
-                  action: () => {
-                      toggleMark$1(menu, menu.editorSchema.marks.sup);
-                  }
-              }),
-              // new DOMinatorMenuButton ({
-              //     key: 'pencil',
-              //     icon: 'pencil',
-              //     action: () => {
-              //         toggleMark(menu, menu.editorSchema.marks.del);
-              //     }
-              // }),
-              new DOMinatorMenuDropdown ({
-                  key: 'alignment',
-                  icon: 'align-left',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'align left',
-                          icon: 'align-left',
-                          action: (button) => {
-                              alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align center',
-                          icon: 'align-center',
-                          action: () => {
-                              alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align right',
-                          icon: 'align-right',
-                          action: () => {
-                              alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'clear alignment',
-                          icon: 'clearalignment',
-                          iconType: 'dics',
-                          action: () => {
-                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                  ]
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'remove_formatting',
-                  icon: 'eraser',
-                  action: () => {
-                      clearFormatting(menu);
-                  }
-              }),
-          ]
+          items: items
       });
   }
 
-  function smLink(menu) {
+  function _Link(menu) {
+
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Link'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuInput ({
+              update: (input) => {
+                  input.setValue(menu.activeMark.attrs.href);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnMark('href', val, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'unlink',
+              icon: 'chain-broken',
+              action: () => {
+                  clearFormatting(menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  if(menu.activeMark.attrs.target === '_blank'){
+                      button.activate();
+                  }else{
+                      button.deactivate();
+                  }
+              },
+              key: 'link_external',
+              icon: 'external-link',
+              action: (state, dispatch, view)=>{
+                  // attribute, value, menu, mark
+                  toggleAttributeOnMark('target', '_blank', menu, menu.activeMark);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-default', button, menu);
+              },
+              key: 'link_style_default',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-default', linkClasses);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-primary', button, menu);
+              },
+              key: 'link_style_primary',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-primary', linkClasses);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-warning', button, menu);
+              },
+              key: 'link_style_warning',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-warning', linkClasses);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-danger', button, menu);
+              },
+              key: 'link_style_danger',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-danger', linkClasses);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-success', button, menu);
+              },
+              key: 'link_style_success',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-success', linkClasses);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton('button button-info', button, menu);
+              },
+              key: 'link_style_info',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, 'button button-info', linkClasses);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.link ===  'function'){
+          menu.dominator.options.menu.link(items, menu);
+      }
 
       return new DOMinatorSubMenu({
           key: 'link',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Link'
-              }),
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuInput ({
-                  update: (input) => {
-                      input.setValue(menu.activeMark.attrs.href);
-                  },
-                  key: 'href',
-                  action: (val) => {
-                      changeAttributeOnMark('href', val, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'unlink',
-                  icon: 'chain-broken',
-                  action: () => {
-                      clearFormatting(menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      if(menu.activeMark.attrs.target === '_blank'){
-                          button.activate();
-                      }else{
-                          button.deactivate();
-                      }
-                  },
-                  key: 'link_external',
-                  icon: 'external-link',
-                  action: (state, dispatch, view)=>{
-                      // attribute, value, menu, mark
-                      toggleAttributeOnMark('target', '_blank', menu, menu.activeMark);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-default', button, menu);
-                  },
-                  key: 'link_style_default',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-default', linkClasses);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-primary', button, menu);
-                  },
-                  key: 'link_style_primary',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-primary', linkClasses);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-warning', button, menu);
-                  },
-                  key: 'link_style_warning',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-warning', linkClasses);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-danger', button, menu);
-                  },
-                  key: 'link_style_danger',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-danger', linkClasses);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-success', button, menu);
-                  },
-                  key: 'link_style_success',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-success', linkClasses);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  update: (button) => {
-                      updateLinkStyleButton('button button-info', button, menu);
-                  },
-                  key: 'link_style_info',
-                  icon: 'paint-brush',
-                  action: ()=>{
-                      toggleClassOnMark(menu, menu.activeMark, 'button button-info', linkClasses);
-                  }
-              }),
-          ]
+          items: items
       });
   }
 
@@ -20449,173 +20507,176 @@
       }
   }
 
-  function smHeading(menu) {
+  function _Heading(menu) {
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Heading'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'paragraph',
+              icon: 'paragraph',
+              action: () => { convertBlock('paragraph', {}, menu); }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 1',
+              label: 'H1',
+              update: (button) => {
+                  return activateHeaderButton(1, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 1 }, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 2',
+              label: 'H2',
+              update: (button) => {
+                  return activateHeaderButton(2, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 2 }, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 3',
+              label: 'H3',
+              update: (button) => {
+                  return activateHeaderButton(3, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 3 }, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 4',
+              label: 'H4',
+              update: (button) => {
+                  return activateHeaderButton(4, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 4 }, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 5',
+              label: 'H5',
+              update: (button) => {
+                  return activateHeaderButton(5, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 5 }, menu);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'heading 6',
+              label: 'H6',
+              update: (button) => {
+                  return activateHeaderButton(6, menu, button);
+              },
+              action: () => {
+                  convertBlock('heading', { level: 6 }, menu);
+              }
+          }),
+          new DOMinatorMenuDropdown ({
+              key: 'alignment',
+              icon: 'align-left',
+              items: [
+                  new DOMinatorMenuButton ({
+                      key: 'align left',
+                      icon: 'align-left',
+                      update(button){
+                          return updateAlignmentButton(button, menu, 'left');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'align center',
+                      icon: 'align-center',
+                      update(button){
+                          return updateAlignmentButton(button, menu, 'center');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'align right',
+                      icon: 'align-right',
+                      update(button){
+                          return updateAlignmentButton(button, menu, 'right');
+                      },
+                      action: (button) => {
+                          alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'clear alignment',
+                      icon: 'clearalignment',
+                      iconType: 'dics',
+                      action: () => {
+                          alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
+                      }
+                  }),
+              ]
+          }),
+          new DOMinatorMenuButton ({
+              key: 'paddings',
+              icon: 'padding',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('paddings');
+              },
+              update(button, menu,){
+                  if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                      button.disable();
+                      button.deactivate();
+                  }else{
+                      button.enable();
+                      button.deactivate();
+                      if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
+                          button.activate();
+                          return true;
+                      }else{
+                          return false;
+                      }
 
+                  }
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'margins',
+              icon: 'margin',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('margins');
+              },
+              update(button, menu,){
+                  if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                      button.disable();
+                      button.deactivate();
+                  }else{
+                      button.enable();
+                      button.deactivate();
+                      if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                          button.activate();
+                          return true;
+                      }else{
+                          return false;
+                      }
+
+                  }
+              }
+          }),
+      ];
+      if( typeof menu.dominator.options.menu.heading ===  'function'){
+          menu.dominator.options.menu.heading(items, menu);
+      }
       return new DOMinatorSubMenu({
           key: 'heading',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Heading'
-              }),
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuButton ({
-                  key: 'paragraph',
-                  icon: 'paragraph',
-                  action: () => { convertBlock('paragraph', {}, menu); }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 1',
-                  label: 'H1',
-                  update: (button) => {
-                      return activateHeaderButton(1, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 1 }, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 2',
-                  label: 'H2',
-                  update: (button) => {
-                      return activateHeaderButton(2, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 2 }, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 3',
-                  label: 'H3',
-                  update: (button) => {
-                      return activateHeaderButton(3, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 3 }, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 4',
-                  label: 'H4',
-                  update: (button) => {
-                      return activateHeaderButton(4, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 4 }, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 5',
-                  label: 'H5',
-                  update: (button) => {
-                      return activateHeaderButton(5, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 5 }, menu);
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'heading 6',
-                  label: 'H6',
-                  update: (button) => {
-                      return activateHeaderButton(6, menu, button);
-                  },
-                  action: () => {
-                      convertBlock('heading', { level: 6 }, menu);
-                  }
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'alignment',
-                  icon: 'align-left',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'align left',
-                          icon: 'align-left',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'left');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'left', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align center',
-                          icon: 'align-center',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'center');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'center', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align right',
-                          icon: 'align-right',
-                          update(button){
-                              return updateAlignmentButton(button, menu, 'right');
-                          },
-                          action: (button) => {
-                              alignSelection(menu.view, button.isActive() ? '':'right', menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'clear alignment',
-                          icon: 'clearalignment',
-                          iconType: 'dics',
-                          action: () => {
-                              alignSelection(menu.view, null, menu.dominator.options.textAlignClasses);
-                          }
-                      }),
-                  ]
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'paddings',
-                  icon: 'padding',
-                  iconType: 'dics',
-                  action: (button) => {
-                      menu.activateSubmenu('paddings');
-                  },
-                  update(button, menu,){
-                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
-                          button.disable();
-                          button.deactivate();
-                      }else{
-                          button.enable();
-                          button.deactivate();
-                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
-                              button.activate();
-                              return true;
-                          }else{
-                              return false;
-                          }
-
-                      }
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'margins',
-                  icon: 'margin',
-                  iconType: 'dics',
-                  action: (button) => {
-                      menu.activateSubmenu('margins');
-                  },
-                  update(button, menu,){
-                      if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
-                          button.disable();
-                          button.deactivate();
-                      }else{
-                          button.enable();
-                          button.deactivate();
-                          if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
-                              button.activate();
-                              return true;
-                          }else{
-                              return false;
-                          }
-
-                      }
-                  }
-              }),
-          ],
+          items: items
       });
   }
 
@@ -20769,138 +20830,143 @@
       }
   }
 
-  function smPhotograph(menu) {
+  function _Photograph(menu) {
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Photograph'
+          }),
+          new DOMinatorMenuSeparator (),
+
+          new DOMinatorMenuDropdown ({
+              key: 'change image size',
+              icon: 'expand',
+              items: [
+                  new DOMinatorMenuButton ({
+                      key: 'full size',
+                      label: '100%',
+                      update: (button) => {
+                          return sizeButtonActivate('100', menu, button);
+                      },
+                      action: () => {
+                          changeSize('100', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: '75 percent',
+                      label: '75%',
+                      update: (button) => {
+                          return sizeButtonActivate('75', menu, button);
+                      },
+                      action: () => {
+                          changeSize('75', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: '66 percent',
+                      label: '66%',
+                      update: (button) => {
+                          return sizeButtonActivate('66', menu, button);
+                      },
+                      action: () => {
+                          changeSize('66', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: '50 percent',
+                      label: '50%',
+                      update: (button) => {
+                          return sizeButtonActivate('50', menu, button);
+                      },
+                      action: () => {
+                          changeSize('50', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: '33 percent',
+                      label: '33%',
+                      update: (button) => {
+                          return sizeButtonActivate('33', menu, button);
+                      },
+                      action: () => {
+                          changeSize('33', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: '25 percent',
+                      label: '25%',
+                      update: (button) => {
+                          return sizeButtonActivate('25', menu, button);
+                      },
+                      action: () => {
+                          changeSize('25', menu);
+                      }
+                  }),
+              ]
+          }),
+          new DOMinatorMenuDropdown ({
+              key: 'alignment',
+              icon: 'floatimage-left',
+              iconType: 'dics',
+              items: [
+                  new DOMinatorMenuButton ({
+                      key: 'float left of text',
+                      icon: 'floatimage-left',
+                      iconType: 'dics',
+                      update: (button) => {
+                          return floatButtonActivate('left', menu, button);
+                      },
+                      action: (button) => {
+                          imageFloat('left', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'align center and clear both side',
+                      icon: 'floatimage-none',
+                      iconType: 'dics',
+                      update: (button) => {
+                          return floatButtonActivate('center', menu, button);
+                      },
+                      action: () => {
+                          imageFloat('center', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'float right of text',
+                      icon: 'floatimage-right',
+                      iconType: 'dics',
+                      update: (button) => {
+                          return floatButtonActivate('right', menu, button);
+                      },
+                      action: () => {
+                          imageFloat('right', menu);
+                      }
+                  })
+              ]
+          }),
+          new DOMinatorMenuLabel({
+              label: 'Alt tag:'
+          }),
+          new DOMinatorMenuInput ({
+              update: (input) => {
+                  const {img} = getImage(menu);
+                  if(!img){ return true; }
+                  const alt = img.attrs.alt || '';
+                  input.setValue(alt);
+              },
+              key: 'href',
+              action: (val) => {
+                  setAlt(menu, val);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.photograph ===  'function'){
+          menu.dominator.options.menu.photograph(items, menu);
+      }
 
       return new DOMinatorSubMenu({
           key: 'photograph',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Photograph'
-              }),
-              new DOMinatorMenuSeparator (),
-
-              new DOMinatorMenuDropdown ({
-                  key: 'change image size',
-                  icon: 'expand',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'full size',
-                          label: '100%',
-                          update: (button) => {
-                              return sizeButtonActivate('100', menu, button);
-                          },
-                          action: () => {
-                              changeSize('100', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '75 percent',
-                          label: '75%',
-                          update: (button) => {
-                              return sizeButtonActivate('75', menu, button);
-                          },
-                          action: () => {
-                              changeSize('75', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '66 percent',
-                          label: '66%',
-                          update: (button) => {
-                              return sizeButtonActivate('66', menu, button);
-                          },
-                          action: () => {
-                              changeSize('66', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '50 percent',
-                          label: '50%',
-                          update: (button) => {
-                              return sizeButtonActivate('50', menu, button);
-                          },
-                          action: () => {
-                              changeSize('50', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '33 percent',
-                          label: '33%',
-                          update: (button) => {
-                              return sizeButtonActivate('33', menu, button);
-                          },
-                          action: () => {
-                              changeSize('33', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: '25 percent',
-                          label: '25%',
-                          update: (button) => {
-                              return sizeButtonActivate('25', menu, button);
-                          },
-                          action: () => {
-                              changeSize('25', menu);
-                          }
-                      }),
-                  ]
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'alignment',
-                  icon: 'floatimage-left',
-                  iconType: 'dics',
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'float left of text',
-                          icon: 'floatimage-left',
-                          iconType: 'dics',
-                          update: (button) => {
-                              return floatButtonActivate('left', menu, button);
-                          },
-                          action: (button) => {
-                              imageFloat('left', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'align center and clear both side',
-                          icon: 'floatimage-none',
-                          iconType: 'dics',
-                          update: (button) => {
-                              return floatButtonActivate('center', menu, button);
-                          },
-                          action: () => {
-                              imageFloat('center', menu);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'float right of text',
-                          icon: 'floatimage-right',
-                          iconType: 'dics',
-                          update: (button) => {
-                              return floatButtonActivate('right', menu, button);
-                          },
-                          action: () => {
-                              imageFloat('right', menu);
-                          }
-                      })
-                  ]
-              }),
-              new DOMinatorMenuLabel({
-                  label: 'Alt tag:'
-              }),
-              new DOMinatorMenuInput ({
-                  update: (input) => {
-                      const {img} = getImage(menu);
-                      if(!img){ return true; }
-                      const alt = img.attrs.alt || '';
-                      input.setValue(alt);
-                  },
-                  key: 'href',
-                  action: (val) => {
-                      setAlt(menu, val);
-                  }
-              }),
-          ]
+          items: items
       });
   }
 
@@ -20918,38 +20984,44 @@
       let node = menu.view.state.doc.nodeAt(pos);
       let dom = menu.view.domAtPos(pos);
 
-      console.log(node);
-      console.log(dom);
-
-
   }
 
-  function smCarousel(menu) {
+  function _Carousel(menu) {
+
+      if( menu.dominator.options.menu.carousel ===  false){
+          return null;
+      }
+
+      let items = [
+          new DOMinatorMenuLabel({
+              label: 'Carousel'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'paragraph',
+              icon: 'paragraph',
+              action: () => {
+                  see(menu);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              update: (input) => {
+
+              },
+              key: 'href',
+              action: (val) => {
+
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.carousel ===  'function'){
+          menu.dominator.options.menu.carousel(items, menu);
+      }
 
       return new DOMinatorSubMenu({
           key: 'carousel',
-          items: [
-              new DOMinatorMenuLabel({
-                  label: 'Carousel'
-              }),
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuButton ({
-                  key: 'paragraph',
-                  icon: 'paragraph',
-                  action: () => {
-                      see(menu);
-                  }
-              }),
-              new DOMinatorMenuInput ({
-                  update: (input) => {
-
-                  },
-                  key: 'href',
-                  action: (val) => {
-
-                  }
-              }),
-          ]
+          items: items
       });
   }
   //
@@ -20984,88 +21056,141 @@
   //
   // });
 
+  function _DownloadLink(menu) {
+      if( menu.dominator.options.menu.download_link ===  false){
+          return null;
+      }
+      const items =  [
+          new DOMinatorMenuLabel({
+              label: 'Download'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'download',
+              icon: 'download',
+              action: (button) => {
+                  menu.dominator.options.downloads(menu.dominator);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link: ',
+              update: (input) => {
+                  input.setValue(menu.activeBlock.attrs.href);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnNode(menu, 'href', val);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Title: ',
+              update: (input) => {
+                  input.setValue(menu.activeBlock.attrs.title);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnNode(menu, 'title', val);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.download_link ===  'function'){
+          menu.dominator.options.menu.download_link(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'download link',
+          items: items,
+      });
+  }
+
   function smRightMenu(menu) {
+      const items = [
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'undo',
+              icon: 'undo',
+              action: (button)=> {
+                  undo(menu.view.state, menu.view.dispatch);
+              },
+              update: (button) => {
+                  undo(menu.view.state) ? button.enable() : button.disable();
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'redo',
+              icon: 'repeat',
+              action: (button)=> {
+                  redo(menu.view.state, menu.view.dispatch);
+              },
+              update: (button) => {
+                  redo(menu.view.state) ? button.enable() : button.disable();
+              }
+          }),
+          new DOMinatorMenuDropdown ({
+              key: 'menu',
+              icon: 'ellipsis-v',
+              dropdownCaret: false,
+              items: [
+                  new DOMinatorMenuButton ({
+                      key: 'page settings',
+                      icon: 'cog',
+                      label: 'Page Settings',
+                      action: (button) => {
+                          menu.dominator.options.pageSettings(menu, menu.dominator);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'revisions',
+                      icon: 'clock-o',
+                      label: 'Show Revisions',
+                      action: () => {
+                          menu.dominator.options.showRevisions(menu, menu.dominator);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'shedule',
+                      icon: 'calendar',
+                      label: 'Shedule',
+                      action: () => {
+                          menu.dominator.options.shedule(menu, menu.dominator);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'new page',
+                      icon: 'file-o',
+                      label: 'New Page',
+                      action: () => {
+                          menu.dominator.options.newPage(menu, menu.dominator);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'go live',
+                      icon: 'check',
+                      label: 'Go Live',
+                      action: () => {
+                          menu.dominator.options.goLive(menu, menu.dominator);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'exit editor',
+                      icon: 'close',
+                      label: 'Exit',
+                      action: () => {
+                          menu.dominator.options.exit(menu, menu.dominator);
+                      }
+                  }),
+              ]
+          })
+      ];
+
+      if( typeof menu.dominator.options.menu.right ===  'function'){
+          menu.dominator.options.menu.right(items, menu);
+      }
+
       return new DOMinatorSubMenu({
           key: 'right',
-          items: [
-              new DOMinatorMenuSeparator (),
-              new DOMinatorMenuButton ({
-                  key: 'undo',
-                  icon: 'undo',
-                  action: (button)=> {
-                      undo(menu.view.state, menu.view.dispatch);
-                  },
-                  update: (button) => {
-                      undo(menu.view.state) ? button.enable() : button.disable();
-                  }
-              }),
-              new DOMinatorMenuButton ({
-                  key: 'redo',
-                  icon: 'repeat',
-                  action: (button)=> {
-                      redo(menu.view.state, menu.view.dispatch);
-                  },
-                  update: (button) => {
-                      redo(menu.view.state) ? button.enable() : button.disable();
-                  }
-              }),
-              new DOMinatorMenuDropdown ({
-                  key: 'menu',
-                  icon: 'ellipsis-v',
-                  dropdownCaret: false,
-                  items: [
-                      new DOMinatorMenuButton ({
-                          key: 'page settings',
-                          icon: 'cog',
-                          label: 'Page Settings',
-                          action: (button) => {
-                              menu.dominator.options.pageSettings(menu, menu.dominator);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'revisions',
-                          icon: 'clock-o',
-                          label: 'Show Revisions',
-                          action: () => {
-                              menu.dominator.options.showRevisions(menu, menu.dominator);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'shedule',
-                          icon: 'calendar',
-                          label: 'Shedule',
-                          action: () => {
-                              menu.dominator.options.shedule(menu, menu.dominator);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'new page',
-                          icon: 'file-o',
-                          label: 'New Page',
-                          action: () => {
-                              menu.dominator.options.newPage(menu, menu.dominator);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'go live',
-                          icon: 'check',
-                          label: 'Go Live',
-                          action: () => {
-                              menu.dominator.options.goLive(menu, menu.dominator);
-                          }
-                      }),
-                      new DOMinatorMenuButton ({
-                          key: 'exit editor',
-                          icon: 'close',
-                          label: 'Exit',
-                          action: () => {
-                              menu.dominator.options.exit(menu, menu.dominator);
-                          }
-                      }),
-                  ]
-              })
-
-          ]
+          items: items
       });
   }
 
@@ -21210,15 +21335,41 @@
       }
 
       initMenu(){
+
           this.submenus = {
-              inline: smInline(this),
-              link: smLink(this),
-              paragraph: smParagraph(this),
-              heading: smHeading(this),
+              inline: _Inline(this),
+              link: _Link(this),
+              paragraph: _Paragraph(this),
+              heading: _Heading(this),
               paddings: paddings(this),
               margins: margins(this),
-              photograph:smPhotograph(this),
-              carousel:smCarousel(this),
+              photograph: _Photograph(this),
+              carousel: _Carousel(this),
+              download_link: _DownloadLink(this),
+              download_title: new DOMinatorSubMenu({
+                  key: 'download link',
+                  items: [
+                      new DOMinatorMenuLabel({
+                          label: 'Downloads Title'
+                      }),
+                      new DOMinatorMenuSeparator (),
+                      new DOMinatorMenuLabel({
+                          label: ' - n/a - '
+                      }),
+                  ]
+              }),
+              downloads: new DOMinatorSubMenu({
+                  key: 'downloads',
+                  items: [
+                      new DOMinatorMenuLabel({
+                          label: 'Downloads'
+                      }),
+                      new DOMinatorMenuSeparator (),
+                      new DOMinatorMenuLabel({
+                          label: ' - n/a -'
+                      }),
+                  ]
+              }),
               custom_html: new DOMinatorSubMenu({
                   key: 'custom_html',
                   items: [
@@ -21235,7 +21386,6 @@
                       }),
                   ],
               }),
-
               span: new DOMinatorSubMenu({
                   key: 'span',
                   items: [
@@ -21254,6 +21404,13 @@
               }),
           };
 
+          // if(typeof this.dominator.options.submenus === 'function'){
+          //     this.submenus = this.dominator.options.submenus(submenus);
+          // }else{
+          //     this.submenus = submenus;
+          // }
+
+          // this.submenus = { submenues, ...this.dominator.options.menus };
           this.dom = document.createElement("div");
           this.leftdom = document.createElement("div");
           this.rightdom = document.createElement("div");
@@ -21262,15 +21419,18 @@
           this.rightdom.className = "DOMinatorMenuRight";
 
           Object.keys(this.submenus).forEach(key=>{
-              this.leftdom.appendChild( this.submenus[key].getDom() );
+              const m = this.submenus[key];
+              if(m){
+                  this.leftdom.appendChild( m.getDom() );
+              }
           });
 
           this.rightMenu = smRightMenu(this);
-
           this.rightdom.appendChild(this.rightMenu.getDom());
 
           this.dom.appendChild(this.leftdom);
           this.dom.appendChild(this.rightdom);
+
       }
 
       // Create an icon for a heading at the given level
@@ -21621,7 +21781,8 @@
               newPage: implementMessage,          // the ui for screating a new page
               goLive: implementMessage,           // the ui for going live and saving a revision
               exit: implementMessage,             // the ui for going live and saving a revision
-              photo: implementMessage,             // the ui for going live and saving a revision
+              photograph: implementMessage,             // the ui for going live and saving a revision
+              downloads: implementMessage,
 
               paddingClasses: paddingClasses,
               marginClasses: marginClasses,
@@ -21644,7 +21805,7 @@
                  '75': 'width-75',
                  '100': 'width-100',
              },
-
+             menu: {}
           };
 
           this.options = {
@@ -21680,44 +21841,35 @@
                           view(editorView) {
                               let menuView = new DOMinatorMenu(that, editorView);
                               editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                              that.menu = menuView;
                               return menuView;
                           },
                           props: {
                               handleKeyDown: (view, event)=>{
                                   if(event.which === 13 && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey){
-
                                       const selection = view.state.selection;
-                                      console.log(selection.$cursor);
 
                                       if(selection.empty && selection.$cursor){
-                                          const parent = selection.$cursor.parent.type.name;
-                                          // create a new paragraph after the photograph
+                                          const $cursor = selection.$cursor;
+                                          const depth = selection.$cursor.depth;
+                                          const parent = $cursor.parent.type.name;
+                                          const grandparentNode = $cursor.node(depth-1); // selection.$cursor.depth > 0 ? selection.$cursor.node(depth-1) : null;
+                                          const grandparent = grandparentNode ? grandparentNode.type.name : '';
 
+
+                                          // create a new paragraph after the photograph
                                           if(parent === "photograph_caption"){
-                                              const pos = selection.$cursor.end()+2;
+                                              const pos = $cursor.end()+2;
                                               const p = this.editorSchema.nodes.paragraph.createAndFill();
 
                                               view.dispatch(view.state.tr.insert( pos, p ));
                                               view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos+1)).scrollIntoView());
-
-
-                                              // tr.setSelection(TextSelection.create(tr.doc, pos));
-                                              // view.dispatch(tr.scrollIntoView());
-
-                                              // const tr = view.state.tr.insert( pos, p );
-                                              // tr.setSelection(TextSelection.create(tr.doc, pos));
-                                              // view.dispatch(tr.scrollIntoView());
                                               return true;
-                                          }else if(!selection.$cursor.nodeAfter && !selection.$cursor.nodeBefore&& selection.$cursor.depth > 2){
-                                              const depth = selection.$cursor.depth;
-                                              const thirdParent = selection.$cursor.node(depth-2);
-                                              const pos = selection.$cursor.end()+3;
 
-                                              if(!thirdParent || !thirdParent.type.name.includes('layout_')){
-                                                  return false;
-                                              }
-
-                                              if(selection.$cursor.after(depth-2) !== pos){
+                                          // break out of layout
+                                          }else if(grandparent.includes('cl_') && !$cursor.nodeAfter && !$cursor.nodeBefore  ){
+                                              const pos = $cursor.end()+3;
+                                              if($cursor.after(depth-2) !== pos){
                                                   return false;
                                               }
 
@@ -21735,9 +21887,33 @@
                                               transaction.setMeta("addToHistory", false);
                                               view.dispatch(transaction.delete( pos-5, pos-2));
                                               return true;
+                                          }else if(parent === 'download_link' && !$cursor.nodeBefore && !$cursor.nodeAfter){
+                                              const before = $cursor.before();
+                                              const after = $cursor.after();
+
+                                              if($cursor.after(depth-2) !== after+2){
+                                                  return false;
+                                              }
+
+                                              const p = this.editorSchema.nodes.paragraph.createAndFill();
+
+                                              let transaction;
+                                              view.dispatch(view.state.tr.insert( after + 1, p ));
+
+                                              transaction = view.state.tr;
+                                              transaction.setMeta("addToHistory", false);
+                                              view.dispatch(transaction.setSelection(TextSelection.create(view.state.doc, after + 2)).scrollIntoView());
+
+                                              transaction = view.state.tr;
+                                              transaction.setMeta("addToHistory", false);
+                                              view.dispatch(transaction.delete( before, after));
+                                              return true;
+                                          }else{
+                                              console.log('4');
                                           }
                                       }
                                   }
+
                                   return false;
                               }
                           }
@@ -21774,13 +21950,34 @@
           });
       }
 
-      addNodes(nodes, newNodes){
-          Object.keys(newNodes).forEach(key => {
-              nodes = nodes.addToEnd(key, newNodes[key]);
-          });
-          return nodes;
+      insertDownloads(items){
+          // [ { href: '/', title: 'I am the title.' } ]
+          return insertDownloads(this.menu, items);
+      }
+
+      insertPhotograph(photo){
+          const selection = this.menu.view.state.selection;
+          const state = this.menu.view.state;
+
+          // caption
+          const captionText = state.schema.text(photo.caption || 'Caption');
+          const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
+
+          // image
+          const image = state.schema.nodes.image.create(photo);
+
+          const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
+          const tr = state.tr.insert(selection.from, photograph);
+          this.menu.view.dispatch(tr);
       }
   };
+
+  // addNodes(nodes, newNodes){
+  //     Object.keys(newNodes).forEach(key => {
+  //         nodes = nodes.addToEnd(key, newNodes[key]);
+  //     });
+  //     return nodes;
+  // }
 
 }());
 //# sourceMappingURL=DOMinator.js.map

@@ -570,6 +570,100 @@ export const nodes = {
 
         }
     },
+    downloads: {
+        content: "download_title{1} download_link+",
+        group: "block",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {
+            class: {
+                default: 'tg_subwidget list-group tg_subwidget_download'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_subwidget_download',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    download_title: {
+        content: "inline*",
+        group: "",
+        defining: true,
+        selectable: false,
+        draggable: false,
+        attrs: {
+            class: {
+                default: 'text-muted tg_subwidget_download_title'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_subwidget_download_title',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "p",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    download_link: {
+        content: "text*",
+        marks: 'b i sub sup',
+        group: "",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {
+            href: {
+                default: ''
+            },
+            title: {
+                default: null
+            },
+            target: {
+                default: null
+            },
+            'class': {
+                default: 'list-group-item geza'
+            }
+        },
+        parseDOM: [{
+            tag: 'a.list-group-item',
+            getAttrs: dom => {
+                return {
+                    href: dom.getAttribute("href"),
+                    title: dom.getAttribute("title"),
+                    target:  dom.getAttribute("target"),
+                    'class': dom.getAttribute("class"),
+                }
+            }
+        }],
+        toDOM(node) {
+            return [
+                "a",
+                node.attrs,
+                0
+            ]
+        }
+    },
     custom_html: {
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
@@ -630,9 +724,8 @@ export const marks = {
         excludes: 'span link',
         inclusive: false,
         parseDOM: [{
-            tag: "a", //[href]
+            tag: "a:not(.list-group-item)", //[href]
             getAttrs(dom) {
-
                 return {
                     href: dom.getAttribute("href"),
                     title: dom.getAttribute("title"),

@@ -167,136 +167,141 @@ function sizeButtonActivate(sizeKey, menu, btn){
 }
 
 export default function(menu) {
+    const items = [
+        new DOMinatorMenuLabel({
+            label: 'Photograph'
+        }),
+        new DOMinatorMenuSeparator (),
+
+        new DOMinatorMenuDropdown ({
+            key: 'change image size',
+            icon: 'expand',
+            items: [
+                new DOMinatorMenuButton ({
+                    key: 'full size',
+                    label: '100%',
+                    update: (button) => {
+                        return sizeButtonActivate('100', menu, button);
+                    },
+                    action: () => {
+                        changeSize('100', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: '75 percent',
+                    label: '75%',
+                    update: (button) => {
+                        return sizeButtonActivate('75', menu, button);
+                    },
+                    action: () => {
+                        changeSize('75', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: '66 percent',
+                    label: '66%',
+                    update: (button) => {
+                        return sizeButtonActivate('66', menu, button);
+                    },
+                    action: () => {
+                        changeSize('66', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: '50 percent',
+                    label: '50%',
+                    update: (button) => {
+                        return sizeButtonActivate('50', menu, button);
+                    },
+                    action: () => {
+                        changeSize('50', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: '33 percent',
+                    label: '33%',
+                    update: (button) => {
+                        return sizeButtonActivate('33', menu, button);
+                    },
+                    action: () => {
+                        changeSize('33', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: '25 percent',
+                    label: '25%',
+                    update: (button) => {
+                        return sizeButtonActivate('25', menu, button);
+                    },
+                    action: () => {
+                        changeSize('25', menu);
+                    }
+                }),
+            ]
+        }),
+        new DOMinatorMenuDropdown ({
+            key: 'alignment',
+            icon: 'floatimage-left',
+            iconType: 'dics',
+            items: [
+                new DOMinatorMenuButton ({
+                    key: 'float left of text',
+                    icon: 'floatimage-left',
+                    iconType: 'dics',
+                    update: (button) => {
+                        return floatButtonActivate('left', menu, button);
+                    },
+                    action: (button) => {
+                        imageFloat('left', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: 'align center and clear both side',
+                    icon: 'floatimage-none',
+                    iconType: 'dics',
+                    update: (button) => {
+                        return floatButtonActivate('center', menu, button);
+                    },
+                    action: () => {
+                        imageFloat('center', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: 'float right of text',
+                    icon: 'floatimage-right',
+                    iconType: 'dics',
+                    update: (button) => {
+                        return floatButtonActivate('right', menu, button);
+                    },
+                    action: () => {
+                        imageFloat('right', menu);
+                    }
+                })
+            ]
+        }),
+        new DOMinatorMenuLabel({
+            label: 'Alt tag:'
+        }),
+        new DOMinatorMenuInput ({
+            update: (input) => {
+                const {img} = getImage(menu);
+                if(!img){ return true; }
+                const alt = img.attrs.alt || '';
+                input.setValue(alt);
+            },
+            key: 'href',
+            action: (val) => {
+                setAlt(menu, val);
+            }
+        }),
+    ];
+
+    if( typeof menu.dominator.options.menu.photograph ===  'function'){
+        menu.dominator.options.menu.photograph(items, menu);
+    }
 
     return new DOMinatorSubMenu({
         key: 'photograph',
-        items: [
-            new DOMinatorMenuLabel({
-                label: 'Photograph'
-            }),
-            new DOMinatorMenuSeparator (),
-
-            new DOMinatorMenuDropdown ({
-                key: 'change image size',
-                icon: 'expand',
-                items: [
-                    new DOMinatorMenuButton ({
-                        key: 'full size',
-                        label: '100%',
-                        update: (button) => {
-                            return sizeButtonActivate('100', menu, button);
-                        },
-                        action: () => {
-                            changeSize('100', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: '75 percent',
-                        label: '75%',
-                        update: (button) => {
-                            return sizeButtonActivate('75', menu, button);
-                        },
-                        action: () => {
-                            changeSize('75', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: '66 percent',
-                        label: '66%',
-                        update: (button) => {
-                            return sizeButtonActivate('66', menu, button);
-                        },
-                        action: () => {
-                            changeSize('66', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: '50 percent',
-                        label: '50%',
-                        update: (button) => {
-                            return sizeButtonActivate('50', menu, button);
-                        },
-                        action: () => {
-                            changeSize('50', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: '33 percent',
-                        label: '33%',
-                        update: (button) => {
-                            return sizeButtonActivate('33', menu, button);
-                        },
-                        action: () => {
-                            changeSize('33', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: '25 percent',
-                        label: '25%',
-                        update: (button) => {
-                            return sizeButtonActivate('25', menu, button);
-                        },
-                        action: () => {
-                            changeSize('25', menu);
-                        }
-                    }),
-                ]
-            }),
-            new DOMinatorMenuDropdown ({
-                key: 'alignment',
-                icon: 'floatimage-left',
-                iconType: 'dics',
-                items: [
-                    new DOMinatorMenuButton ({
-                        key: 'float left of text',
-                        icon: 'floatimage-left',
-                        iconType: 'dics',
-                        update: (button) => {
-                            return floatButtonActivate('left', menu, button);
-                        },
-                        action: (button) => {
-                            imageFloat('left', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: 'align center and clear both side',
-                        icon: 'floatimage-none',
-                        iconType: 'dics',
-                        update: (button) => {
-                            return floatButtonActivate('center', menu, button);
-                        },
-                        action: () => {
-                            imageFloat('center', menu);
-                        }
-                    }),
-                    new DOMinatorMenuButton ({
-                        key: 'float right of text',
-                        icon: 'floatimage-right',
-                        iconType: 'dics',
-                        update: (button) => {
-                            return floatButtonActivate('right', menu, button);
-                        },
-                        action: () => {
-                            imageFloat('right', menu);
-                        }
-                    })
-                ]
-            }),
-            new DOMinatorMenuLabel({
-                label: 'Alt tag:'
-            }),
-            new DOMinatorMenuInput ({
-                update: (input) => {
-                    const {img} = getImage(menu);
-                    if(!img){ return true; }
-                    const alt = img.attrs.alt || '';
-                    input.setValue(alt);
-                },
-                key: 'href',
-                action: (val) => {
-                    setAlt(menu, val);
-                }
-            }),
-        ]
+        items: items
     });
 }

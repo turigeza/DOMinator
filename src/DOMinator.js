@@ -26,6 +26,11 @@ import CustomHtmlView from "./NodeViews/CustomHtmlView"
 import PhotographCaptionView from "./NodeViews/PhotographCaptionView"
 import ImageView from "./NodeViews/ImageView"
 
+// actions
+import {
+    insertDownloads,
+} from "./DOMinatorActions"
+
 window.DOMinator = class DOMinator {
     // editorSchema
     // view -view editors
@@ -44,7 +49,8 @@ window.DOMinator = class DOMinator {
             newPage: implementMessage,          // the ui for screating a new page
             goLive: implementMessage,           // the ui for going live and saving a revision
             exit: implementMessage,             // the ui for going live and saving a revision
-            photo: implementMessage,             // the ui for going live and saving a revision
+            photograph: implementMessage,             // the ui for going live and saving a revision
+            downloads: implementMessage,
 
             paddingClasses: paddingClasses,
             marginClasses: marginClasses,
@@ -67,7 +73,7 @@ window.DOMinator = class DOMinator {
                '75': 'width-75',
                '100': 'width-100',
            },
-
+           menu: {}
         };
 
         this.options = {
@@ -103,44 +109,35 @@ window.DOMinator = class DOMinator {
                         view(editorView) {
                             let menuView = new DOMinatorMenu(that, editorView);
                             editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                            that.menu = menuView;
                             return menuView;
                         },
                         props: {
                             handleKeyDown: (view, event)=>{
                                 if(event.which === 13 && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey){
-
                                     const selection = view.state.selection;
-                                    console.log(selection.$cursor);
 
                                     if(selection.empty && selection.$cursor){
-                                        const parent = selection.$cursor.parent.type.name;
-                                        // create a new paragraph after the photograph
+                                        const $cursor = selection.$cursor;
+                                        const depth = selection.$cursor.depth;
+                                        const parent = $cursor.parent.type.name;
+                                        const grandparentNode = $cursor.node(depth-1); // selection.$cursor.depth > 0 ? selection.$cursor.node(depth-1) : null;
+                                        const grandparent = grandparentNode ? grandparentNode.type.name : '';
 
+
+                                        // create a new paragraph after the photograph
                                         if(parent === "photograph_caption"){
-                                            const pos = selection.$cursor.end()+2;
+                                            const pos = $cursor.end()+2;
                                             const p = this.editorSchema.nodes.paragraph.createAndFill();
 
                                             view.dispatch(view.state.tr.insert( pos, p ));
                                             view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, pos+1)).scrollIntoView());
-
-
-                                            // tr.setSelection(TextSelection.create(tr.doc, pos));
-                                            // view.dispatch(tr.scrollIntoView());
-
-                                            // const tr = view.state.tr.insert( pos, p );
-                                            // tr.setSelection(TextSelection.create(tr.doc, pos));
-                                            // view.dispatch(tr.scrollIntoView());
                                             return true;
-                                        }else if(!selection.$cursor.nodeAfter && !selection.$cursor.nodeBefore&& selection.$cursor.depth > 2){
-                                            const depth = selection.$cursor.depth;
-                                            const thirdParent = selection.$cursor.node(depth-2);
-                                            const pos = selection.$cursor.end()+3;
 
-                                            if(!thirdParent || !thirdParent.type.name.includes('layout_')){
-                                                return false;
-                                            }
-
-                                            if(selection.$cursor.after(depth-2) !== pos){
+                                        // break out of layout
+                                        }else if(grandparent.includes('cl_') && !$cursor.nodeAfter && !$cursor.nodeBefore  ){
+                                            const pos = $cursor.end()+3;
+                                            if($cursor.after(depth-2) !== pos){
                                                 return false;
                                             }
 
@@ -158,9 +155,33 @@ window.DOMinator = class DOMinator {
                                             transaction.setMeta("addToHistory", false);
                                             view.dispatch(transaction.delete( pos-5, pos-2));
                                             return true;
+                                        }else if(parent === 'download_link' && !$cursor.nodeBefore && !$cursor.nodeAfter){
+                                            const before = $cursor.before();
+                                            const after = $cursor.after();
+
+                                            if($cursor.after(depth-2) !== after+2){
+                                                return false;
+                                            }
+
+                                            const p = this.editorSchema.nodes.paragraph.createAndFill();
+
+                                            let transaction;
+                                            view.dispatch(view.state.tr.insert( after + 1, p ));
+
+                                            transaction = view.state.tr;
+                                            transaction.setMeta("addToHistory", false);
+                                            view.dispatch(transaction.setSelection(TextSelection.create(view.state.doc, after + 2)).scrollIntoView());
+
+                                            transaction = view.state.tr;
+                                            transaction.setMeta("addToHistory", false);
+                                            view.dispatch(transaction.delete( before, after));
+                                            return true;
+                                        }else{
+                                            console.log('4');
                                         }
                                     }
                                 }
+
                                 return false;
                             }
                         }
@@ -197,10 +218,31 @@ window.DOMinator = class DOMinator {
         })
     }
 
-    addNodes(nodes, newNodes){
-        Object.keys(newNodes).forEach(key => {
-            nodes = nodes.addToEnd(key, newNodes[key]);
-        });
-        return nodes;
+    insertDownloads(items){
+        // [ { href: '/', title: 'I am the title.' } ]
+        return insertDownloads(this.menu, items);
+    }
+
+    insertPhotograph(photo){
+        const selection = this.menu.view.state.selection;
+        const state = this.menu.view.state;
+
+        // caption
+        const captionText = state.schema.text(photo.caption || 'Caption');
+        const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
+
+        // image
+        const image = state.schema.nodes.image.create(photo);
+
+        const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
+        const tr = state.tr.insert(selection.from, photograph);
+        this.menu.view.dispatch(tr);
     }
 }
+
+// addNodes(nodes, newNodes){
+//     Object.keys(newNodes).forEach(key => {
+//         nodes = nodes.addToEnd(key, newNodes[key]);
+//     });
+//     return nodes;
+// }

@@ -94,47 +94,57 @@ function generateDropdowns(paddingOrMargin, menu){
 }
 
 export function paddings(menu) {
+    const items = [
+        new DOMinatorMenuLabel({
+            label: 'Paddings: '
+        }),
+        ...generateDropdowns('padding', menu),
+        new DOMinatorMenuButton({
+            key: 'clear all paddings',
+            icon: 'clearpadding',
+            iconType: 'dics',
+            action: () => {
+                menu.stayOnMenu = true;
+                normalizePaddingMargin(menu, 'padding');
+            }
+        })
+    ];
+
+    if( typeof menu.dominator.options.menu.paddings ===  'function'){
+        menu.dominator.options.menu.paddings(items, menu);
+    }
 
     return new DOMinatorSubMenu({
         key: 'paddings',
-        items: [
-            new DOMinatorMenuLabel({
-                label: 'Paddings: '
-            }),
-            ...generateDropdowns('padding', menu),
-            new DOMinatorMenuButton({
-                key: 'clear all paddings',
-                icon: 'clearpadding',
-                iconType: 'dics',
-                action: () => {
-                    menu.stayOnMenu = true;
-                    normalizePaddingMargin(menu, 'padding');
-                }
-            })
-        ]
+        items: items
     });
 
 }
 
 export function margins(menu) {
+    const items = [
+        new DOMinatorMenuLabel({
+            label: 'Margins: '
+        }),
+        ...generateDropdowns('margin', menu),
+        new DOMinatorMenuButton({
+            key: 'clear all margins',
+            icon: 'clearmargin',
+            iconType: 'dics',
+            action: () => {
+                menu.stayOnMenu = true;
+                normalizePaddingMargin(menu, 'margin');
+            }
+        }),
+    ];
+
+    if( typeof menu.dominator.options.menu.margins ===  'function'){
+        menu.dominator.options.menu.margins(items, menu);
+    }
 
     return new DOMinatorSubMenu({
         key: 'margins',
-        items: [
-            new DOMinatorMenuLabel({
-                label: 'Margins: '
-            }),
-            ...generateDropdowns('margin', menu),
-            new DOMinatorMenuButton({
-                key: 'clear all margins',
-                icon: 'clearmargin',
-                iconType: 'dics',
-                action: () => {
-                    menu.stayOnMenu = true;
-                    normalizePaddingMargin(menu, 'margin');
-                }
-            }),
-        ]
+        items: items
     });
 
 }

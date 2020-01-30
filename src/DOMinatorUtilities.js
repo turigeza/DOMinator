@@ -53,11 +53,11 @@ export function getBlockRange(menu) {
     } else {
         return false;
     }
-    
+
     return {from, to};
 }
 
-// the rest comes from tiptap
+// comes from TIPTAP https://tiptap.scrumpy.io/
 export function nodeIsActive(state, type, attrs = {}) {
     const predicate = node => node.type === type
     const node = findSelectedNodeOfType(type)(state.selection)

@@ -179,38 +179,44 @@ function see(menu){
     let node = menu.view.state.doc.nodeAt(pos);
     let dom = menu.view.domAtPos(pos);
 
-    console.log(node);
-    console.log(dom);
-
-
 }
 
 export default function(menu) {
 
+    if( menu.dominator.options.menu.carousel ===  false){
+        return null;
+    }
+
+    let items = [
+        new DOMinatorMenuLabel({
+            label: 'Carousel'
+        }),
+        new DOMinatorMenuSeparator (),
+        new DOMinatorMenuButton ({
+            key: 'paragraph',
+            icon: 'paragraph',
+            action: () => {
+                see(menu);
+            }
+        }),
+        new DOMinatorMenuInput ({
+            update: (input) => {
+
+            },
+            key: 'href',
+            action: (val) => {
+
+            }
+        }),
+    ];
+
+    if( typeof menu.dominator.options.menu.carousel ===  'function'){
+        menu.dominator.options.menu.carousel(items, menu);
+    }
+
     return new DOMinatorSubMenu({
         key: 'carousel',
-        items: [
-            new DOMinatorMenuLabel({
-                label: 'Carousel'
-            }),
-            new DOMinatorMenuSeparator (),
-            new DOMinatorMenuButton ({
-                key: 'paragraph',
-                icon: 'paragraph',
-                action: () => {
-                    see(menu);
-                }
-            }),
-            new DOMinatorMenuInput ({
-                update: (input) => {
-
-                },
-                key: 'href',
-                action: (val) => {
-
-                }
-            }),
-        ]
+        items: items
     });
 }
 //

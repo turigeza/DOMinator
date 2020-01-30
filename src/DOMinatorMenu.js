@@ -11,13 +11,14 @@ import DOMinatorMenuSeparator from "./DOMinatorMenuSeparator"
 import DOMinatorMenuLabel from "./DOMinatorMenuLabel"
 
 // Submenues
-import { paddings as smPaddings, margins as smMargins} from "./Submenues/PaddingMargin"
-import smParagraph from "./Submenues/Paragraph"
-import smInline from "./Submenues/Inline"
-import smLink from "./Submenues/Link"
-import smHeading from "./Submenues/Heading"
-import smPhotograph from "./Submenues/Photograph"
-import smCarousel from "./Submenues/Carousel"
+import { paddings as _Paddings, margins as _Margins} from "./Submenues/PaddingMargin"
+import _Paragraph from "./Submenues/Paragraph"
+import _Inline from "./Submenues/Inline"
+import _Link from "./Submenues/Link"
+import _Heading from "./Submenues/Heading"
+import _Photograph from "./Submenues/Photograph"
+import _Carousel from "./Submenues/Carousel"
+import _DownloadLink from "./Submenues/DownloadLink"
 
 import smRightMenu from "./Submenues/RightMenu"
 
@@ -171,6 +172,7 @@ export default class DOMinatorMenu {
         if(!this.submenus[key]){
             console.error(this.submenus);
             throw 'Submenu does no texist with a key: ' + key;
+            return;
         }
 
         Object.keys(this.submenus).forEach(key=>{
@@ -183,16 +185,41 @@ export default class DOMinatorMenu {
     }
 
     initMenu(){
-        const linkClasses = ['button button-default', 'button button-primary', 'button button-warning', 'button button-danger', 'button button-success', 'button button-info', ]
+
         this.submenus = {
-            inline: smInline(this),
-            link: smLink(this),
-            paragraph: smParagraph(this),
-            heading: smHeading(this),
-            paddings: smPaddings(this),
-            margins: smMargins(this),
-            photograph:smPhotograph(this),
-            carousel:smCarousel(this),
+            inline: _Inline(this),
+            link: _Link(this),
+            paragraph: _Paragraph(this),
+            heading: _Heading(this),
+            paddings: _Paddings(this),
+            margins: _Margins(this),
+            photograph: _Photograph(this),
+            carousel: _Carousel(this),
+            download_link: _DownloadLink(this),
+            download_title: new DOMinatorSubMenu({
+                key: 'download link',
+                items: [
+                    new DOMinatorMenuLabel({
+                        label: 'Downloads Title'
+                    }),
+                    new DOMinatorMenuSeparator (),
+                    new DOMinatorMenuLabel({
+                        label: ' - n/a - '
+                    }),
+                ]
+            }),
+            downloads: new DOMinatorSubMenu({
+                key: 'downloads',
+                items: [
+                    new DOMinatorMenuLabel({
+                        label: 'Downloads'
+                    }),
+                    new DOMinatorMenuSeparator (),
+                    new DOMinatorMenuLabel({
+                        label: ' - n/a -'
+                    }),
+                ]
+            }),
             custom_html: new DOMinatorSubMenu({
                 key: 'custom_html',
                 items: [
@@ -209,7 +236,6 @@ export default class DOMinatorMenu {
                     }),
                 ],
             }),
-
             span: new DOMinatorSubMenu({
                 key: 'span',
                 items: [
@@ -228,6 +254,13 @@ export default class DOMinatorMenu {
             }),
         }
 
+        // if(typeof this.dominator.options.submenus === 'function'){
+        //     this.submenus = this.dominator.options.submenus(submenus);
+        // }else{
+        //     this.submenus = submenus;
+        // }
+
+        // this.submenus = { submenues, ...this.dominator.options.menus };
         this.dom = document.createElement("div");
         this.leftdom = document.createElement("div");
         this.rightdom = document.createElement("div");
@@ -236,15 +269,18 @@ export default class DOMinatorMenu {
         this.rightdom.className = "DOMinatorMenuRight";
 
         Object.keys(this.submenus).forEach(key=>{
-            this.leftdom.appendChild( this.submenus[key].getDom() );
+            const m = this.submenus[key];
+            if(m){
+                this.leftdom.appendChild( m.getDom() );
+            }
         });
 
-        this.rightMenu = smRightMenu(this)
-
+        this.rightMenu = smRightMenu(this);
         this.rightdom.appendChild(this.rightMenu.getDom());
 
         this.dom.appendChild(this.leftdom);
         this.dom.appendChild(this.rightdom);
+
     }
 
     // Create an icon for a heading at the given level

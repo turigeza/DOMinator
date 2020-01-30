@@ -185,6 +185,21 @@ body.dominatorMenuActive{
     padding-right: 7px;
 }
 .DOMinatorMenuInput{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex-grow: 1;
+}
+.DOMinatorMenuInput span{
+    background-color: #009CDE;
+    padding: 0px 15px;
+    height: 44px;
+    line-height: 44px;
+    font-size: 14px;
+    color: white;
+
+}
+.DOMinatorMenuInput input{
     /* resets */
     margin:0;
 	display:inline-block;
@@ -210,23 +225,24 @@ body.dominatorMenuActive{
     background-color: #eee;
     font-size: 14px;
     padding-left: 15px;
-    color: #009CDE;
+    /* color: #009CDE; */
 }
-.DOMinatorMenuInput:focus{
+.DOMinatorMenuInput input:focus{
     outline: none;
-    border-left: 3px solid #009CDE;
+    caret-color: #009CDE;
+    /* border-left: 3px solid #009CDE; */
 }
-.DOMinatorMenuInput::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: #bbb;
+.DOMinatorMenuInput input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #bbb;
 }
-.DOMinatorMenuInput::-moz-placeholder { /* Firefox 19+ */
-  color: #bbb;
+.DOMinatorMenuInput input::-moz-placeholder { /* Firefox 19+ */
+    color: #bbb;
 }
-.DOMinatorMenuInput:-ms-input-placeholder { /* IE 10+ */
-  color: #bbb;
+.DOMinatorMenuInput input:-ms-input-placeholder { /* IE 10+ */
+    color: #bbb;
 }
-.DOMinatorMenuInput:-moz-placeholder { /* Firefox 18- */
-  color: #bbb;
+.DOMinatorMenuInput input:-moz-placeholder { /* Firefox 18- */
+    color: #bbb;
 }
 
 .DOMinatorMenuLabel{
@@ -234,7 +250,8 @@ body.dominatorMenuActive{
     font-size: 14px;
     padding-left: 13px;
     padding-right: 6px;
-    line-height: 24px;
+    line-height: 45px;
+    height: 45px;
     white-space: nowrap;
     /* background-color: #eee; */
     /* height: 40px; */

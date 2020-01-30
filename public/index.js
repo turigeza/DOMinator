@@ -1,7 +1,31 @@
 $( document ).ready(function(){
     var editor = new DOMinator({
-        container: '#editor'
+        container: '#editor',
+        downloads: (DOMinator) => {
+            DOMinator.insertDownloads([
+                { href: '/', title: 'I am the title.',  target: null },
+                { href: '/', title: 'An other download.',  target: null },
+                { href: '/', title: 'How about this thing here?',  target: null },
+            ]);
+        },
+        photograph: (DOMinator) => {
+            DOMinator.insertPhotograph({
+                src: 'https://picsum.photos/600/400?grayscale',
+                alt: 'Just a placeholder from picsum.photos',
+                caption: 'A placeholder from picsum.photos',
+                // medium: null,
+                // large: null
+            });
+        },
+        menu: {
+            paragraph: (items) => {
+                items.splice(14,1);
+                items.splice(11,1);
+                items.splice(9,1);
+            }
+        }
     });
+
     if( $('.carousel-cell').length !== 0){
 
         $('.carousel_wrapper').each(function(){
