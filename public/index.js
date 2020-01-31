@@ -10,11 +10,11 @@ $( document ).ready(function(){
         },
         photograph: (DOMinator) => {
             DOMinator.insertPhotograph({
-                src: 'https://picsum.photos/600/400?grayscale',
                 alt: 'Just a placeholder from picsum.photos',
                 caption: 'A placeholder from picsum.photos',
-                // medium: null,
-                // large: null
+                // medium: 'https://i.picsum.photos/id/816/600/400.jpg?grayscale',
+                medium: 'https://picsum.photos/600/400?grayscale',
+                large: 'https://picsum.photos/1200/800?grayscale'
             });
         },
         menu: {

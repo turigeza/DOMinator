@@ -4,7 +4,13 @@
 //     NodeSelection,
 //     AllSelection
 // } from "prosemirror-state"
-import {Plugin, EditorState, TextSelection} from "prosemirror-state"
+import {
+    Plugin,
+    EditorState,
+    TextSelection,
+    NodeSelection
+}
+from "prosemirror-state"
 import {EditorView} from "prosemirror-view"
 import {Schema, DOMParser} from "prosemirror-model"
 import {addListNodes} from "prosemirror-schema-list"
@@ -224,19 +230,47 @@ window.DOMinator = class DOMinator {
     }
 
     insertPhotograph(photo){
-        const selection = this.menu.view.state.selection;
-        const state = this.menu.view.state;
+        if(!photo['medium']){
+            throw 'The medium size for an image is mandatory!';
+        }
+
+        const view = this.menu.view;
+        const selection = view.state.selection;
+        const state = view.state;
+        const pos = selection.from;
 
         // caption
         const captionText = state.schema.text(photo.caption || 'Caption');
         const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
 
+        const dom = view.domAtPos(pos);
+        const width = dom.node.offsetWidth;
+
+        let src = photo['medium'];
+        if(width > 650 && photo['large']){
+            src = photo['large'];
+        }
+
         // image
-        const image = state.schema.nodes.image.create(photo);
+        const imageAttrs = {
+            'data-photograph_id': photo['id'] || null,
+            'data-photograph_medium': photo['medium'],
+            'data-photograph_large': photo['large'] || photo['medium'],
+            src: src,
+            alt: photo['alt'] || ''
+        };
+
+        const image = state.schema.nodes.image.create(imageAttrs);
 
         const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
-        const tr = state.tr.insert(selection.from, photograph);
-        this.menu.view.dispatch(tr);
+        let tr = state.tr.insert(pos+1, photograph);
+        view.dispatch(tr);
+
+        tr = view.state.tr;
+        tr.setMeta("addToHistory", false);
+        const newSelection = NodeSelection.create(view.state.doc, pos+1);
+        view.dispatch(tr.setSelection(newSelection));
+
     }
 }
 
