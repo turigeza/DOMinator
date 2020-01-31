@@ -8,14 +8,17 @@
     padding: 0;
     width: 100%;
 }
+
 #editor{
     /* background-color: LightSeaGreen; */
     /* border: 2px solid LightSeaGreen; */
     float: left;
+    overflow: visible;
 }
+
 #content{
     /* background-color: Salmon; */
-    border: 2px solid Salmon;
-    float: right;
+    /* border: 2px solid Salmon;
+    float: right; */
     display: none;
 }

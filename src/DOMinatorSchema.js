@@ -664,6 +664,46 @@ export const nodes = {
             ]
         }
     },
+    blocklink: {
+        content: "block+",
+        group: "block",
+        // marks: 'span b i code del sub sup u',
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {
+            href: {
+                default: ''
+            },
+            title: {
+                default: null
+            },
+            target: {
+                default: null
+            },
+            'class': {
+                default: 'd-block-link'
+            }
+        },
+        parseDOM: [{
+            tag: 'a.d-block-link',
+            getAttrs: dom => {
+                return {
+                    href: dom.getAttribute("href"),
+                    title: dom.getAttribute("title"),
+                    target:  dom.getAttribute("target"),
+                    'class': dom.getAttribute("class"),
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "a",
+                node.attrs,
+                0
+            ]
+        }
+    },
     custom_html: {
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
@@ -724,7 +764,7 @@ export const marks = {
         excludes: 'span link',
         inclusive: false,
         parseDOM: [{
-            tag: "a:not(.list-group-item)", //[href]
+            tag: "a:not(.list-group-item) a:not(.d-block-link)", //[href]
             getAttrs(dom) {
                 return {
                     href: dom.getAttribute("href"),

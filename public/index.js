@@ -1,4 +1,20 @@
 $( document ).ready(function(){
+
+    // if the photo caption text marked as not to display you should empty it
+    $('.tg_subwidget_photograph_text[style="display: none;"]').empty();
+
+    // remove spans which are hidden in photo text
+    $('.tg_subwidget_photograph_text span[style="display: none;"]').remove();
+
+    // remove spansformating on the photograph captions
+    $('.tg_subwidget_photograph_text span').each(function() {
+        $(this).replaceWith(this.childNodes);
+    });
+
+    // mark blocklink links with class d-block-link
+    $('.tg_subwidget_blocklink a .tg_sub_editable>*').unwrap();
+    $('.tg_subwidget_blocklink a').addClass('d-block-link').unwrap();
+
     var editor = new DOMinator({
         container: '#editor',
         downloads: (DOMinator) => {

@@ -14122,6 +14122,46 @@
               ]
           }
       },
+      blocklink: {
+          content: "block+",
+          group: "block",
+          // marks: 'span b i code del sub sup u',
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {
+              href: {
+                  default: ''
+              },
+              title: {
+                  default: null
+              },
+              target: {
+                  default: null
+              },
+              'class': {
+                  default: 'd-block-link'
+              }
+          },
+          parseDOM: [{
+              tag: 'a.d-block-link',
+              getAttrs: dom => {
+                  return {
+                      href: dom.getAttribute("href"),
+                      title: dom.getAttribute("title"),
+                      target:  dom.getAttribute("target"),
+                      'class': dom.getAttribute("class"),
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "a",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
       custom_html: {
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
@@ -14182,7 +14222,7 @@
           excludes: 'span link',
           inclusive: false,
           parseDOM: [{
-              tag: "a:not(.list-group-item)", //[href]
+              tag: "a:not(.list-group-item) a:not(.d-block-link)", //[href]
               getAttrs(dom) {
                   return {
                       href: dom.getAttribute("href"),
@@ -19442,10 +19482,11 @@
   }
 
   function changeAttributeOnNode(menu, attribute, value){
-      let range = getBlockRange(menu);
-      let attrs = {};
+      const {from, to} = getBlockRange(menu);
+      const node = menu.view.state.doc.nodeAt(from);
+      let attrs = { ...node.attrs };
       attrs[attribute] = value;
-      let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(range.from, null, attrs).scrollIntoView());
+      let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(from, null, attrs).scrollIntoView());
   }
 
   function normalizePaddingMargin(menu, paddingOrMargin, side, size){
@@ -19469,8 +19510,8 @@
       const node = menu.activeBlock;
 
       if(typeof node.type.attrs.class === 'undefined'){
-          console.log(node.type.name);
-          console.log(node.type);
+          console.error(node.type.name);
+          console.error(node.type);
           throw('This element does not support a class.');
       }
 
@@ -19734,6 +19775,55 @@
       menu.view.dispatch(tr);
   }
 
+  function toggleClassOnNode(menu, className){
+      const selection = menu.view.state.selection;
+
+      let pos = 0;
+      let selectionType = false;
+      if(selection.empty && selection.$cursor){
+          pos = selection.$cursor.start()-1;
+          selectionType = 'text';
+      }else if(selection.constructor.name === 'NodeSelection'){
+          pos = selection.from;
+          selectionType = 'node';
+      }
+
+      const node = menu.view.state.doc.nodeAt(pos);
+
+      // this should never exist anyway
+      if(node.type.name === 'text'){
+          throw 'This is a text node. It can not take a class.';
+      }
+
+      if(!node.type.spec.attrs.class){
+          return false;
+      }
+
+      let classNameNow = node.attrs.class || '';
+      let newClassName = '';
+
+      if(classNameNow.includes(className)){
+          newClassName = classNameNow.replace(className, '').trim();
+      }else{
+          newClassName = classNameNow + ' ' + className;
+          newClassName = newClassName.trim();
+      }
+      if(newClassName === ''){
+          newClassName = null;
+      }
+
+      const newAttrs = { ...node.attrs, 'class': newClassName };
+      menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, newAttrs).scrollIntoView());
+
+      let newSelection;
+      if(selectionType === 'node'){
+          newSelection = NodeSelection.create(menu.view.state.doc, pos);
+      }else{
+          newSelection = TextSelection.create(menu.view.state.doc, selection.$cursor.pos);
+      }
+
+      menu.view.dispatch(menu.view.state.tr.setSelection(newSelection));
+  }
   // comes from TIPTAP https://tiptap.scrumpy.io/
   function isList(node, schema) {
       return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)
@@ -19946,7 +20036,6 @@
               label: 'Paragraph'
           }),
           new DOMinatorMenuSeparator(),
-
           // paragraph
           new DOMinatorMenuButton({
               key: 'paragraph',
@@ -21104,6 +21193,75 @@
       });
   }
 
+  function _BlockLink(menu) {
+      if( menu.dominator.options.menu.download_link ===  false){
+          return null;
+      }
+      const items =  [
+          new DOMinatorMenuLabel({
+              label: 'Block Link'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'shadow',
+              icon: 'window-restore',
+              action: (button) => {
+                  toggleClassOnNode(menu, 'd-block-link-flat');
+              },
+              update(button){
+                  if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-block-link-flat')){
+                      button.deactivate();
+                  }else{
+                      button.activate();
+                  }
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'outline',
+              icon: 'square-o',
+              action: (button) => {
+                  toggleClassOnNode(menu, 'd-block-link-no-outline');
+              },
+              update(button){
+                  if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-block-link-no-outline')){
+                      button.deactivate();
+                  }else{
+                      button.activate();
+                  }
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link: ',
+              update: (input) => {
+                  input.setValue(menu.activeBlock.attrs.href);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnNode(menu, 'href', val);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Title: ',
+              update: (input) => {
+                  input.setValue(menu.activeBlock.attrs.title);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnNode(menu, 'title', val);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.download_link ===  'function'){
+          menu.dominator.options.menu.download_link(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'download link',
+          items: items,
+      });
+  }
+
   function smRightMenu(menu) {
       const items = [
           new DOMinatorMenuSeparator (),
@@ -21370,6 +21528,7 @@
                       }),
                   ]
               }),
+              blocklink: _BlockLink(this),
               custom_html: new DOMinatorSubMenu({
                   key: 'custom_html',
                   items: [

@@ -19,6 +19,7 @@ import _Heading from "./Submenues/Heading"
 import _Photograph from "./Submenues/Photograph"
 import _Carousel from "./Submenues/Carousel"
 import _DownloadLink from "./Submenues/DownloadLink"
+import _BlockLink from "./Submenues/BlockLink"
 
 import smRightMenu from "./Submenues/RightMenu"
 
@@ -220,6 +221,7 @@ export default class DOMinatorMenu {
                     }),
                 ]
             }),
+            blocklink: _BlockLink(this),
             custom_html: new DOMinatorSubMenu({
                 key: 'custom_html',
                 items: [

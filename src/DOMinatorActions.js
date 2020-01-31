@@ -23,6 +23,10 @@ import {
     Slice,
     Fragment
 } from "prosemirror-model"
+import {
+    TextSelection,
+    NodeSelection
+} from "prosemirror-state"
 
 export function updateAlignmentButton(button, menu, classKey){
     button.deactivate();
@@ -103,10 +107,11 @@ export function stripPaddingMarginClasses(string, strip, classes){
 }
 
 export function changeAttributeOnNode(menu, attribute, value){
-    let range = getBlockRange(menu);
-    let attrs = {};
+    const {from, to} = getBlockRange(menu);
+    const node = menu.view.state.doc.nodeAt(from);
+    let attrs = { ...node.attrs };
     attrs[attribute] = value;
-    let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(range.from, null, attrs).scrollIntoView());
+    let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(from, null, attrs).scrollIntoView());
 }
 
 export function normalizePaddingMargin(menu, paddingOrMargin, side, size){
@@ -130,8 +135,8 @@ export function normalizePaddingMargin(menu, paddingOrMargin, side, size){
     const node = menu.activeBlock;
 
     if(typeof node.type.attrs.class === 'undefined'){
-        console.log(node.type.name);
-        console.log(node.type);
+        console.error(node.type.name);
+        console.error(node.type);
         throw('This element does not support a class.');
     }
 
@@ -395,6 +400,56 @@ export function insertDownloads(menu, items){
     menu.view.dispatch(tr);
 }
 
+export function toggleClassOnNode(menu, className){
+    const selection = menu.view.state.selection;
+
+    let pos = 0;
+    let selectionType = false;
+    if(selection.empty && selection.$cursor){
+        pos = selection.$cursor.start()-1;
+        selectionType = 'text';
+    }else if(selection.constructor.name === 'NodeSelection'){
+        pos = selection.from;
+        selectionType = 'node';
+    }
+
+    const node = menu.view.state.doc.nodeAt(pos);
+
+    // this should never exist anyway
+    if(node.type.name === 'text'){
+        throw 'This is a text node. It can not take a class.';
+        return false;
+    }
+
+    if(!node.type.spec.attrs.class){
+        return false;
+    }
+
+    let classNameNow = node.attrs.class || '';
+    let newClassName = '';
+
+    if(classNameNow.includes(className)){
+        newClassName = classNameNow.replace(className, '').trim();
+    }else{
+        newClassName = classNameNow + ' ' + className;
+        newClassName = newClassName.trim();
+    }
+    if(newClassName === ''){
+        newClassName = null;
+    }
+
+    const newAttrs = { ...node.attrs, 'class': newClassName };
+    menu.view.dispatch(menu.view.state.tr.setNodeMarkup(pos, null, newAttrs).scrollIntoView());
+
+    let newSelection;
+    if(selectionType === 'node'){
+        newSelection = NodeSelection.create(menu.view.state.doc, pos);
+    }else{
+        newSelection = TextSelection.create(menu.view.state.doc, selection.$cursor.pos);
+    }
+
+    menu.view.dispatch(menu.view.state.tr.setSelection(newSelection));
+}
 // comes from TIPTAP https://tiptap.scrumpy.io/
 function isList(node, schema) {
     return (node.type === schema.nodes.bullet_list || node.type === schema.nodes.ordered_list)

@@ -1,6 +1,7 @@
 import {
     alignSelection,
-    updateAlignmentButton
+    updateAlignmentButton,
+    toggleClassOnNode
 } from "./../DOMinatorActions"
 
 import DOMinatorMenuButton from "./../DOMinatorMenuButton"
@@ -23,7 +24,6 @@ export default function(menu) {
             label: 'Paragraph'
         }),
         new DOMinatorMenuSeparator(),
-
         // paragraph
         new DOMinatorMenuButton({
             key: 'paragraph',
