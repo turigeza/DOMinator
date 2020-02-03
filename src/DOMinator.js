@@ -31,6 +31,7 @@ import {paddingClasses, marginClasses} from "./DOMinatorPaddingsAndMargins"
 import CustomHtmlView from "./NodeViews/CustomHtmlView"
 import PhotographCaptionView from "./NodeViews/PhotographCaptionView"
 import ImageView from "./NodeViews/ImageView"
+import CarouselView from "./NodeViews/CarouselView"
 
 // actions
 import {
@@ -42,11 +43,13 @@ window.DOMinator = class DOMinator {
     // view -view editors
     // menuItems
     constructor(options) {
+
         const implementMessage = () => alert('It is up to you to implement this.');
 
         // init options
         const defaults = {
             container: '',
+            listeners: {}, //
 
             // DOMinator hands over the ui which don't want to take care of. These are callback functions.
             pageSettings: implementMessage,     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
@@ -211,17 +214,19 @@ window.DOMinator = class DOMinator {
             nodeViews: {
                 custom_html(node, view, getPos) { return new CustomHtmlView(node, view, getPos) },
                 photograph_caption(node, view, getPos) { return new PhotographCaptionView(node, view, getPos) },
+                carousel(node, view, getPos) { return new CarouselView(node, view, getPos) },
                 image(node, view, getPos) { return new ImageView(node, view, getPos) },
             },
             // listen to transactions
             // dispatchTransaction: (transaction) => {
-            //     console.log(transaction.meta);
-            //     // console.log("Document size went from", transaction.before.content.size,
-            //     // "to", transaction.doc.content.size)
+            //     console.log(transaction);
             //     let newState = this.view.state.apply(transaction)
             //     this.view.updateState(newState)
             // }
-        })
+        });
+        this.view.$d_listeners = this.options.listeners;
+
+        
     }
 
     insertDownloads(items){
@@ -273,10 +278,3 @@ window.DOMinator = class DOMinator {
 
     }
 }
-
-// addNodes(nodes, newNodes){
-//     Object.keys(newNodes).forEach(key => {
-//         nodes = nodes.addToEnd(key, newNodes[key]);
-//     });
-//     return nodes;
-// }

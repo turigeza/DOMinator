@@ -6,6 +6,7 @@
     <meta name='viewport' content='width=device-width'>
     <title>DOMinator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/flickity-fullscreen@1/fullscreen.css">
     <link rel="stylesheet" type="text/css" href="ProseMirror.css">
     <link rel="stylesheet" type="text/css" href="DOMinator.css">
     <link rel="stylesheet" type="text/css" href="index.css">
@@ -18,7 +19,7 @@
 <body>
     <div id="main_wrapper">
 
-        <h1>DOMinator - ProseMirror Try</h1>
+        <h1>DOMinator - Taming ProseMirror</h1>
 
         <div id="container">
             <!-- host element for the editor -->
@@ -26,6 +27,38 @@
 
             <!-- element to store the HTML representation of your content Ohhh Dear! this needs to be separate ? style="display: none;" -->
             <div id="content">
+                <h2 class="fancy danger">Carousel</h2>
+
+                <div class="tg_subwidget tg_subwidget_carousel" data-tooltip_key="carousel" data-window_key="tg_carousel">
+                    <div class="carousel_wrapper">
+                        <div class="flickity-carousel">
+                            <div class="carousel-cell" style="" aria-hidden="true">
+                                <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
+                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                                    <h3>Title of image</h3>
+                                    <p>Description on the image</p>
+                                </div>
+                            </div>
+                            <div class="carousel-cell" style="" aria-hidden="true">
+                                <img src="https://i.picsum.photos/id/365/900/600.jpg?grayscale" alt="Branklyn">
+                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                                    <h3>Title of image</h3>
+                                    <p>Description on the image</p>
+                                </div>
+                            </div>
+                            <div class="carousel-cell" style="" aria-hidden="true">
+                                <img src="https://i.picsum.photos/id/249/800/1200.jpg?grayscale" alt="Branklyn">
+                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                                    <h3>Title of image</h3>
+                                    <p>Description on the image</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="toggle-fullscreen" style="display:none"> <i class="fa fa-arrows-alt" aria-hidden="true"></i> </a>
+                        <div class="flickity_json">{"wrapAround":true,"fullscreen":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
+                        <a class="flickity_link" href="#"></a>
+                    </div>
+                </div>
                 <div class="tg_widget layout layout_48" data-category="layouts" data-key="layout_48" data-widget_id="1c686b87-30a0-4faa-807c-7999a0fc995e">
                     <div class="tg_editable cl_4" data-editable_id="content_4">
                         <h3>Column 1</h3>
@@ -172,31 +205,7 @@
 
                     </div>
                 </div>
-                <h2 class="fancy danger">Carousel</h2>
 
-                <div class="tg_subwidget tg_subwidget_carousel" data-tooltip_key="carousel" data-window_key="tg_carousel">
-                    <div class="carousel_wrapper">
-                        <div class="flickity-carousel">
-                            <div class="carousel-cell" style="" aria-hidden="true">
-                                <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
-                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
-                                    <h3>Title of image</h3>
-                                    <p>Description on the image</p>
-                                </div>
-                            </div>
-                            <div class="carousel-cell" style="" aria-hidden="true">
-                                <img src="https://i.picsum.photos/id/365/900/600.jpg?grayscale" alt="Branklyn">
-                                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
-                                    <h3>Title of image</h3>
-                                    <p>Description on the image</p>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="#" class="toggle-fullscreen" style="display:none"> <i class="fa fa-arrows-alt" aria-hidden="true"></i> </a>
-                        <div class="flickity_json">{"wrapAround":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
-                        <a class="flickity_link" href="#"></a>
-                    </div>
-                </div>
                 <div class="tg_widget layout layout_66" data-category="layouts" data-key="layout_66" data-widget_id="c6d7ce23-e6af-4abb-b45b-a6f7cdfa16a7">
                     <div class="tg_editable cl_6" data-editable_id="content_1">
                         <h3>Lorem Ipsum</h3>
@@ -324,6 +333,7 @@
     <!-- flickity -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+    <script src="https://unpkg.com/flickity-fullscreen@1/fullscreen.js"></script>
 
     <script src='DOMinator.js'></script>
     <script src='index.js'></script>

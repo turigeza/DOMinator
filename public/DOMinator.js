@@ -14009,8 +14009,6 @@
           parseDOM: [{
               tag: 'div.tg_subwidget_carousel',
               getAttrs: dom => {
-                  // console.log(dom.getAttribute("class"));
-                  // let attributes = Array.prototype.slice.call(dom.attributes);
                   return {
                       'class': dom.getAttribute("class"),
                       html: dom.innerHTML
@@ -14018,6 +14016,7 @@
               }
           }],
           toDOM(node) {
+              // console.log('toDOM');
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
               if(node.attrs){
@@ -14199,7 +14198,6 @@
 
           }
       },
-
   };
 
   const marks = {
@@ -14328,7 +14326,6 @@
               return ["sup", 0];
           }
       },
-
   };
 
   const schema = new Schema({
@@ -21069,9 +21066,12 @@
 
   function see(menu){
       let selection = menu.view.state.selection;
-      let pos = selection.from;
+      let pos = selection.from+2;
       let node = menu.view.state.doc.nodeAt(pos);
       let dom = menu.view.domAtPos(pos);
+      console.log(pos);
+      console.log(dom.node);
+      console.dir(dom.node);
 
   }
 
@@ -21755,55 +21755,51 @@
               this.dom.setAttribute("class", node.attrs.class);
           }
 
-          this.dom.addEventListener("mousedown", event => {
-
-              // select node if not yet selected //event.metaKey &&
-              if(!this.dom.classList.contains("ProseMirror-selectednode")){
-                  const selection = NodeSelection.create(
-                      this.view.state.doc,
-                      this.getPos()
-                  );
-
-                  this.view.dispatch(this.view.state.tr.setSelection(selection));
-                  // event.stopPropagation();
-                  // event.preventDefault();
-              }
-
-              console.log('mousedown');
-          });
-      }
-
-      selectNode() {
-          this.dom.classList.add("ProseMirror-selectednode");
-      }
-
-      deselectNode() {
-          this.dom.classList.remove("ProseMirror-selectednode");
+          // this.dom.addEventListener("mousedown", event => {
+          //
+          //     // select node if not yet selected //event.metaKey &&
+          //     if(!this.dom.classList.contains("ProseMirror-selectednode")){
+          //         const selection = NodeSelection.create(
+          //             this.view.state.doc,
+          //             this.getPos()
+          //         );
+          //
+          //         this.view.dispatch(this.view.state.tr.setSelection(selection));
+          //         // event.stopPropagation();
+          //         // event.preventDefault();
+          //     }else{
+          //         // console.log('STOPSTOPSTOPSTOPSTOPSTOP');
+          //         // event.stopPropagation();
+          //         // event.preventDefault();
+          //     }
+          //
+          //     console.log('mousedown');
+          // });
       }
 
       update(node, decorations) {
           console.log('update --- CustomHtmlView');
       }
 
-      stopEvent(event) {
-          const blacklisted = [
-              'dragstart',
-              'dragenter',
-              'dragover',
-              'dragend',
-              'drop',
-              'mousedown',
-          ];
-
-          if( blacklisted.indexOf(event.type) > -1 ){
-              return true;
-          }
-
-          console.log(event.type);
-          return false;
-          // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
-          // Events for which this returns true are not handled by the editor.
-      }
+      // stopEvent(event) {
+      //     const blacklisted = [
+      //         'dragstart',
+      //         'dragenter',
+      //         'dragover',
+      //         'dragend',
+      //         'drop',
+      //         'mousedown',
+      //     ];
+      //
+      //     if( blacklisted.indexOf(event.type) > -1 ){
+      //         return true;
+      //     }
+      //
+      //     console.log(event.type);
+      //     return false;
+      //     // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
+      //     // Events for which this returns true are not handled by the editor.
+      // }
 
       ignoreMutation() {
           return true;
@@ -21920,6 +21916,45 @@
 
   }
 
+  class CarouselView {
+
+      constructor(node, view, getPos) {
+          this.node = node;
+          this.view = view;
+          this.getPos = getPos;
+
+          this.dom = document.createElement('div');
+          this.dom.innerHTML = node.attrs.html;
+
+          if(node.attrs.class){
+              this.dom.setAttribute("class", node.attrs.class);
+          }
+
+          // this where we need to reapply the carousel but not always
+          if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
+              view.$d_listeners.afterCarouselConstruct(this.dom, node, view, getPos);
+          }
+      }
+
+      update(node, decorations) {
+          console.log('UPDATE --- CarouselHtmlView');
+      }
+
+      ignoreMutation() {
+          return true;
+          // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
+          // the record will have a type property of "selection" (which doesn't occur for native mutation records).
+          // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
+      }
+
+      // Called when the node view is removed from the editor or the whole editor is destroyed.
+      destroy() {
+          this.dom.remove();
+          console.log('destroy --- CarouselHtmlView');
+      }
+
+  }
+
   // import {
 
   window.DOMinator = class DOMinator {
@@ -21927,11 +21962,13 @@
       // view -view editors
       // menuItems
       constructor(options) {
+
           const implementMessage = () => alert('It is up to you to implement this.');
 
           // init options
           const defaults = {
               container: '',
+              listeners: {}, //
 
               // DOMinator hands over the ui which don't want to take care of. These are callback functions.
               pageSettings: implementMessage,     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
@@ -22096,17 +22133,19 @@
               nodeViews: {
                   custom_html(node, view, getPos) { return new CustomHtmlView(node, view, getPos) },
                   photograph_caption(node, view, getPos) { return new PhotographCaptionView(node, view, getPos) },
+                  carousel(node, view, getPos) { return new CarouselView(node, view, getPos) },
                   image(node, view, getPos) { return new ImageView(node, view, getPos) },
               },
               // listen to transactions
               // dispatchTransaction: (transaction) => {
-              //     console.log(transaction.meta);
-              //     // console.log("Document size went from", transaction.before.content.size,
-              //     // "to", transaction.doc.content.size)
+              //     console.log(transaction);
               //     let newState = this.view.state.apply(transaction)
               //     this.view.updateState(newState)
               // }
           });
+          this.view.$d_listeners = this.options.listeners;
+
+          
       }
 
       insertDownloads(items){
@@ -22158,13 +22197,6 @@
 
       }
   };
-
-  // addNodes(nodes, newNodes){
-  //     Object.keys(newNodes).forEach(key => {
-  //         nodes = nodes.addToEnd(key, newNodes[key]);
-  //     });
-  //     return nodes;
-  // }
 
 }());
 //# sourceMappingURL=DOMinator.js.map

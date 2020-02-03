@@ -551,8 +551,6 @@ export const nodes = {
         parseDOM: [{
             tag: 'div.tg_subwidget_carousel',
             getAttrs: dom => {
-                // console.log(dom.getAttribute("class"));
-                // let attributes = Array.prototype.slice.call(dom.attributes);
                 return {
                     'class': dom.getAttribute("class"),
                     html: dom.innerHTML
@@ -560,6 +558,7 @@ export const nodes = {
             }
         }],
         toDOM(node) {
+            // console.log('toDOM');
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
             if(node.attrs){
@@ -741,7 +740,6 @@ export const nodes = {
 
         }
     },
-
 }
 
 export const marks = {
@@ -870,7 +868,6 @@ export const marks = {
             return ["sup", 0];
         }
     },
-
 }
 
 export const schema = new Schema({

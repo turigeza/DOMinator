@@ -994,7 +994,6 @@ img{
     margin-right: 10px;
 
 }
-
 .tg_subwidget_download{
     clear:both;
 }
@@ -1010,32 +1009,86 @@ img{
 }
 
 /* carousel */
+/*
+
+.flickity-enabled.is-fullscreen{
+    z-index: 101;
+}
+.flickity-carousel.is-fullscreen .carousel_text h3{
+
+}
+.carousel_wrapper{
+    position: relative;
+    background-color: #FFBF3F;
+    padding: 15px 15px 0px 15px;
+    margin-bottom: 15px;
+}
+.carousel_wrapper h1, .carousel_wrapper h2, .carousel_wrapper h3, .carousel_wrapper h4, .carousel_wrapper h5, .carousel_wrapper h6{
+    margin-bottom: 0px;
+}
+.flickity-is-fullscreen .download_photograph{
+    position: fixed;
+    z-index: 501;
+}
+.flickity-page-dots, .flickity-enabled.is-fullscreen .flickity-page-dots{
+    top: 15px;
+    bottom: initial;
+    left: 60px;
+    right: 60px;
+    width:auto;
+}
+.flickity-page-dots .dot, .flickity-enabled.is-fullscreen .flickity-page-dots .dot{
+    background-color: #FFBF3F;
+    opacity: 1;
+}
+.flickity-page-dots .is-selected, .flickity-enabled.is-fullscreen .flickity-page-dots .is-selected{
+    background-color: #ff00c4;
+}
+.download_photograph{
+    font-size: 36px;
+    position:absolute;
+    z-index:3;
+    bottom: 30px;
+    right: 10px;
+    left: 10px;
+    margin: auto;
+    border-radius: 30px;
+    color: black;
+    cursor:pointer;
+    background: #FFBF3F;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+} */
+/* /carousel */
+
+/* carousel  STARTS */
+
+.flickity-page-dots, .flickity-enabled.is-fullscreen .flickity-page-dots{
+    top: 15px;
+    bottom: initial;
+    left: 60px;
+    right: 60px;
+    width:auto;
+}
+.flickity-page-dots .dot, .flickity-enabled.is-fullscreen .flickity-page-dots .dot{
+    background-color: #FFBF3F;
+    opacity: 1;
+}
+.flickity-page-dots .is-selected, .flickity-enabled.is-fullscreen .flickity-page-dots .is-selected{
+    background-color: #ff00c4;
+}
+
+/* old stuff */
 .flickity_json{
     display: none;
 }
 .flickity_link{
     display: none;
 }
-
-.flickity-carousel{
-    /* height: 360px; */
-    /*
-    height: auto;
-    margin-bottom: 20px;
-    */
-}
-
 .carousel-cell {
-    /* height: 100%; */
     width: 100%;
-    /*
-    margin-right: 20px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    overflow: auto;
-    position: relative;
-    */
 }
 .layout_12 .carousel_wrapper{
     width: 66%;
@@ -1045,10 +1098,6 @@ img{
 .carousel_text{
     margin-top: 10px;
 }
-.flickity-fullscreen .carousel_text{
-    margin-top: 50px;
-    color: #ddd;
-}
 .flickity-enabled.is-draggable .flickity-viewport{
     cursor:pointer;
 }
@@ -1056,94 +1105,16 @@ img{
     display: none;
 }
 .carousel-cell img{
-    /* height: 100%; */
     width:100%;
 }
-.flickity-slider{
-    /*
-    height: auto;
-    overflow-y: auto;
-    */
-}
-
-.flickity-fullscreen .flickity-carousel{
-    width:100vw;
-    height:100vh;
-    position:fixed;
-    z-index:500;
-    top:0;
-    bottom: 0;
-    right:0;
-    left:0;
-    margin: auto;
-}
-.flickity-fullscreen .carousel-cell img{
-    max-height: 100vh;
-    max-width:100vw;
-    width: auto;
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    vertical-align: middle;
-    perspective(1px) translateY(-50%);
-    transform: perspective(1px) translateY(-50%) translateX(-50%);
-    -webkit-transform: perspective(1px) translateY(-50%) translateX(-50%);
-    -ms-transform: perspective(1px) translateY(-50%) translateX(-50%);
-    margin: auto;
-}
-.flickity-fullscreen .flickity-viewport{
-    height: 100% !IMPORTANT;
-}
-.flickity-fullscreen .carousel-cell{
-    text-align: center;
-    margin: auto;
-    bottom: 0;
-    top: 0;
-    z-index: 501;
-}
-
-#background_fade{
-    background-color: rgba(0,0,0,0.9);
-    position: fixed;
-    z-index:103;
-    top:0;
-    bottom: 0;
-    right:0;
-    left:0;
-}
-
 .carousel_wrapper{
     position: relative;
     background-color: #FFBF3F;
-    /* background-color: #D9E8D0; */
     padding: 15px 15px 0px 15px;
     margin-bottom: 15px;
-    /* overflow: auto; */
 }
 .carousel_wrapper h1, .carousel_wrapper h2, .carousel_wrapper h3, .carousel_wrapper h4, .carousel_wrapper h5, .carousel_wrapper h6{
     margin-bottom: 0px;
-}
-.toggle-fullscreen{
-    position:absolute;
-    z-index:3;
-    top: 0;
-    right: 0;
-    /*
-    left:0;
-    margin: auto;
-    */
-    color: #333;
-    cursor:pointer;
-    background:rgba(255,255,255,0.8);
-    width: 40px;
-    height: 40px;
-    text-align: center;
-    line-height: 40px;
-}
-.flickity-fullscreen .toggle-fullscreen{
-    position: fixed;
-    z-index: 501;
 }
 .download_photograph{
     font-size: 36px;
@@ -1162,27 +1133,73 @@ img{
     text-align: center;
     line-height: 60px;
 }
-.flickity-fullscreen .download_photograph{
-    position: fixed;
-    z-index: 501;
-}
-.flickity-page-dots{
-    top: 15px;
-    bottom: auto;
-    left: 30px;
-    right: 30px;
-    width:auto;
-}
-.flickity-page-dots .dot{
-    background-color: #FFBF3F;
-    opacity: 1;
-}
 .flickity-page-dots .is-selected{
     background-color: #ff00c4;
 }
-/* /carousel */
 
-/* leave this intact */
+/* fullscreen */
+
+.flickity-carousel.is-fullscreen{
+    z-index: 101;
+}
+.flickity-is-fullscreen .download_photograph{
+    position: fixed;
+    z-index: 501;
+}
+.flickity-carousel.is-fullscreen{
+    width:100vw;
+    height:100vh;
+    position:fixed;
+    z-index:500;
+    top:0;
+    bottom: 0;
+    right:0;
+    left:0;
+    margin: 0;
+    padding: 0;
+}
+.flickity-carousel.is-fullscreen .flickity-viewport{
+    height: 100% !IMPORTANT;
+}
+.flickity-carousel.is-fullscreen .carousel-cell{
+    text-align: center;
+    margin: auto;
+    bottom: 0;
+    top: 0;
+    z-index: 501;
+}
+.flickity-carousel.is-fullscreen .carousel-cell img{
+    max-height: 100vh;
+    max-width:100vw;
+    width: auto;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    vertical-align: middle;
+    perspective(1px) translateY(-50%);
+    transform: perspective(1px) translateY(-50%) translateX(-50%);
+    -webkit-transform: perspective(1px) translateY(-50%) translateX(-50%);
+    -ms-transform: perspective(1px) translateY(-50%) translateX(-50%);
+    margin: auto;
+}
+.flickity-carousel.is-fullscreen .carousel_text{
+    margin-top: 50px;
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    transform: translateX(-50%);
+    left: 50%;
+    padding: 0px 15px;
+    margin: 0;
+}
+.flickity-carousel.is-fullscreen .download_photograph{
+    position: fixed;
+    z-index: 501;
+}
+/* carousel ENDS */
+
 .tg_subwidget_blocklink a{
     color: #333;
     border: 1px solid #ccc;

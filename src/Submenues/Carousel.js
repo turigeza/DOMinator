@@ -175,9 +175,12 @@ function sizeButtonActivate(sizeKey, menu, btn){
 
 function see(menu){
     let selection = menu.view.state.selection;
-    let pos = selection.from;
+    let pos = selection.from+2;
     let node = menu.view.state.doc.nodeAt(pos);
     let dom = menu.view.domAtPos(pos);
+    console.log(pos);
+    console.log(dom.node);
+    console.dir(dom.node);
 
 }
 
