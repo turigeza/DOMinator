@@ -20,6 +20,9 @@ import _Photograph from "./Submenues/Photograph"
 import _Carousel from "./Submenues/Carousel"
 import _DownloadLink from "./Submenues/DownloadLink"
 import _BlockLink from "./Submenues/BlockLink"
+import _Layout from "./Submenues/Layout"
+import _LayoutColumn from "./Submenues/LayoutColumn"
+
 
 import smRightMenu from "./Submenues/RightMenu"
 
@@ -139,9 +142,15 @@ export default class DOMinatorMenu {
 
                 this.activeBlock = selection.$head.parent;
             }else if (selection.constructor.name === 'NodeSelection'){
-                if(this.submenus[selection.node.type.name]){
+                if(selection.node.type.spec.menu){
+                    activeSubmenuKey = selection.node.type.spec.menu;
+                }else{
                     activeSubmenuKey = selection.node.type.name;
                 }
+
+                // if(this.submenus[selection.node.type.name]){
+                //     activeSubmenuKey = selection.node.type.name;
+                // }
 
                 this.activeBlock = selection.node;
             }else if(selection.constructor.name === 'AllSelection'){
@@ -196,6 +205,9 @@ export default class DOMinatorMenu {
             margins: _Margins(this),
             photograph: _Photograph(this),
             carousel: _Carousel(this),
+            layout: _Layout(this),
+            layoutcolumn: _LayoutColumn(this),
+
             download_link: _DownloadLink(this),
             download_title: new DOMinatorSubMenu({
                 key: 'download link',

@@ -13641,6 +13641,7 @@
       layout_12: {
           content: "cl_12{1}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           selectable: true,
           canTakeMargin: true,
@@ -13668,6 +13669,7 @@
       layout_48: {
           content: "cl_4{1} cl_8{1}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           canTakeMargin: true,
           attrs: {
@@ -13694,6 +13696,7 @@
       layout_66: {
           content: "cl_6{2}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           canTakeMargin: true,
           attrs: {
@@ -13720,6 +13723,7 @@
       layout_84: {
           content: "cl_8{1} cl_4{1}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           canTakeMargin: true,
           attrs: {
@@ -13746,6 +13750,7 @@
       layout_444: {
           content: "cl_4{3}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           canTakeMargin: true,
           attrs: {
@@ -13772,6 +13777,7 @@
       layout_3333: {
           content: "cl_3{4}",
           group: "layout",
+          menu: 'layout',
           defining: true,
           canTakeMargin: true,
           attrs: {
@@ -13798,6 +13804,7 @@
 
       cl_3: {
           content: "block+",
+          menu: 'layoutcolumn',
           group: "layout_columns",
           defining: true,
           selectable: false,
@@ -13825,6 +13832,7 @@
       },
       cl_4: {
           content: "block+",
+          menu: 'layoutcolumn',
           group: "layout_columns",
           defining: true,
           selectable: false,
@@ -13853,6 +13861,7 @@
       cl_6: {
           content: "block+",
           group: "layout_columns",
+          menu: 'layoutcolumn',
           defining: true,
           selectable: false,
           canTakePadding: true,
@@ -13880,6 +13889,7 @@
       cl_8: {
           content: "block+",
           group: "layout_columns",
+          menu: 'layoutcolumn',
           defining: true,
           selectable: false,
           canTakePadding: true,
@@ -13907,6 +13917,7 @@
       cl_12: {
           content: "block+",
           group: "layout_columns",
+          menu: 'layoutcolumn',
           defining: true,
           selectable: false,
           canTakePadding: true,
@@ -21262,6 +21273,70 @@
       });
   }
 
+  function _Layout(menu) {
+      if( menu.dominator.options.menu.layout ===  false){
+          return null;
+      }
+
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Layout: '
+          }),
+          new DOMinatorMenuSeparator (),
+          ...generateDropdowns('margin', menu),
+          new DOMinatorMenuButton({
+              key: 'clear all margins',
+              icon: 'clearmargin',
+              iconType: 'dics',
+              action: () => {
+                  menu.stayOnMenu = true;
+                  normalizePaddingMargin(menu, 'margin');
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.heading ===  'function'){
+          menu.dominator.options.menu.layout(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'layout',
+          items: items
+      });
+  }
+
+  function _LayoutColumn(menu) {
+      if( menu.dominator.options.menu.layout ===  false){
+          return null;
+      }
+
+      const items = [
+          new DOMinatorMenuLabel({
+              label: 'Layout Column: '
+          }),
+          new DOMinatorMenuSeparator (),
+          ...generateDropdowns('padding', menu),
+          new DOMinatorMenuButton({
+              key: 'clear all paddings',
+              icon: 'clearpadding',
+              iconType: 'dics',
+              action: () => {
+                  menu.stayOnMenu = true;
+                  normalizePaddingMargin(menu, 'padding');
+              }
+          })
+      ];
+
+      if( typeof menu.dominator.options.menu.heading ===  'function'){
+          menu.dominator.options.menu.layout(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'layout',
+          items: items
+      });
+  }
+
   function smRightMenu(menu) {
       const items = [
           new DOMinatorMenuSeparator (),
@@ -21447,9 +21522,15 @@
 
                   this.activeBlock = selection.$head.parent;
               }else if (selection.constructor.name === 'NodeSelection'){
-                  if(this.submenus[selection.node.type.name]){
+                  if(selection.node.type.spec.menu){
+                      activeSubmenuKey = selection.node.type.spec.menu;
+                  }else{
                       activeSubmenuKey = selection.node.type.name;
                   }
+
+                  // if(this.submenus[selection.node.type.name]){
+                  //     activeSubmenuKey = selection.node.type.name;
+                  // }
 
                   this.activeBlock = selection.node;
               }else if(selection.constructor.name === 'AllSelection'){
@@ -21503,6 +21584,9 @@
               margins: margins(this),
               photograph: _Photograph(this),
               carousel: _Carousel(this),
+              layout: _Layout(this),
+              layoutcolumn: _LayoutColumn(this),
+
               download_link: _DownloadLink(this),
               download_title: new DOMinatorSubMenu({
                   key: 'download link',

@@ -183,6 +183,7 @@ export const nodes = {
     layout_12: {
         content: "cl_12{1}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         selectable: true,
         canTakeMargin: true,
@@ -210,6 +211,7 @@ export const nodes = {
     layout_48: {
         content: "cl_4{1} cl_8{1}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         canTakeMargin: true,
         attrs: {
@@ -236,6 +238,7 @@ export const nodes = {
     layout_66: {
         content: "cl_6{2}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         canTakeMargin: true,
         attrs: {
@@ -262,6 +265,7 @@ export const nodes = {
     layout_84: {
         content: "cl_8{1} cl_4{1}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         canTakeMargin: true,
         attrs: {
@@ -288,6 +292,7 @@ export const nodes = {
     layout_444: {
         content: "cl_4{3}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         canTakeMargin: true,
         attrs: {
@@ -314,6 +319,7 @@ export const nodes = {
     layout_3333: {
         content: "cl_3{4}",
         group: "layout",
+        menu: 'layout',
         defining: true,
         canTakeMargin: true,
         attrs: {
@@ -340,6 +346,7 @@ export const nodes = {
 
     cl_3: {
         content: "block+",
+        menu: 'layoutcolumn',
         group: "layout_columns",
         defining: true,
         selectable: false,
@@ -367,6 +374,7 @@ export const nodes = {
     },
     cl_4: {
         content: "block+",
+        menu: 'layoutcolumn',
         group: "layout_columns",
         defining: true,
         selectable: false,
@@ -395,6 +403,7 @@ export const nodes = {
     cl_6: {
         content: "block+",
         group: "layout_columns",
+        menu: 'layoutcolumn',
         defining: true,
         selectable: false,
         canTakePadding: true,
@@ -422,6 +431,7 @@ export const nodes = {
     cl_8: {
         content: "block+",
         group: "layout_columns",
+        menu: 'layoutcolumn',
         defining: true,
         selectable: false,
         canTakePadding: true,
@@ -449,6 +459,7 @@ export const nodes = {
     cl_12: {
         content: "block+",
         group: "layout_columns",
+        menu: 'layoutcolumn',
         defining: true,
         selectable: false,
         canTakePadding: true,
