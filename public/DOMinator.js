@@ -3299,7 +3299,7 @@
 
   // ::- A DOM serializer knows how to convert ProseMirror nodes and
   // marks of various types to DOM nodes.
-  var DOMSerializer = function DOMSerializer(nodes, marks) {
+  var DOMSerializer$1 = function DOMSerializer(nodes, marks) {
     // :: Object<(node: Node) → DOMOutputSpec>
     // The node serialization functions.
     this.nodes = nodes || {};
@@ -3313,7 +3313,7 @@
   // not in the browser, the `document` option, containing a DOM
   // document, should be passed so that the serializer can create
   // nodes.
-  DOMSerializer.prototype.serializeFragment = function serializeFragment (fragment, options, target) {
+  DOMSerializer$1.prototype.serializeFragment = function serializeFragment (fragment, options, target) {
       var this$1 = this;
       if ( options === void 0 ) options = {};
 
@@ -3356,11 +3356,11 @@
   // document. To serialize a whole document, use
   // [`serializeFragment`](#model.DOMSerializer.serializeFragment) on
   // its [content](#model.Node.content).
-  DOMSerializer.prototype.serializeNode = function serializeNode (node, options) {
+  DOMSerializer$1.prototype.serializeNode = function serializeNode (node, options) {
       if ( options === void 0 ) options = {};
 
     var ref =
-        DOMSerializer.renderSpec(doc(options), this.nodes[node.type.name](node));
+        DOMSerializer$1.renderSpec(doc(options), this.nodes[node.type.name](node));
       var dom = ref.dom;
       var contentDOM = ref.contentDOM;
     if (contentDOM) {
@@ -3374,7 +3374,7 @@
     return dom
   };
 
-  DOMSerializer.prototype.serializeNodeAndMarks = function serializeNodeAndMarks (node, options) {
+  DOMSerializer$1.prototype.serializeNodeAndMarks = function serializeNodeAndMarks (node, options) {
       if ( options === void 0 ) options = {};
 
     var dom = this.serializeNode(node, options);
@@ -3388,18 +3388,18 @@
     return dom
   };
 
-  DOMSerializer.prototype.serializeMark = function serializeMark (mark, inline, options) {
+  DOMSerializer$1.prototype.serializeMark = function serializeMark (mark, inline, options) {
       if ( options === void 0 ) options = {};
 
     var toDOM = this.marks[mark.type.name];
-    return toDOM && DOMSerializer.renderSpec(doc(options), toDOM(mark, inline))
+    return toDOM && DOMSerializer$1.renderSpec(doc(options), toDOM(mark, inline))
   };
 
   // :: (dom.Document, DOMOutputSpec) → {dom: dom.Node, contentDOM: ?dom.Node}
   // Render an [output spec](#model.DOMOutputSpec) to a DOM node. If
   // the spec has a hole (zero) in it, `contentDOM` will point at the
   // node with the hole.
-  DOMSerializer.renderSpec = function renderSpec (doc, structure) {
+  DOMSerializer$1.renderSpec = function renderSpec (doc, structure) {
     if (typeof structure == "string")
       { return {dom: doc.createTextNode(structure)} }
     if (structure.nodeType != null)
@@ -3419,7 +3419,7 @@
           { throw new RangeError("Content hole must be the only child of its parent node") }
         return {dom: dom, contentDOM: dom}
       } else {
-        var ref = DOMSerializer.renderSpec(doc, child);
+        var ref = DOMSerializer$1.renderSpec(doc, child);
           var inner = ref.dom;
           var innerContent = ref.contentDOM;
         dom.appendChild(inner);
@@ -3435,15 +3435,15 @@
   // :: (Schema) → DOMSerializer
   // Build a serializer using the [`toDOM`](#model.NodeSpec.toDOM)
   // properties in a schema's node and mark specs.
-  DOMSerializer.fromSchema = function fromSchema (schema) {
+  DOMSerializer$1.fromSchema = function fromSchema (schema) {
     return schema.cached.domSerializer ||
-      (schema.cached.domSerializer = new DOMSerializer(this.nodesFromSchema(schema), this.marksFromSchema(schema)))
+      (schema.cached.domSerializer = new DOMSerializer$1(this.nodesFromSchema(schema), this.marksFromSchema(schema)))
   };
 
   // : (Schema) → Object<(node: Node) → DOMOutputSpec>
   // Gather the serializers in a schema's node specs into an object.
   // This can be useful as a base to build a custom serializer from.
-  DOMSerializer.nodesFromSchema = function nodesFromSchema (schema) {
+  DOMSerializer$1.nodesFromSchema = function nodesFromSchema (schema) {
     var result = gatherToDOM(schema.nodes);
     if (!result.text) { result.text = function (node) { return node.text; }; }
     return result
@@ -3451,7 +3451,7 @@
 
   // : (Schema) → Object<(mark: Mark) → DOMOutputSpec>
   // Gather the serializers in a schema's mark specs into an object.
-  DOMSerializer.marksFromSchema = function marksFromSchema (schema) {
+  DOMSerializer$1.marksFromSchema = function marksFromSchema (schema) {
     return gatherToDOM(schema.marks)
   };
 
@@ -3474,7 +3474,7 @@
     __proto__: null,
     ContentMatch: ContentMatch,
     DOMParser: DOMParser,
-    DOMSerializer: DOMSerializer,
+    DOMSerializer: DOMSerializer$1,
     Fragment: Fragment,
     Mark: Mark,
     MarkType: MarkType,
@@ -7362,7 +7362,7 @@
       var custom = view.nodeViews[mark.type.name];
       var spec = custom && custom(mark, view, inline);
       if (!spec || !spec.dom)
-        { spec = DOMSerializer.renderSpec(document, mark.type.spec.toDOM(mark, inline)); }
+        { spec = DOMSerializer$1.renderSpec(document, mark.type.spec.toDOM(mark, inline)); }
       return new MarkViewDesc(parent, mark, spec.dom, spec.contentDOM || spec.dom)
     };
 
@@ -7438,7 +7438,7 @@
         if (!dom) { dom = document.createTextNode(node.text); }
         else if (dom.nodeType != 3) { throw new RangeError("Text must be rendered as a DOM text node") }
       } else if (!dom) {
-  ((assign = DOMSerializer.renderSpec(document, node.type.spec.toDOM(node)), dom = assign.dom, contentDOM = assign.contentDOM));
+  ((assign = DOMSerializer$1.renderSpec(document, node.type.spec.toDOM(node)), dom = assign.dom, contentDOM = assign.contentDOM));
       }
       if (!contentDOM && !node.isText && dom.nodeName != "BR") { // Chrome gets confused by <br contenteditable=false>
         if (!dom.hasAttribute("contenteditable")) { dom.contentEditable = false; }
@@ -8947,7 +8947,7 @@
       content = node.content;
     }
 
-    var serializer = view.someProp("clipboardSerializer") || DOMSerializer.fromSchema(view.state.schema);
+    var serializer = view.someProp("clipboardSerializer") || DOMSerializer$1.fromSchema(view.state.schema);
     var doc = detachedDoc(), wrap = doc.createElement("div");
     wrap.appendChild(serializer.serializeFragment(content, {document: doc}));
 
@@ -14008,7 +14008,6 @@
           selectable: true,
           atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
           draggable: false,
-          // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
               class: {
                   default: null
@@ -14027,7 +14026,8 @@
               }
           }],
           toDOM(node) {
-              // console.log('toDOM');
+              console.log('toDOM');
+              console.log(node);
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
               if(node.attrs){
@@ -21067,25 +21067,6 @@
       });
   }
 
-  // closest('.carousel_wrapper').find('.flickity_json').text(JSON.stringify(json));
-  // function get_carousel(){
-  //     return priv.tooltips.carousel.$attached_to.find('.flickity-carousel').flickity();
-  // }
-  // var $carousel = get_carousel();
-  // var text = $carousel.closest('.carousel_wrapper').find('.flickity_json').text();
-  // carousel.closest('.carousel_wrapper').find('.toggle-fullscreen').hide();
-
-  function see(menu){
-      let selection = menu.view.state.selection;
-      let pos = selection.from+2;
-      let node = menu.view.state.doc.nodeAt(pos);
-      let dom = menu.view.domAtPos(pos);
-      console.log(pos);
-      console.log(dom.node);
-      console.dir(dom.node);
-
-  }
-
   function _Carousel(menu) {
 
       if( menu.dominator.options.menu.carousel ===  false){
@@ -21098,13 +21079,83 @@
           }),
           new DOMinatorMenuSeparator (),
           new DOMinatorMenuButton ({
-              key: 'paragraph',
-              icon: 'paragraph',
+              key: 'add a slide',
+              icon: 'plus',
               action: () => {
-                  see(menu);
+                  
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'add a slide',
+              icon: 'plus',
+              action: () => {
+                  menu.dominator.options.carouselAddSlide(menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'remove slide',
+              icon: 'minus',
+              action: () => {
+                  menu.dominator.options.carouselRemoveSlide(menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'move slide left',
+              icon: 'chevron-left',
+              action: () => {
+                  menu.dominator.options.carouselMoveSlideLeft(menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'move slide right',
+              icon: 'chevron-right',
+              action: () => {
+                  menu.dominator.options.carouselMoveSlideRight(menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'auto play',
+              icon: 'play',
+              action: () => {
+                  menu.dominator.options.carouselToggleSetting('autoPlay', menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'toggle full screen option',
+              icon: 'expand',
+              action: () => {
+                  menu.dominator.options.carouselToggleSetting('fullscreen', menu.dominator);
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'link slide',
+              icon: 'link',
+              action: () => {
+                  menu.activateSubmenu('carousel_link');
               }
           }),
           new DOMinatorMenuInput ({
+              label: 'Title',
+              update: (input) => {
+
+              },
+              key: 'href',
+              action: (val) => {
+
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Description',
+              update: (input) => {
+
+              },
+              key: 'href',
+              action: (val) => {
+
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link',
               update: (input) => {
 
               },
@@ -21124,37 +21175,6 @@
           items: items
       });
   }
-  //
-  // var $remove = $('<button class="btn btn-default btn" title="Remove this carousel cell"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
-  // $remove.on('click', function(event){
-  //     var $carousel = get_carousel();
-  //     var flickity = $carousel.data('flickity');
-  //     if(flickity.cells.length === 1){
-  //         editable_toast('editor_last_carousel_el');
-  //         return;
-  //     }
-  //     $carousel.flickity( 'remove',  flickity.selectedElement);
-  //     $carousel.flickity('reloadCells').flickity('resize');
-  // });
-  //
-  // var $move_left = $('<button class="btn btn-default btn" title="Move cell to left"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
-  // $move_left.on('click', function(event){
-  //     var $carousel = get_carousel();
-  //     var flickity = $carousel.data('flickity');
-  //     var selected_el = flickity.selectedElement;
-  //     var selected_index = flickity.selectedIndex;
-  //
-  //     if(selected_index > 0){
-  //         var new_index =  flickity.selectedIndex-1;
-  //     }else{
-  //         var new_index = flickity.cells.length-1;
-  //     }
-  //
-  //     $carousel.flickity( 'remove',  flickity.selectedElement);
-  //     $carousel.flickity( 'insert',  selected_el, new_index);
-  //     $carousel.flickity( 'selectCell', new_index, false, true);
-  //
-  // });
 
   function _DownloadLink(menu) {
       if( menu.dominator.options.menu.download_link ===  false){
@@ -22024,7 +22044,11 @@
           console.log('UPDATE --- CarouselHtmlView');
       }
 
-      ignoreMutation() {
+      ignoreMutation(m) {
+          if(m.type === 'attributes' && m.type === 'attributeName'){
+              return false;
+          }
+          console.log(m);
           return true;
           // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
           // the record will have a type property of "selection" (which doesn't occur for native mutation records).
@@ -22063,7 +22087,11 @@
               exit: implementMessage,             // the ui for going live and saving a revision
               photograph: implementMessage,             // the ui for going live and saving a revision
               downloads: implementMessage,
-
+              carouselAddSlide: implementMessage,
+              carouselRemoveSlide: implementMessage,
+              carouselMoveSlideLeft: implementMessage,
+              carouselMoveSlideRight: implementMessage,
+              carouselToggleSetting: implementMessage,
               paddingClasses: paddingClasses,
               marginClasses: marginClasses,
               textAlignClasses: {
@@ -22229,7 +22257,24 @@
           });
           this.view.$d_listeners = this.options.listeners;
 
-          
+
+      }
+
+      // comes from TIPTAP https://tiptap.scrumpy.io/
+      getHTML() {
+          const div = document.createElement('div');
+          const fragment = DOMSerializer
+          .fromSchema(this.schema)
+          .serializeFragment(this.state.doc.content);
+
+          div.appendChild(fragment);
+
+          return div.innerHTML
+      }
+      
+      // comes from TIPTAP https://tiptap.scrumpy.io/
+      getJSON() {
+          return this.state.doc.toJSON()
       }
 
       insertDownloads(items){
@@ -22279,6 +22324,11 @@
           const newSelection = NodeSelection.create(view.state.doc, pos+1);
           view.dispatch(tr.setSelection(newSelection));
 
+      }
+
+      selectNode(pos){
+          const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
+          this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
       }
   };
 

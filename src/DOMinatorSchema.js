@@ -550,7 +550,6 @@ export const nodes = {
         selectable: true,
         atom: true, // though this isn't a leaf node, it doesn't have directly editable content and should be treated as a single unit in the view.
         draggable: false,
-        // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
             class: {
                 default: null
@@ -569,7 +568,8 @@ export const nodes = {
             }
         }],
         toDOM(node) {
-            // console.log('toDOM');
+            console.log('toDOM');
+            console.log(node);
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
             if(node.attrs){

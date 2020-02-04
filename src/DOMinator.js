@@ -60,7 +60,11 @@ window.DOMinator = class DOMinator {
             exit: implementMessage,             // the ui for going live and saving a revision
             photograph: implementMessage,             // the ui for going live and saving a revision
             downloads: implementMessage,
-
+            carouselAddSlide: implementMessage,
+            carouselRemoveSlide: implementMessage,
+            carouselMoveSlideLeft: implementMessage,
+            carouselMoveSlideRight: implementMessage,
+            carouselToggleSetting: implementMessage,
             paddingClasses: paddingClasses,
             marginClasses: marginClasses,
             textAlignClasses: {
@@ -226,7 +230,24 @@ window.DOMinator = class DOMinator {
         });
         this.view.$d_listeners = this.options.listeners;
 
-        
+
+    }
+
+    // comes from TIPTAP https://tiptap.scrumpy.io/
+    getHTML() {
+        const div = document.createElement('div')
+        const fragment = DOMSerializer
+        .fromSchema(this.schema)
+        .serializeFragment(this.state.doc.content)
+
+        div.appendChild(fragment)
+
+        return div.innerHTML
+    }
+    
+    // comes from TIPTAP https://tiptap.scrumpy.io/
+    getJSON() {
+        return this.state.doc.toJSON()
     }
 
     insertDownloads(items){
@@ -276,5 +297,10 @@ window.DOMinator = class DOMinator {
         const newSelection = NodeSelection.create(view.state.doc, pos+1);
         view.dispatch(tr.setSelection(newSelection));
 
+    }
+
+    selectNode(pos){
+        const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
+        this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
     }
 }
