@@ -33,7 +33,7 @@ export default function(menu) {
         new DOMinatorMenuButton ({
             key: 'add a slide',
             icon: 'plus',
-            action: () => {
+            action: (DOMinator) => {
                 menu.dominator.options.carouselAddSlide(menu.dominator);
             }
         }),

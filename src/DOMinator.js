@@ -36,6 +36,8 @@ import CarouselView from "./NodeViews/CarouselView"
 // actions
 import {
     insertDownloads,
+    changeAttributeOnNode
+
 } from "./DOMinatorActions"
 
 window.DOMinator = class DOMinator {
@@ -244,7 +246,7 @@ window.DOMinator = class DOMinator {
 
         return div.innerHTML
     }
-    
+
     // comes from TIPTAP https://tiptap.scrumpy.io/
     getJSON() {
         return this.state.doc.toJSON()
@@ -302,5 +304,9 @@ window.DOMinator = class DOMinator {
     selectNode(pos){
         const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
         this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
+    }
+
+    updateCarousel(html){
+        changeAttributeOnNode(this.menu, 'html', html);
     }
 }

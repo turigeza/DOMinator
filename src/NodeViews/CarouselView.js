@@ -16,7 +16,7 @@ export default class CarouselView {
         if(node.attrs.class){
             this.dom.setAttribute("class", node.attrs.class);
         }
-
+        console.log('constructor');
         // this where we need to reapply the carousel but not always
         if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
             view.$d_listeners.afterCarouselConstruct(this.dom, node, view, getPos);
@@ -25,16 +25,11 @@ export default class CarouselView {
 
     update(node, decorations) {
         console.log('UPDATE --- CarouselHtmlView');
+        return true;
     }
 
-    ignoreMutation(m) {
-        if(m.type === 'attributes' && m.attributeName === 'letmethrough'){
-            return false;
-        }
+    ignoreMutation() {
         return true;
-        // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
-        // the record will have a type property of "selection" (which doesn't occur for native mutation records).
-        // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
     }
 
     // Called when the node view is removed from the editor or the whole editor is destroyed.

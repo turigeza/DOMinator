@@ -39,11 +39,19 @@ $( document ).ready(function(){
 
         // carousel
         carouselAddSlide: (DOMinator) => {
-
+            const images = [
+                'https://i.picsum.photos/id/985/1200/800.jpg?grayscale',
+                'https://i.picsum.photos/id/986/1200/800.jpg?grayscale',
+                'https://i.picsum.photos/id/987/1200/800.jpg?grayscale',
+                'https://i.picsum.photos/id/988/1200/800.jpg?grayscale',
+                'https://i.picsum.photos/id/989/1200/800.jpg?grayscale',
+                'https://i.picsum.photos/id/990/1200/800.jpg?grayscale',
+            ]
+            const src = images[Math.floor(Math.random() * images.length)];
             // DOMinator.carouselAddSlide(slide);
-            const $slide = $(`<div class="carousel-cell" style="" aria-hidden="true">
-                <img src="https://picsum.photos/1200/800?grayscale" alt="Branklyn">
-                <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+            const $slide = $(`<div class="carousel-cell">
+                <img src="${src}">
+                <div class="tg_sub_editable carousel_text">
                     <h3>I have added this image</h3>
                     <p>Description on the image</p>
                 </div>
@@ -55,14 +63,19 @@ $( document ).ready(function(){
             flickity.selectCell( flickity.selectedIndex+1, false, true);
 
             $slide.find('img').one("load", ()=>{
-                flickity.reloadCells();
-                flickity.resize();
-                // flickity.destroy();
-                $widget.attr('letmethrough', true);
+                const $clone = $widget.clone(true);
+
+                const tempFlickity = $clone.find('.flickity-carousel').data('flickity');
+                tempFlickity.guid = 10000000;
+                console.log(tempFlickity);
+                $clone.remove();
+                tempFlickity.destroy();
+                // DOMinator.updateCarousel($clone.html());
             });
         },
         carouselRemoveSlide: (DOMinator) => {
             const flickity = getCarousel();
+
             if(flickity.cells.length === 1){
                 alert('You can not remove the last element.');
                // editable_toast('editor_last_carousel_el');
@@ -70,7 +83,7 @@ $( document ).ready(function(){
            }
 
            flickity.remove(flickity.selectedElement);
-           $('.ProseMirror-selectednode').attr('letmethrough', true);
+
            flickity.reloadCells();
            flickity.resize();
         },
@@ -160,38 +173,49 @@ $( document ).ready(function(){
     }
 
     function initCarousels (){
-        $('.carousel_wrapper').each(function(){
-
+        $('.tg_subwidget_carousel').each(function(){
             var $this = $(this);
-
             var flickity = $this.find('.flickity-carousel').data('flickity')
-
             if(flickity){
                 flickity.destroy();
             }
+            initCarousel($this);
+        });
+    }
 
-            var text = $this.find('.flickity_json').text();
-            var settings = null;
+    function initCarousel ($dom){
+        var text = $dom.find('.flickity_json').text();
+        var settings = null;
 
-            try{
-                var settings = JSON.parse(text);
-            }catch(err){
+        try{
+            var settings = JSON.parse(text);
+        }catch(err){
 
+        }
+
+        if(!settings){
+            settings = {
+                wrapAround: true,
+                parallax: true,
+                adaptiveHeight: true,
+                imagesLoaded: true,
+                fullscreen: true
+                //lazyLoad: 2,
             }
+        }
 
-            if(!settings){
-                settings = {
-                    wrapAround: true,
-                    parallax: true,
-                    adaptiveHeight: true,
-                    imagesLoaded: true,
-                    fullscreen: true
-                    //lazyLoad: 2,
-                }
-            }
+        settings.draggable = true;
+        const $carousel = $dom.find('.flickity-carousel');
+        $carousel.flickity(settings);
 
-            settings.draggable = true;
-            $this.find('.flickity-carousel').flickity(settings);
+        const existingIndex = $carousel.attr('index') || 0;
+        const flickity = $carousel.data('flickity');
+
+        flickity.select(existingIndex, false, true);
+
+        // this so we can reinstate the index after reinitialiseing the cartousel
+        $carousel.on( 'change.flickity', function( event, index ) {
+            $carousel.attr('index', index);
         });
     }
 });

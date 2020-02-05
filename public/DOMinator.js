@@ -14014,9 +14014,6 @@
               },
               html: {
                   default: ''
-              },
-              letmethrough: {
-                  default: null
               }
           },
           parseDOM: [{
@@ -14024,23 +14021,18 @@
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class"),
-                      'letmethrough': dom.getAttribute("letmethrough"),
                       html: dom.innerHTML
                   };
               }
           }],
           toDOM(node) {
-              console.log('toDOM');
-              console.log(node);
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
               if(node.attrs){
                   newDiv.setAttribute('class', node.attrs.class);
-                  newDiv.setAttribute('letmethrough', node.attrs.letmethrough);
               }
 
               return newDiv;
-
           }
       },
       downloads: {
@@ -21086,7 +21078,7 @@
           new DOMinatorMenuButton ({
               key: 'add a slide',
               icon: 'plus',
-              action: () => {
+              action: (DOMinator) => {
                   menu.dominator.options.carouselAddSlide(menu.dominator);
               }
           }),
@@ -22031,7 +22023,7 @@
           if(node.attrs.class){
               this.dom.setAttribute("class", node.attrs.class);
           }
-
+          console.log('constructor');
           // this where we need to reapply the carousel but not always
           if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
               view.$d_listeners.afterCarouselConstruct(this.dom, node, view, getPos);
@@ -22040,16 +22032,11 @@
 
       update(node, decorations) {
           console.log('UPDATE --- CarouselHtmlView');
+          return true;
       }
 
-      ignoreMutation(m) {
-          if(m.type === 'attributes' && m.attributeName === 'letmethrough'){
-              return false;
-          }
+      ignoreMutation() {
           return true;
-          // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
-          // the record will have a type property of "selection" (which doesn't occur for native mutation records).
-          // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
       }
 
       // Called when the node view is removed from the editor or the whole editor is destroyed.
@@ -22268,7 +22255,7 @@
 
           return div.innerHTML
       }
-      
+
       // comes from TIPTAP https://tiptap.scrumpy.io/
       getJSON() {
           return this.state.doc.toJSON()
@@ -22326,6 +22313,10 @@
       selectNode(pos){
           const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
           this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
+      }
+
+      updateCarousel(html){
+          changeAttributeOnNode(this.menu, 'html', html);
       }
   };
 

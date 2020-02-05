@@ -556,9 +556,6 @@ export const nodes = {
             },
             html: {
                 default: ''
-            },
-            letmethrough: {
-                default: null
             }
         },
         parseDOM: [{
@@ -566,23 +563,18 @@ export const nodes = {
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class"),
-                    'letmethrough': dom.getAttribute("letmethrough"),
                     html: dom.innerHTML
                 };
             }
         }],
         toDOM(node) {
-            console.log('toDOM');
-            console.log(node);
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
             if(node.attrs){
                 newDiv.setAttribute('class', node.attrs.class);
-                newDiv.setAttribute('letmethrough', node.attrs.letmethrough);
             }
 
             return newDiv;
-
         }
     },
     downloads: {
