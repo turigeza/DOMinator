@@ -14015,12 +14015,16 @@
               html: {
                   default: ''
               },
+              letmethrough: {
+                  default: null
+              }
           },
           parseDOM: [{
               tag: 'div.tg_subwidget_carousel',
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class"),
+                      'letmethrough': dom.getAttribute("letmethrough"),
                       html: dom.innerHTML
                   };
               }
@@ -14032,6 +14036,7 @@
               newDiv.innerHTML = node.attrs.html;
               if(node.attrs){
                   newDiv.setAttribute('class', node.attrs.class);
+                  newDiv.setAttribute('letmethrough', node.attrs.letmethrough);
               }
 
               return newDiv;
@@ -21082,18 +21087,11 @@
               key: 'add a slide',
               icon: 'plus',
               action: () => {
-                  
-              }
-          }),
-          new DOMinatorMenuButton ({
-              key: 'add a slide',
-              icon: 'plus',
-              action: () => {
                   menu.dominator.options.carouselAddSlide(menu.dominator);
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'remove slide',
+              key: 'remove current slide',
               icon: 'minus',
               action: () => {
                   menu.dominator.options.carouselRemoveSlide(menu.dominator);
@@ -22045,10 +22043,9 @@
       }
 
       ignoreMutation(m) {
-          if(m.type === 'attributes' && m.type === 'attributeName'){
+          if(m.type === 'attributes' && m.attributeName === 'letmethrough'){
               return false;
           }
-          console.log(m);
           return true;
           // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
           // the record will have a type property of "selection" (which doesn't occur for native mutation records).

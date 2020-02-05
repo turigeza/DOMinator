@@ -28,10 +28,9 @@ export default class CarouselView {
     }
 
     ignoreMutation(m) {
-        if(m.type === 'attributes' && m.type === 'attributeName'){
+        if(m.type === 'attributes' && m.attributeName === 'letmethrough'){
             return false;
         }
-        console.log(m);
         return true;
         // Called when a DOM mutation or a selection change happens within the view. When the change is a selection change,
         // the record will have a type property of "selection" (which doesn't occur for native mutation records).

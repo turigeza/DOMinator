@@ -37,6 +37,7 @@ $( document ).ready(function(){
             });
         },
 
+        // carousel
         carouselAddSlide: (DOMinator) => {
 
             // DOMinator.carouselAddSlide(slide);
@@ -48,13 +49,16 @@ $( document ).ready(function(){
                 </div>
             </div>`);
 
-            const flickity = getCarousel();
+            const { flickity, $flickity, $widget } = getCarousel();
+
             flickity.insert($slide, flickity.selectedIndex+1);
             flickity.selectCell( flickity.selectedIndex+1, false, true);
 
             $slide.find('img').one("load", ()=>{
                 flickity.reloadCells();
                 flickity.resize();
+                // flickity.destroy();
+                $widget.attr('letmethrough', true);
             });
         },
         carouselRemoveSlide: (DOMinator) => {
@@ -141,7 +145,7 @@ $( document ).ready(function(){
         const flickity = $flickity.data('flickity');
         const $widget = $('.tg_subwidget_carousel.ProseMirror-selectednode');
 
-        return { $flickity,  };
+        return { flickity, $flickity, $widget };
     }
     function destroyCarousels (){
         $('.carousel_wrapper').each(function(){

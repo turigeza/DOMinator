@@ -557,12 +557,16 @@ export const nodes = {
             html: {
                 default: ''
             },
+            letmethrough: {
+                default: null
+            }
         },
         parseDOM: [{
             tag: 'div.tg_subwidget_carousel',
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class"),
+                    'letmethrough': dom.getAttribute("letmethrough"),
                     html: dom.innerHTML
                 };
             }
@@ -574,6 +578,7 @@ export const nodes = {
             newDiv.innerHTML = node.attrs.html;
             if(node.attrs){
                 newDiv.setAttribute('class', node.attrs.class);
+                newDiv.setAttribute('letmethrough', node.attrs.letmethrough);
             }
 
             return newDiv;

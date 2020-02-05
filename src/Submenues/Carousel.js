@@ -34,18 +34,11 @@ export default function(menu) {
             key: 'add a slide',
             icon: 'plus',
             action: () => {
-                
-            }
-        }),
-        new DOMinatorMenuButton ({
-            key: 'add a slide',
-            icon: 'plus',
-            action: () => {
                 menu.dominator.options.carouselAddSlide(menu.dominator);
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'remove slide',
+            key: 'remove current slide',
             icon: 'minus',
             action: () => {
                 menu.dominator.options.carouselRemoveSlide(menu.dominator);
