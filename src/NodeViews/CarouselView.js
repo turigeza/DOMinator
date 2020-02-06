@@ -24,8 +24,13 @@ export default class CarouselView {
     }
 
     update(node, decorations) {
+        console.log(node);
         console.log('UPDATE --- CarouselHtmlView');
         return true;
+    }
+
+    filterTransaction(tr){
+        console.log(tr);
     }
 
     ignoreMutation() {

@@ -62,15 +62,20 @@ $( document ).ready(function(){
             flickity.insert($slide, flickity.selectedIndex+1);
             flickity.selectCell( flickity.selectedIndex+1, false, true);
 
-            $slide.find('img').one("load", ()=>{
-                const $clone = $widget.clone(true);
+            $slide.find('img').one("load", () => {
+                const $clone = $widget.clone(false);
 
-                const tempFlickity = $clone.find('.flickity-carousel').data('flickity');
-                tempFlickity.guid = 10000000;
-                console.log(tempFlickity);
-                $clone.remove();
-                tempFlickity.destroy();
-                // DOMinator.updateCarousel($clone.html());
+                const $carousel = $clone.find('.flickity-carousel');
+                $carousel.removeClass('flickity-enabled').removeClass('is-draggable').removeAttr('tabindex'); ///.removeAttr('index');
+                $carousel.find('.carousel-cell').unwrap().unwrap().removeAttr('style').removeAttr('aria-hidden').removeClass('is-selected');
+                $carousel.find('.tg_sub_editable').removeClass('tg_sub_editable');
+                $carousel.find('.flickity-button').remove();
+                $carousel.find('.flickity-page-dots').remove();
+                const html = $clone.html();
+                DOMinator.updateCarousel(html);
+                flickity.reloadCells();
+                flickity.resize();
+
             });
         },
         carouselRemoveSlide: (DOMinator) => {
