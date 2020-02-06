@@ -46,8 +46,10 @@ $( document ).ready(function(){
                 'https://i.picsum.photos/id/988/1200/800.jpg?grayscale',
                 'https://i.picsum.photos/id/989/1200/800.jpg?grayscale',
                 'https://i.picsum.photos/id/990/1200/800.jpg?grayscale',
-            ]
+            ];
+
             const src = images[Math.floor(Math.random() * images.length)];
+
             // DOMinator.carouselAddSlide(slide);
             const $slide = $(`<div class="carousel-cell">
                 <img src="${src}">
@@ -61,21 +63,27 @@ $( document ).ready(function(){
 
             flickity.insert($slide, flickity.selectedIndex+1);
             flickity.selectCell( flickity.selectedIndex+1, false, true);
+            let version = Number($widget.attr('data-version'));
+            let id = Date.now() + Math.floor(Math.random()*10);
+            // console.log( Math.floor(Math.random() * 100000000 ) );
+
+            version += 1;
+
+            const $clone = $widget.clone(false);
+            const $carousel = $clone.find('.flickity-carousel');
+            $carousel.removeClass('flickity-enabled').removeClass('is-draggable').removeAttr('tabindex'); ///.removeAttr('index');
+            $carousel.find('.carousel-cell').unwrap().unwrap().removeAttr('style').removeAttr('aria-hidden').removeClass('is-selected');
+            $carousel.find('.tg_sub_editable').removeClass('tg_sub_editable');
+            $carousel.find('.flickity-button').remove();
+            $carousel.find('.flickity-page-dots').remove();
+
+            const html = $clone.html();
+            $widget.attr('data-version', version);
+            DOMinator.updateCarousel(html, version);
 
             $slide.find('img').one("load", () => {
-                const $clone = $widget.clone(false);
-
-                const $carousel = $clone.find('.flickity-carousel');
-                $carousel.removeClass('flickity-enabled').removeClass('is-draggable').removeAttr('tabindex'); ///.removeAttr('index');
-                $carousel.find('.carousel-cell').unwrap().unwrap().removeAttr('style').removeAttr('aria-hidden').removeClass('is-selected');
-                $carousel.find('.tg_sub_editable').removeClass('tg_sub_editable');
-                $carousel.find('.flickity-button').remove();
-                $carousel.find('.flickity-page-dots').remove();
-                const html = $clone.html();
-                DOMinator.updateCarousel(html);
                 flickity.reloadCells();
                 flickity.resize();
-
             });
         },
         carouselRemoveSlide: (DOMinator) => {

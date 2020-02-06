@@ -13459,8 +13459,12 @@
       })
   }
 
-  // The basic shema got a from prosemirror-schema-basic and then modified to my needs
+  function toNaturalNumber(val) {
+      const abs = Math.abs(parseInt(val, 10));
+      return isNaN(abs) ? 0 : abs;
+  }
 
+  // The basic shema got a from prosemirror-schema-basic and then modified to my needs
   const nodes = {
 
       doc: {
@@ -14014,24 +14018,30 @@
               },
               html: {
                   default: ''
+              },
+              'data-version': {
+                  default: 0
               }
           },
           parseDOM: [{
               tag: 'div.tg_subwidget_carousel',
               getAttrs: dom => {
+                  console.log('getAttrs');
+                  console.log(toNaturalNumber(dom.getAttribute("data-version")));
                   return {
                       'class': dom.getAttribute("class"),
+                      'data-version': toNaturalNumber(dom.getAttribute("data-version")),
                       html: dom.innerHTML
                   };
               }
           }],
           toDOM(node) {
+              console.log('toDOM');
+              console.log(node.attrs['data-version']);
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
-              if(node.attrs){
-                  newDiv.setAttribute('class', node.attrs.class);
-              }
-
+              newDiv.setAttribute('class', node.attrs.class);
+              newDiv.setAttribute('data-version', node.attrs['data-version']);
               return newDiv;
           }
       },
@@ -19489,8 +19499,14 @@
   function changeAttributeOnNode(menu, attribute, value){
       const {from, to} = getBlockRange(menu);
       const node = menu.view.state.doc.nodeAt(from);
-      let attrs = { ...node.attrs };
-      attrs[attribute] = value;
+      let attrs;
+      if(typeof attribute === "object" && attribute !== null){
+          attrs = { ...node.attrs, ...attribute }; // to update multiple attributes at the same time
+      }else{
+          attrs = { ...node.attrs };
+          attrs[attribute] = value;
+      }
+
       let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(from, null, attrs).scrollIntoView());
   }
 
@@ -22020,10 +22036,12 @@
           this.dom = document.createElement('div');
           this.dom.innerHTML = node.attrs.html;
 
-          if(node.attrs.class){
-              this.dom.setAttribute("class", node.attrs.class);
-          }
+          this.dom.setAttribute("class", node.attrs.class);
+          this.dom.setAttribute('data-version', node.attrs['data-version']);
           console.log('constructor');
+          console.log(node.attrs['data-version']);
+
+
           // this where we need to reapply the carousel but not always
           if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
               view.$d_listeners.afterCarouselConstruct(this.dom, node, view, getPos);
@@ -22031,13 +22049,12 @@
       }
 
       update(node, decorations) {
-          console.log(node);
           console.log('UPDATE --- CarouselHtmlView');
+          
+          console.log("this.dom.getAttribute('data-version')" + this.dom.getAttribute('data-version'));
+          console.log("this.node.attrs['data-version']" + this.node.attrs['data-version']);
+          console.log("node.attrs['data-version']" + node.attrs['data-version']);
           return true;
-      }
-
-      filterTransaction(tr){
-          console.log(tr);
       }
 
       ignoreMutation() {
@@ -22320,8 +22337,10 @@
           this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
       }
 
-      updateCarousel(html){
-          changeAttributeOnNode(this.menu, 'html', html);
+      updateCarousel(html, version){
+          console.log('updateCarousel');
+          console.log(version);
+          changeAttributeOnNode(this.menu, { html: html, 'data-version': version });
       }
   };
 

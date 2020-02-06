@@ -13,10 +13,12 @@ export default class CarouselView {
         this.dom = document.createElement('div');
         this.dom.innerHTML = node.attrs.html;
 
-        if(node.attrs.class){
-            this.dom.setAttribute("class", node.attrs.class);
-        }
+        this.dom.setAttribute("class", node.attrs.class);
+        this.dom.setAttribute('data-version', node.attrs['data-version']);
         console.log('constructor');
+        console.log(node.attrs['data-version']);
+
+
         // this where we need to reapply the carousel but not always
         if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
             view.$d_listeners.afterCarouselConstruct(this.dom, node, view, getPos);
@@ -24,13 +26,12 @@ export default class CarouselView {
     }
 
     update(node, decorations) {
-        console.log(node);
         console.log('UPDATE --- CarouselHtmlView');
+        
+        console.log("this.dom.getAttribute('data-version')" + this.dom.getAttribute('data-version'));
+        console.log("this.node.attrs['data-version']" + this.node.attrs['data-version']);
+        console.log("node.attrs['data-version']" + node.attrs['data-version']);
         return true;
-    }
-
-    filterTransaction(tr){
-        console.log(tr);
     }
 
     ignoreMutation() {

@@ -25,7 +25,8 @@
         "prosemirror-schema-list": "^1.0.0",
         "prosemirror-state": "^1.0.0",
         "prosemirror-tables": "^1.0.0",
-        "prosemirror-utils": "^0.9.6"
+        "prosemirror-utils": "^0.9.6",
+        "uuid": "^3.4.0"
     },
     "devDependencies": {
         "rollup": "^1.26.3",

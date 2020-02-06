@@ -2,7 +2,9 @@
 import {
     Schema
 } from "prosemirror-model"
-
+import {
+    toNaturalNumber
+} from "./Helpers/General"
 export const nodes = {
 
     doc: {
@@ -556,24 +558,30 @@ export const nodes = {
             },
             html: {
                 default: ''
+            },
+            'data-version': {
+                default: 0
             }
         },
         parseDOM: [{
             tag: 'div.tg_subwidget_carousel',
             getAttrs: dom => {
+                console.log('getAttrs');
+                console.log(toNaturalNumber(dom.getAttribute("data-version")));
                 return {
                     'class': dom.getAttribute("class"),
+                    'data-version': toNaturalNumber(dom.getAttribute("data-version")),
                     html: dom.innerHTML
                 };
             }
         }],
         toDOM(node) {
+            console.log('toDOM');
+            console.log(node.attrs['data-version']);
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
-            if(node.attrs){
-                newDiv.setAttribute('class', node.attrs.class);
-            }
-
+            newDiv.setAttribute('class', node.attrs.class);
+            newDiv.setAttribute('data-version', node.attrs['data-version']);
             return newDiv;
         }
     },

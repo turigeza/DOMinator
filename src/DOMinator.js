@@ -306,7 +306,9 @@ window.DOMinator = class DOMinator {
         this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
     }
 
-    updateCarousel(html){
-        changeAttributeOnNode(this.menu, 'html', html);
+    updateCarousel(html, version){
+        console.log('updateCarousel');
+        console.log(version);
+        changeAttributeOnNode(this.menu, { html: html, 'data-version': version });
     }
 }

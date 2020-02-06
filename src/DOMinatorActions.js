@@ -109,8 +109,14 @@ export function stripPaddingMarginClasses(string, strip, classes){
 export function changeAttributeOnNode(menu, attribute, value){
     const {from, to} = getBlockRange(menu);
     const node = menu.view.state.doc.nodeAt(from);
-    let attrs = { ...node.attrs };
-    attrs[attribute] = value;
+    let attrs;
+    if(typeof attribute === "object" && attribute !== null){
+        attrs = { ...node.attrs, ...attribute }; // to update multiple attributes at the same time
+    }else{
+        attrs = { ...node.attrs };
+        attrs[attribute] = value;
+    }
+
     let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(from, null, attrs).scrollIntoView());
 }
 
