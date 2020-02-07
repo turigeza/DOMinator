@@ -49,8 +49,6 @@ $( document ).ready(function(){
             ];
 
             const src = images[Math.floor(Math.random() * images.length)];
-
-            // DOMinator.carouselAddSlide(slide);
             const $slide = $(`<div class="carousel-cell">
                 <img src="${src}">
                 <div class="tg_sub_editable carousel_text">
@@ -63,23 +61,8 @@ $( document ).ready(function(){
 
             flickity.insert($slide, flickity.selectedIndex+1);
             flickity.selectCell( flickity.selectedIndex+1, false, true);
-            let version = Number($widget.attr('data-version'));
-            let id = Date.now() + Math.floor(Math.random()*10);
-            // console.log( Math.floor(Math.random() * 100000000 ) );
 
-            version += 1;
-
-            const $clone = $widget.clone(false);
-            const $carousel = $clone.find('.flickity-carousel');
-            $carousel.removeClass('flickity-enabled').removeClass('is-draggable').removeAttr('tabindex'); ///.removeAttr('index');
-            $carousel.find('.carousel-cell').unwrap().unwrap().removeAttr('style').removeAttr('aria-hidden').removeClass('is-selected');
-            $carousel.find('.tg_sub_editable').removeClass('tg_sub_editable');
-            $carousel.find('.flickity-button').remove();
-            $carousel.find('.flickity-page-dots').remove();
-
-            const html = $clone.html();
-            $widget.attr('data-version', version);
-            DOMinator.updateCarousel(html, version);
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
 
             $slide.find('img').one("load", () => {
                 flickity.reloadCells();
@@ -87,7 +70,7 @@ $( document ).ready(function(){
             });
         },
         carouselRemoveSlide: (DOMinator) => {
-            const flickity = getCarousel();
+            const { flickity, $flickity, $widget } = getCarousel();
 
             if(flickity.cells.length === 1){
                 alert('You can not remove the last element.');
@@ -96,12 +79,12 @@ $( document ).ready(function(){
            }
 
            flickity.remove(flickity.selectedElement);
-
            flickity.reloadCells();
            flickity.resize();
+           DOMinator.updateCarousel(getHtmlFromCarousel($widget));
         },
         carouselMoveSlideLeft: (DOMinator) => {
-            const flickity = getCarousel();
+            const { flickity, $flickity, $widget } = getCarousel();
             const selectedElement = flickity.selectedElement;
             const selectedIndex = flickity.selectedIndex;
             let newIndex = 0;
@@ -114,9 +97,10 @@ $( document ).ready(function(){
             flickity.remove(flickity.selectedElement);
             flickity.insert(selectedElement, newIndex);
             flickity.selectCell(newIndex, false, true);
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
         },
         carouselMoveSlideRight: (DOMinator) => {
-            const flickity = getCarousel();
+            const { flickity, $flickity, $widget } = getCarousel();
             const selectedElement = flickity.selectedElement;
             const selectedIndex = flickity.selectedIndex;
             let newIndex = 0;
@@ -129,10 +113,10 @@ $( document ).ready(function(){
             flickity.remove(flickity.selectedElement);
             flickity.insert(selectedElement, newIndex);
             flickity.selectCell(newIndex, false, true);
-
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
         },
-        carouselToggleSetting: (key) => {
-            const flickity = getCarousel();
+        carouselToggleSetting: (DOMinator, key) => {
+            const { flickity, $flickity, $widget } = getCarousel();
             const jsonString = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
             let settings = JSON.parse(jsonString);
             if(settings[key]){
@@ -142,10 +126,9 @@ $( document ).ready(function(){
             }
 
             $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text(JSON.stringify(settings));
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
             destroyCarousels();
             initCarousels();
-            // flickity.destroy();
-            // $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity-carousel').flickity(settings);
         },
         menu: {
             paragraph: (items) => {
@@ -159,12 +142,36 @@ $( document ).ready(function(){
                 setTimeout(()=>{
                     initCarousels();
                 }, 10);
-            }
+            },
+            beforeCarouselUpdate: (dom, node) => {
+                const htmlInDom = getHtmlFromCarousel($(dom));
+                const htmlOnNode = node.attrs.html;
+
+                if(htmlInDom !== htmlOnNode){
+                    setTimeout(()=>{
+                        initCarousels();
+                    }, 10);
+                    return false;
+                }
+                return true;
+            },
         }
     });
 
     editor.selectNode(10);
+
     initCarousels();
+
+    function getHtmlFromCarousel($widget){
+        const $clone = $widget.clone(false);
+        const $carousel = $clone.find('.flickity-carousel');
+        $carousel.removeClass('flickity-enabled').removeClass('is-draggable').removeAttr('tabindex'); ///.removeAttr('index');
+        $carousel.find('.carousel-cell').unwrap().unwrap().removeAttr('style').removeAttr('aria-hidden').removeClass('is-selected');
+        $carousel.find('.tg_sub_editable').removeClass('tg_sub_editable');
+        $carousel.find('.flickity-button').remove();
+        $carousel.find('.flickity-page-dots').remove();
+        return $clone.html();
+    }
 
     function getCarousel(){
         const $flickity = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity-carousel');
@@ -173,6 +180,7 @@ $( document ).ready(function(){
 
         return { flickity, $flickity, $widget };
     }
+
     function destroyCarousels (){
         $('.carousel_wrapper').each(function(){
 

@@ -13459,11 +13459,6 @@
       })
   }
 
-  function toNaturalNumber(val) {
-      const abs = Math.abs(parseInt(val, 10));
-      return isNaN(abs) ? 0 : abs;
-  }
-
   // The basic shema got a from prosemirror-schema-basic and then modified to my needs
   const nodes = {
 
@@ -14018,30 +14013,21 @@
               },
               html: {
                   default: ''
-              },
-              'data-version': {
-                  default: 0
               }
           },
           parseDOM: [{
               tag: 'div.tg_subwidget_carousel',
               getAttrs: dom => {
-                  console.log('getAttrs');
-                  console.log(toNaturalNumber(dom.getAttribute("data-version")));
                   return {
                       'class': dom.getAttribute("class"),
-                      'data-version': toNaturalNumber(dom.getAttribute("data-version")),
                       html: dom.innerHTML
                   };
               }
           }],
           toDOM(node) {
-              console.log('toDOM');
-              console.log(node.attrs['data-version']);
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
               newDiv.setAttribute('class', node.attrs.class);
-              newDiv.setAttribute('data-version', node.attrs['data-version']);
               return newDiv;
           }
       },
@@ -21123,14 +21109,14 @@
               key: 'auto play',
               icon: 'play',
               action: () => {
-                  menu.dominator.options.carouselToggleSetting('autoPlay', menu.dominator);
+                  menu.dominator.options.carouselToggleSetting(menu.dominator, 'autoPlay');
               }
           }),
           new DOMinatorMenuButton ({
               key: 'toggle full screen option',
               icon: 'expand',
               action: () => {
-                  menu.dominator.options.carouselToggleSetting('fullscreen', menu.dominator);
+                  menu.dominator.options.carouselToggleSetting(menu.dominator, 'fullscreen');
               }
           }),
           new DOMinatorMenuButton ({
@@ -22037,10 +22023,6 @@
           this.dom.innerHTML = node.attrs.html;
 
           this.dom.setAttribute("class", node.attrs.class);
-          this.dom.setAttribute('data-version', node.attrs['data-version']);
-          console.log('constructor');
-          console.log(node.attrs['data-version']);
-
 
           // this where we need to reapply the carousel but not always
           if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
@@ -22049,11 +22031,10 @@
       }
 
       update(node, decorations) {
-          console.log('UPDATE --- CarouselHtmlView');
-          
-          console.log("this.dom.getAttribute('data-version')" + this.dom.getAttribute('data-version'));
-          console.log("this.node.attrs['data-version']" + this.node.attrs['data-version']);
-          console.log("node.attrs['data-version']" + node.attrs['data-version']);
+          console.log(node.type);
+          if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCarouselUpdate === 'function'){
+              return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
+          }
           return true;
       }
 
@@ -22061,7 +22042,6 @@
           return true;
       }
 
-      // Called when the node view is removed from the editor or the whole editor is destroyed.
       destroy() {
           this.dom.remove();
           console.log('destroy --- CarouselHtmlView');
@@ -22263,7 +22243,6 @@
           });
           this.view.$d_listeners = this.options.listeners;
 
-
       }
 
       // comes from TIPTAP https://tiptap.scrumpy.io/
@@ -22337,10 +22316,8 @@
           this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
       }
 
-      updateCarousel(html, version){
-          console.log('updateCarousel');
-          console.log(version);
-          changeAttributeOnNode(this.menu, { html: html, 'data-version': version });
+      updateCarousel(html){
+          changeAttributeOnNode(this.menu, 'html',  html);
       }
   };
 

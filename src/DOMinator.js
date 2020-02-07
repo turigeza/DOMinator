@@ -232,7 +232,6 @@ window.DOMinator = class DOMinator {
         });
         this.view.$d_listeners = this.options.listeners;
 
-
     }
 
     // comes from TIPTAP https://tiptap.scrumpy.io/
@@ -306,9 +305,7 @@ window.DOMinator = class DOMinator {
         this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
     }
 
-    updateCarousel(html, version){
-        console.log('updateCarousel');
-        console.log(version);
-        changeAttributeOnNode(this.menu, { html: html, 'data-version': version });
+    updateCarousel(html){
+        changeAttributeOnNode(this.menu, 'html',  html);
     }
 }

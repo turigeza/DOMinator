@@ -1,8 +1,3 @@
-import {
-    TextSelection,
-    NodeSelection
-} from "prosemirror-state"
-
 export default class CarouselView {
 
     constructor(node, view, getPos) {
@@ -14,10 +9,6 @@ export default class CarouselView {
         this.dom.innerHTML = node.attrs.html;
 
         this.dom.setAttribute("class", node.attrs.class);
-        this.dom.setAttribute('data-version', node.attrs['data-version']);
-        console.log('constructor');
-        console.log(node.attrs['data-version']);
-
 
         // this where we need to reapply the carousel but not always
         if(view.$d_listeners && typeof view.$d_listeners.afterCarouselConstruct === 'function'){
@@ -26,11 +17,10 @@ export default class CarouselView {
     }
 
     update(node, decorations) {
-        console.log('UPDATE --- CarouselHtmlView');
-        
-        console.log("this.dom.getAttribute('data-version')" + this.dom.getAttribute('data-version'));
-        console.log("this.node.attrs['data-version']" + this.node.attrs['data-version']);
-        console.log("node.attrs['data-version']" + node.attrs['data-version']);
+        console.log(node.type);
+        if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCarouselUpdate === 'function'){
+            return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
+        }
         return true;
     }
 
@@ -38,7 +28,6 @@ export default class CarouselView {
         return true;
     }
 
-    // Called when the node view is removed from the editor or the whole editor is destroyed.
     destroy() {
         this.dom.remove();
         console.log('destroy --- CarouselHtmlView');

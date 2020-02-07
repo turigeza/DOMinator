@@ -62,14 +62,14 @@ export default function(menu) {
             key: 'auto play',
             icon: 'play',
             action: () => {
-                menu.dominator.options.carouselToggleSetting('autoPlay', menu.dominator);
+                menu.dominator.options.carouselToggleSetting(menu.dominator, 'autoPlay');
             }
         }),
         new DOMinatorMenuButton ({
             key: 'toggle full screen option',
             icon: 'expand',
             action: () => {
-                menu.dominator.options.carouselToggleSetting('fullscreen', menu.dominator);
+                menu.dominator.options.carouselToggleSetting(menu.dominator, 'fullscreen');
             }
         }),
         new DOMinatorMenuButton ({
