@@ -57,7 +57,7 @@ export default function(menu) {
     }
 
     return new DOMinatorSubMenu({
-        key: 'download link',
+        key: 'download_link',
         items: items,
     });
 }

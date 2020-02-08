@@ -17,10 +17,17 @@ export default class CarouselView {
     }
 
     update(node, decorations) {
-        console.log(node.type);
+
+        // I don't get this bit but
+        if(node.type.name !== 'carousel'){
+            console.error('WRONG TYPE NOT CAROUSEL');
+            return false;
+        }
+
         if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCarouselUpdate === 'function'){
             return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
         }
+
         return true;
     }
 

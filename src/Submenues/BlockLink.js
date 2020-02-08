@@ -16,7 +16,7 @@ import {
 } from "./../DOMinatorActions"
 
 export default function(menu) {
-    if( menu.dominator.options.menu.download_link ===  false){
+    if( menu.dominator.options.menu.block_link ===  false){
         return null;
     }
     const items =  [
@@ -67,19 +67,19 @@ export default function(menu) {
             update: (input) => {
                 input.setValue(menu.activeBlock.attrs.title);
             },
-            key: 'href',
+            key: 'title',
             action: (val) => {
                 changeAttributeOnNode(menu, 'title', val);
             }
         }),
     ];
 
-    if( typeof menu.dominator.options.menu.download_link ===  'function'){
-        menu.dominator.options.menu.download_link(items, menu);
+    if( typeof menu.dominator.options.menu.block_link ===  'function'){
+        menu.dominator.options.menu.block_link(items, menu);
     }
 
     return new DOMinatorSubMenu({
-        key: 'download link',
+        key: 'block_link',
         items: items,
     });
 }

@@ -130,6 +130,113 @@ $( document ).ready(function(){
             destroyCarousels();
             initCarousels();
         },
+        carouselUpdateButton: (DOMinator, button) => {
+            const { flickity, $flickity, $widget } = getCarousel();
+            const jsonString = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
+            let settings = JSON.parse(jsonString);
+            const key = button.options.key;
+            const $link = $flickity.find('.is-selected .carousel_link');
+
+            if(key === 'add_a_slide'){
+                button.enable();
+            }else if(key === 'remove_current_slide'){
+                if($flickity.find('.carousel-cell').length > 1){
+                    button.enable();
+                }else{
+                    button.disable();
+                }
+            }else if(key === 'move_slide_left'){
+                if($flickity.find('.carousel-cell').length > 1){
+                    button.enable();
+                }else{
+                    button.disable();
+                }
+            }else if(key === 'move_slide_right'){
+                if($flickity.find('.carousel-cell').length > 1){
+                    button.enable();
+                }else{
+                    button.disable();
+                }
+            }else if(key === 'auto_play'){
+                if(settings.autoPlay){
+                    button.activate();
+                }else{
+                    button.deactivate();
+                }
+            }else if(key === 'toggle_full_screen_button'){
+                if(settings.fullscreen){
+                    button.activate();
+                }else{
+                    button.deactivate();
+                }
+            }else if(key === 'link_slide'){
+                if($link.length > 0 && $link.attr('href') !== ''){
+                    button.activate();
+                }else{
+                    button.deactivate();
+                }
+            }else if(key === 'link_external'){
+                if($link.length > 0 && $link.attr('target') === '_blank'){
+                    button.activate();
+                }else{
+                    button.deactivate();
+                }
+            }
+        },
+        carouselGet: (DOMinator, key) => {
+            const $selected = $('.tg_subwidget_carousel.ProseMirror-selectednode .is-selected');
+            if(key === 'title'){
+                return $selected.find('.carousel_text h3').text();
+            }else if(key === 'description'){
+                return $selected.find('.carousel_text p').text();
+            }else if(key === 'href'){
+                return $selected.find('.carousel_link').attr('href') || '';
+            }else if(key === 'link_title'){
+                return $selected.find('.carousel_link').attr('title') || '';
+            }
+        },
+        carouselSet: (DOMinator, key, value) => {
+            const { flickity, $flickity, $widget } = getCarousel();
+            var $selected = $flickity.find('.is-selected');
+
+            function getLink(){
+                let $link = $selected.find('.carousel_link')
+                if($link.length === 0){
+                    const title = $selected.find('.carousel_text h3').text() || '';
+                    $link = $(`<a class="carousel_link" href="" title="${title}"></a>`);
+                    $selected.find('.carousel_text').after($link)
+                }
+                return $link;
+            }
+
+            if(key === 'title'){
+                $selected.find('.carousel_text h3').text(value);
+                $selected.find('.carousel_link').attr('title', value);
+            }else if(key === 'description'){
+                $selected.find('.carousel_text p').text(value);
+            }else if(key === 'href'){
+                if(value){
+                    DOMinator.menu.stayOnMenu = true;
+                    const $link = getLink();
+                    $selected.find('.carousel_link').attr('href', value);
+                }else{
+                    $selected.find('.carousel_link').remove();
+                }
+            }else if(key === 'link_title'){
+                DOMinator.menu.stayOnMenu = true;
+                const $link = getLink();
+                $selected.find('.carousel_link').attr('title', value);
+            }else if(key === 'target'){
+                DOMinator.menu.stayOnMenu = true;
+                const $link = getLink();
+                if($link.attr('target') === '_blank'){
+                    $link.removeAttr('target')
+                }else{
+                    $link.attr('target', '_blank');
+                }
+            }
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
+        },
         menu: {
             paragraph: (items) => {
                 items.splice(14,1);
@@ -158,7 +265,9 @@ $( document ).ready(function(){
         }
     });
 
-    editor.selectNode(10);
+    setTimeout(()=>{
+        editor.selectNode(10);
+    }, 500);
 
     initCarousels();
 

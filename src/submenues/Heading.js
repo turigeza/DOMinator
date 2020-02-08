@@ -29,7 +29,7 @@ export default function(menu) {
             action: () => { convertBlock('paragraph', {}, menu); }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 1',
+            key: 'heading_1',
             label: 'H1',
             update: (button) => {
                 return activateHeaderButton(1, menu, button);
@@ -39,7 +39,7 @@ export default function(menu) {
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 2',
+            key: 'heading_2',
             label: 'H2',
             update: (button) => {
                 return activateHeaderButton(2, menu, button);
@@ -49,7 +49,7 @@ export default function(menu) {
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 3',
+            key: 'heading_3',
             label: 'H3',
             update: (button) => {
                 return activateHeaderButton(3, menu, button);
@@ -59,7 +59,7 @@ export default function(menu) {
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 4',
+            key: 'heading_4',
             label: 'H4',
             update: (button) => {
                 return activateHeaderButton(4, menu, button);
@@ -69,7 +69,7 @@ export default function(menu) {
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 5',
+            key: 'heading_5',
             label: 'H5',
             update: (button) => {
                 return activateHeaderButton(5, menu, button);
@@ -79,7 +79,7 @@ export default function(menu) {
             }
         }),
         new DOMinatorMenuButton ({
-            key: 'heading 6',
+            key: 'heading_6',
             label: 'H6',
             update: (button) => {
                 return activateHeaderButton(6, menu, button);
@@ -93,7 +93,7 @@ export default function(menu) {
             icon: 'align-left',
             items: [
                 new DOMinatorMenuButton ({
-                    key: 'align left',
+                    key: 'align_left',
                     icon: 'align-left',
                     update(button){
                         return updateAlignmentButton(button, menu, 'left');
@@ -103,7 +103,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'align center',
+                    key: 'align_center',
                     icon: 'align-center',
                     update(button){
                         return updateAlignmentButton(button, menu, 'center');
@@ -113,7 +113,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'align right',
+                    key: 'align_right',
                     icon: 'align-right',
                     update(button){
                         return updateAlignmentButton(button, menu, 'right');
@@ -123,7 +123,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'clear alignment',
+                    key: 'clear_alignment',
                     icon: 'clearalignment',
                     iconType: 'dics',
                     action: () => {

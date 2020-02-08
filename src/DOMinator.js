@@ -44,9 +44,8 @@ window.DOMinator = class DOMinator {
     // editorSchema
     // view -view editors
     // menuItems
+    // menu
     constructor(options) {
-
-        const implementMessage = () => alert('It is up to you to implement this.');
 
         // init options
         const defaults = {
@@ -54,19 +53,26 @@ window.DOMinator = class DOMinator {
             listeners: {}, //
 
             // DOMinator hands over the ui which don't want to take care of. These are callback functions.
-            pageSettings: implementMessage,     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
-            showRevisions: implementMessage,    // the ui for selecting revisions saving them naming them making them live shedule delete them etc
-            shedule: implementMessage,          // the ui for saving and sheduling this revision
-            newPage: implementMessage,          // the ui for screating a new page
-            goLive: implementMessage,           // the ui for going live and saving a revision
-            exit: implementMessage,             // the ui for going live and saving a revision
-            photograph: implementMessage,             // the ui for going live and saving a revision
-            downloads: implementMessage,
-            carouselAddSlide: implementMessage,
-            carouselRemoveSlide: implementMessage,
-            carouselMoveSlideLeft: implementMessage,
-            carouselMoveSlideRight: implementMessage,
-            carouselToggleSetting: implementMessage,
+            pageSettings: this.implementMessage('pageSettings'),     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
+            showRevisions: this.implementMessage('showRevisions'),    // the ui for selecting revisions saving them naming them making them live shedule delete them etc
+            shedule: this.implementMessage('shedule'),          // the ui for saving and sheduling this revision
+            newPage: this.implementMessage('newPage'),          // the ui for screating a new page
+            goLive: this.implementMessage('goLive'),           // the ui for going live and saving a revision
+            exit: this.implementMessage('exit'),             // the ui for going live and saving a revision
+            photograph: this.implementMessage('photograph'),             // the ui for going live and saving a revision
+            downloads: this.implementMessage('downloads'),
+
+            // carousel related'//'()
+            carouselAddSlide: this.implementMessage('carouselAddSlide'),
+            carouselRemoveSlide: this.implementMessage('carouselRemoveSlide'),
+            carouselMoveSlideLeft: this.implementMessage('carouselMoveSlideLeft'),
+            carouselMoveSlideRight: this.implementMessage('carouselMoveSlideRight'),
+            carouselToggleSetting: this.implementMessage('carouselToggleSetting'),
+
+            carouselUpdateButton: ()=>{},
+            carouselGet: ()=>{},
+            carouselSet: this.implementMessage('carouselSet'),
+
             paddingClasses: paddingClasses,
             marginClasses: marginClasses,
             textAlignClasses: {
@@ -302,10 +308,19 @@ window.DOMinator = class DOMinator {
 
     selectNode(pos){
         const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
-        this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
+        this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection)); //.scrollIntoView()
     }
 
     updateCarousel(html){
         changeAttributeOnNode(this.menu, 'html',  html);
+    }
+
+    implementMessage(key){
+        return () => {
+            console.log(this);
+            if(this.options.doNotWarn[key]) {
+                console.warn(`"${key} is not implemented"`);
+            }
+        }
     }
 }

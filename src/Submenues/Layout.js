@@ -22,7 +22,7 @@ export default function(menu) {
         new DOMinatorMenuSeparator (),
         ...generateDropdowns('margin', menu),
         new DOMinatorMenuButton({
-            key: 'clear all margins',
+            key: 'clear_all_margins',
             icon: 'clearmargin',
             iconType: 'dics',
             action: () => {

@@ -22,7 +22,7 @@ export default function(menu) {
         new DOMinatorMenuSeparator (),
         ...generateDropdowns('padding', menu),
         new DOMinatorMenuButton({
-            key: 'clear all paddings',
+            key: 'clear_all_paddings',
             icon: 'clearpadding',
             iconType: 'dics',
             action: () => {

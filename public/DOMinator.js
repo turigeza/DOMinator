@@ -14344,16 +14344,23 @@
       // icon
       // tempIcon = the last icon which was appended to the dropdown is kept for reference so we can swap it
       constructor(options) {
+
           this.options = options;
           this.dom = document.createElement("button");
           this.dom.setAttribute('tabindex', '0');
           this.dom.className = "DOMinatorMenuButton DOMinatorMenuButton-"+this.options.key;
+          if(typeof this.options.key === 'string' && this.options.key.includes(' ')){
+              console.log('key is not allowed to have spaces - '+this.options.key);
+          }
+          if(typeof this.options.key === 'string' && this.options.key.includes('-')){
+              console.log('key is not allowed to have "-" '+this.options.key);
+          }
           if(options.classes){
               this.dom.className += options.classes;
           }
 
           // title
-          const title = this.options.title || this.options.key.charAt(0).toUpperCase() + this.options.key.slice(1);
+          const title = this.options.title || this.options.key.charAt(0).toUpperCase() + this.options.key.replace(/_/g, ' ').slice(1);
           this.dom.setAttribute("title", title);
 
           //document.createTextNode("Hello World");
@@ -19897,13 +19904,13 @@
 
   function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
       const sizes = [
-          ['xxs', 'extra-extra small'],
-          ['xs', 'extra small'],
+          ['xxs', 'extra_extra_small'],
+          ['xs', 'extra_small'],
           ['s', 'small'],
           ['m', 'medium'],
           ['l', 'large'],
-          ['xl', 'extra large'],
-          ['xxl', 'extra-extra large'],
+          ['xl', 'extra_large'],
+          ['xxl', 'extra_extra_large'],
       ];
 
       let items = [];
@@ -19954,13 +19961,13 @@
 
       const classes = paddingOrMargin === 'padding' ? menu.dominator.options.paddingClasses : menu.dominator.options.marginClasses;
       const dropdowns = [
-          [paddingOrMargin + ' all', 'allsides', 'all'],
-          [paddingOrMargin + ' top and bottom', 'ysides', 'y'],
-          [paddingOrMargin + ' left and right', 'xsides', 'x'],
-          [paddingOrMargin + ' top', 'topside', 'top'],
-          [paddingOrMargin + ' left', 'leftside', 'left'],
-          [paddingOrMargin + ' bottom', 'bottomside', 'bottom'],
-          [paddingOrMargin + ' right', 'rightside', 'right'],
+          [paddingOrMargin + '_all', 'allsides', 'all'],
+          [paddingOrMargin + '_top_and_bottom', 'ysides', 'y'],
+          [paddingOrMargin + '_left_and_right', 'xsides', 'x'],
+          [paddingOrMargin + '_top', 'topside', 'top'],
+          [paddingOrMargin + '_left', 'leftside', 'left'],
+          [paddingOrMargin + '_bottom', 'bottomside', 'bottom'],
+          [paddingOrMargin + '_right', 'rightside', 'right'],
       ];
 
       let items = [];
@@ -19986,7 +19993,7 @@
           }),
           ...generateDropdowns('padding', menu),
           new DOMinatorMenuButton({
-              key: 'clear all paddings',
+              key: 'clear_all_paddings',
               icon: 'clearpadding',
               iconType: 'dics',
               action: () => {
@@ -20014,7 +20021,7 @@
           }),
           ...generateDropdowns('margin', menu),
           new DOMinatorMenuButton({
-              key: 'clear all margins',
+              key: 'clear_all_margins',
               icon: 'clearmargin',
               iconType: 'dics',
               action: () => {
@@ -20064,7 +20071,7 @@
               icon: 'header',
               items: [
                   new DOMinatorMenuButton({
-                      key: 'heading 1',
+                      key: 'heading_1',
                       label: 'H1',
                       action: () => {
                           convertBlock('heading', {
@@ -20073,7 +20080,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'heading 2',
+                      key: 'heading_2',
                       label: 'H2',
                       action: () => {
                           convertBlock('heading', {
@@ -20082,7 +20089,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'heading 3',
+                      key: 'heading_3',
                       label: 'H3',
                       action: () => {
                           convertBlock('heading', {
@@ -20091,7 +20098,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'heading 4',
+                      key: 'heading_4',
                       label: 'H4',
                       action: () => {
                           convertBlock('heading', {
@@ -20100,7 +20107,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'heading 5',
+                      key: 'heading_5',
                       label: 'H5',
                       action: () => {
                           convertBlock('heading', {
@@ -20109,7 +20116,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'heading 6',
+                      key: 'heading_6',
                       label: 'H6',
                       action: () => {
                           convertBlock('heading', {
@@ -20125,7 +20132,7 @@
               icon: 'align-left',
               items: [
                   new DOMinatorMenuButton({
-                      key: 'align left',
+                      key: 'align_left',
                       icon: 'align-left',
                       update(button) {
                           return updateAlignmentButton(button, menu, 'left');
@@ -20135,7 +20142,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'align center',
+                      key: 'align_center',
                       icon: 'align-center',
                       update(button) {
                           return updateAlignmentButton(button, menu, 'center');
@@ -20145,7 +20152,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'align right',
+                      key: 'align_right',
                       icon: 'align-right',
                       update(button) {
                           return updateAlignmentButton(button, menu, 'right');
@@ -20155,7 +20162,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'clear alignment',
+                      key: 'clear_alignment',
                       icon: 'clearalignment',
                       iconType: 'dics',
                       action: () => {
@@ -20166,7 +20173,7 @@
           }),
           // ul
           new DOMinatorMenuButton({
-              key: 'unordered list',
+              key: 'unordered_list',
               icon: 'list-ul',
               action: () => {
                   toggleList('bullet_list', menu);
@@ -20174,7 +20181,7 @@
           }),
           // ol
           new DOMinatorMenuButton({
-              key: 'ordered list',
+              key: 'ordered_list',
               icon: 'list-ol',
               action: () => {
                   toggleList('ordered_list', menu);
@@ -20220,12 +20227,12 @@
               iconType: 'dics',
               items: [
                   new DOMinatorMenuButton({
-                      key: 'big card',
+                      key: 'big_card',
                       icon: 'card',
                       iconType: 'dics'
                   }),
                   new DOMinatorMenuButton({
-                      key: 'small card',
+                      key: 'small_card',
                       icon: 'smallcard',
                       iconType: 'dics'
                   })
@@ -20238,7 +20245,7 @@
               iconType: 'dics',
               items: [
                   new DOMinatorMenuButton({
-                      key: 'column 1 third - 2 third',
+                      key: 'column_1_third_and_2_third',
                       icon: 'columns12',
                       iconType: 'dics',
                       action: (button) => {
@@ -20246,7 +20253,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: 'column 2 third - 1 third',
+                      key: 'column_2_third_and_1_third',
                       icon: 'columns21',
                       iconType: 'dics',
                       action: (button) => {
@@ -20254,7 +20261,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: '4 columns',
+                      key: '4_columns',
                       icon: 'fourcolumns',
                       iconType: 'dics',
                       action: (button) => {
@@ -20262,7 +20269,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: '3 columns',
+                      key: '3_columns',
                       icon: 'threecolumns',
                       iconType: 'dics',
                       action: (button) => {
@@ -20270,7 +20277,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: '2 columns',
+                      key: '2_columns',
                       icon: 'twocolumns',
                       iconType: 'dics',
                       action: (button) => {
@@ -20278,7 +20285,7 @@
                       }
                   }),
                   new DOMinatorMenuButton({
-                      key: '1 column',
+                      key: '1_column',
                       icon: 'onecolumn',
                       iconType: 'dics',
                       action: (button) => {
@@ -20297,7 +20304,7 @@
           }),
           // element id
           new DOMinatorMenuButton({
-              key: 'element id',
+              key: 'element_id',
               icon: 'hashtag',
               action: () => {
 
@@ -20305,7 +20312,7 @@
           }),
           // custom html
           new DOMinatorMenuButton({
-              key: 'custom html',
+              key: 'custom_html',
               icon: 'code',
               action: (button) => {
                   menu.dominator.options.photo(menu, menu.dominator);
@@ -20436,28 +20443,28 @@
               icon: 'align-left',
               items: [
                   new DOMinatorMenuButton ({
-                      key: 'align left',
+                      key: 'align_left',
                       icon: 'align-left',
                       action: (button) => {
                           alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'align center',
+                      key: 'align_center',
                       icon: 'align-center',
                       action: () => {
                           alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'align right',
+                      key: 'align_right',
                       icon: 'align-right',
                       action: () => {
                           alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'clear alignment',
+                      key: 'clear_alignment',
                       icon: 'clearalignment',
                       iconType: 'dics',
                       action: () => {
@@ -20615,7 +20622,7 @@
               action: () => { convertBlock('paragraph', {}, menu); }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 1',
+              key: 'heading_1',
               label: 'H1',
               update: (button) => {
                   return activateHeaderButton(1, menu, button);
@@ -20625,7 +20632,7 @@
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 2',
+              key: 'heading_2',
               label: 'H2',
               update: (button) => {
                   return activateHeaderButton(2, menu, button);
@@ -20635,7 +20642,7 @@
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 3',
+              key: 'heading_3',
               label: 'H3',
               update: (button) => {
                   return activateHeaderButton(3, menu, button);
@@ -20645,7 +20652,7 @@
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 4',
+              key: 'heading_4',
               label: 'H4',
               update: (button) => {
                   return activateHeaderButton(4, menu, button);
@@ -20655,7 +20662,7 @@
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 5',
+              key: 'heading_5',
               label: 'H5',
               update: (button) => {
                   return activateHeaderButton(5, menu, button);
@@ -20665,7 +20672,7 @@
               }
           }),
           new DOMinatorMenuButton ({
-              key: 'heading 6',
+              key: 'heading_6',
               label: 'H6',
               update: (button) => {
                   return activateHeaderButton(6, menu, button);
@@ -20679,7 +20686,7 @@
               icon: 'align-left',
               items: [
                   new DOMinatorMenuButton ({
-                      key: 'align left',
+                      key: 'align_left',
                       icon: 'align-left',
                       update(button){
                           return updateAlignmentButton(button, menu, 'left');
@@ -20689,7 +20696,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'align center',
+                      key: 'align_center',
                       icon: 'align-center',
                       update(button){
                           return updateAlignmentButton(button, menu, 'center');
@@ -20699,7 +20706,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'align right',
+                      key: 'align_right',
                       icon: 'align-right',
                       update(button){
                           return updateAlignmentButton(button, menu, 'right');
@@ -20709,7 +20716,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'clear alignment',
+                      key: 'clear_alignment',
                       icon: 'clearalignment',
                       iconType: 'dics',
                       action: () => {
@@ -20934,11 +20941,11 @@
           new DOMinatorMenuSeparator (),
 
           new DOMinatorMenuDropdown ({
-              key: 'change image size',
+              key: 'change_image_size',
               icon: 'expand',
               items: [
                   new DOMinatorMenuButton ({
-                      key: 'full size',
+                      key: 'full_size',
                       label: '100%',
                       update: (button) => {
                           return sizeButtonActivate('100', menu, button);
@@ -20948,7 +20955,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: '75 percent',
+                      key: '75_percent',
                       label: '75%',
                       update: (button) => {
                           return sizeButtonActivate('75', menu, button);
@@ -20958,7 +20965,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: '66 percent',
+                      key: '66_percent',
                       label: '66%',
                       update: (button) => {
                           return sizeButtonActivate('66', menu, button);
@@ -20968,7 +20975,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: '50 percent',
+                      key: '50_percent',
                       label: '50%',
                       update: (button) => {
                           return sizeButtonActivate('50', menu, button);
@@ -20978,7 +20985,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: '33 percent',
+                      key: '33_percent',
                       label: '33%',
                       update: (button) => {
                           return sizeButtonActivate('33', menu, button);
@@ -20988,7 +20995,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: '25 percent',
+                      key: '25_percent',
                       label: '25%',
                       update: (button) => {
                           return sizeButtonActivate('25', menu, button);
@@ -21005,7 +21012,7 @@
               iconType: 'dics',
               items: [
                   new DOMinatorMenuButton ({
-                      key: 'float left of text',
+                      key: 'float_left_of_text',
                       icon: 'floatimage-left',
                       iconType: 'dics',
                       update: (button) => {
@@ -21016,7 +21023,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'align center and clear both side',
+                      key: 'align_center_and_clear_both_side',
                       icon: 'floatimage-none',
                       iconType: 'dics',
                       update: (button) => {
@@ -21027,7 +21034,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'float right of text',
+                      key: 'float_right_of_text',
                       icon: 'floatimage-right',
                       iconType: 'dics',
                       update: (button) => {
@@ -21072,88 +21079,89 @@
           return null;
       }
 
+      function updateButton(button){
+          menu.dominator.options.carouselUpdateButton(menu.dominator, button);
+      }
+
       let items = [
           new DOMinatorMenuLabel({
               label: 'Carousel'
           }),
           new DOMinatorMenuSeparator (),
           new DOMinatorMenuButton ({
-              key: 'add a slide',
+              key: 'add_a_slide',
               icon: 'plus',
               action: (DOMinator) => {
                   menu.dominator.options.carouselAddSlide(menu.dominator);
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'remove current slide',
+              key: 'remove_current_slide',
               icon: 'minus',
               action: () => {
                   menu.dominator.options.carouselRemoveSlide(menu.dominator);
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'move slide left',
+              key: 'move_slide_left',
               icon: 'chevron-left',
               action: () => {
                   menu.dominator.options.carouselMoveSlideLeft(menu.dominator);
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'move slide right',
+              key: 'move_slide_right',
               icon: 'chevron-right',
               action: () => {
                   menu.dominator.options.carouselMoveSlideRight(menu.dominator);
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'auto play',
+              key: 'auto_play',
               icon: 'play',
               action: () => {
                   menu.dominator.options.carouselToggleSetting(menu.dominator, 'autoPlay');
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'toggle full screen option',
+              key: 'toggle_full_screen_button',
               icon: 'expand',
               action: () => {
                   menu.dominator.options.carouselToggleSetting(menu.dominator, 'fullscreen');
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuButton ({
-              key: 'link slide',
+              key: 'link_slide',
               icon: 'link',
               action: () => {
                   menu.activateSubmenu('carousel_link');
-              }
+              },
+              update: updateButton
           }),
           new DOMinatorMenuInput ({
               label: 'Title',
               update: (input) => {
-
+                  input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'title'));
               },
-              key: 'href',
+              key: 'title',
               action: (val) => {
-
+                  menu.dominator.options.carouselSet(menu.dominator, 'title', val);
               }
           }),
           new DOMinatorMenuInput ({
               label: 'Description',
               update: (input) => {
-
+                  input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'description'));
               },
-              key: 'href',
+              key: 'description',
               action: (val) => {
-
-              }
-          }),
-          new DOMinatorMenuInput ({
-              label: 'Link',
-              update: (input) => {
-
-              },
-              key: 'href',
-              action: (val) => {
-
+                  menu.dominator.options.carouselSet(menu.dominator, 'description', val);
               }
           }),
       ];
@@ -21165,6 +21173,64 @@
       return new DOMinatorSubMenu({
           key: 'carousel',
           items: items
+      });
+  }
+
+  function _CarouselLink(menu) {
+      if( menu.dominator.options.menu.carousel_link ===  false){
+          return null;
+      }
+      const items =  [
+          new DOMinatorMenuLabel({
+              label: 'Carousel Link'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'unlink',
+              icon: 'chain-broken',
+              action: () => {
+                  menu.dominator.options.carouselSet(menu.dominator, 'href', '');
+              }
+          }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  menu.dominator.options.carouselUpdateButton(menu.dominator, button);
+              },
+              key: 'link_external',
+              icon: 'external-link',
+              action: ()=>{
+                  menu.dominator.options.carouselSet(menu.dominator, 'target');
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link: ',
+              update: (input) => {
+                  input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'href'));
+              },
+              key: 'href',
+              action: (val) => {
+                  menu.dominator.options.carouselSet(menu.dominator, 'href', val);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link Title: ',
+              update: (input) => {
+                  input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'link_title'));
+              },
+              key: 'link_title',
+              action: (val) => {
+                  menu.dominator.options.carouselSet(menu.dominator, 'link_title', val);
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.carousel_link ===  'function'){
+          menu.dominator.options.menu.carousel_link(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'carousel_link',
+          items: items,
       });
   }
 
@@ -21211,13 +21277,13 @@
       }
 
       return new DOMinatorSubMenu({
-          key: 'download link',
+          key: 'download_link',
           items: items,
       });
   }
 
   function _BlockLink(menu) {
-      if( menu.dominator.options.menu.download_link ===  false){
+      if( menu.dominator.options.menu.block_link ===  false){
           return null;
       }
       const items =  [
@@ -21268,19 +21334,19 @@
               update: (input) => {
                   input.setValue(menu.activeBlock.attrs.title);
               },
-              key: 'href',
+              key: 'title',
               action: (val) => {
                   changeAttributeOnNode(menu, 'title', val);
               }
           }),
       ];
 
-      if( typeof menu.dominator.options.menu.download_link ===  'function'){
-          menu.dominator.options.menu.download_link(items, menu);
+      if( typeof menu.dominator.options.menu.block_link ===  'function'){
+          menu.dominator.options.menu.block_link(items, menu);
       }
 
       return new DOMinatorSubMenu({
-          key: 'download link',
+          key: 'block_link',
           items: items,
       });
   }
@@ -21297,7 +21363,7 @@
           new DOMinatorMenuSeparator (),
           ...generateDropdowns('margin', menu),
           new DOMinatorMenuButton({
-              key: 'clear all margins',
+              key: 'clear_all_margins',
               icon: 'clearmargin',
               iconType: 'dics',
               action: () => {
@@ -21329,7 +21395,7 @@
           new DOMinatorMenuSeparator (),
           ...generateDropdowns('padding', menu),
           new DOMinatorMenuButton({
-              key: 'clear all paddings',
+              key: 'clear_all_paddings',
               icon: 'clearpadding',
               iconType: 'dics',
               action: () => {
@@ -21378,7 +21444,7 @@
               dropdownCaret: false,
               items: [
                   new DOMinatorMenuButton ({
-                      key: 'page settings',
+                      key: 'page_settings',
                       icon: 'cog',
                       label: 'Page Settings',
                       action: (button) => {
@@ -21402,7 +21468,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'new page',
+                      key: 'new_page',
                       icon: 'file-o',
                       label: 'New Page',
                       action: () => {
@@ -21410,7 +21476,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'go live',
+                      key: 'go_live',
                       icon: 'check',
                       label: 'Go Live',
                       action: () => {
@@ -21418,7 +21484,7 @@
                       }
                   }),
                   new DOMinatorMenuButton ({
-                      key: 'exit editor',
+                      key: 'exit_editor',
                       icon: 'close',
                       label: 'Exit',
                       action: () => {
@@ -21596,12 +21662,13 @@
               margins: margins(this),
               photograph: _Photograph(this),
               carousel: _Carousel(this),
+              carousel_link: _CarouselLink(this),
               layout: _Layout(this),
               layoutcolumn: _LayoutColumn(this),
 
               download_link: _DownloadLink(this),
               download_title: new DOMinatorSubMenu({
-                  key: 'download link',
+                  key: 'download_link',
                   items: [
                       new DOMinatorMenuLabel({
                           label: 'Downloads Title'
@@ -22031,10 +22098,17 @@
       }
 
       update(node, decorations) {
-          console.log(node.type);
+
+          // I don't get this bit but
+          if(node.type.name !== 'carousel'){
+              console.error('WRONG TYPE NOT CAROUSEL');
+              return false;
+          }
+
           if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCarouselUpdate === 'function'){
               return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
           }
+
           return true;
       }
 
@@ -22055,9 +22129,8 @@
       // editorSchema
       // view -view editors
       // menuItems
+      // menu
       constructor(options) {
-
-          const implementMessage = () => alert('It is up to you to implement this.');
 
           // init options
           const defaults = {
@@ -22065,19 +22138,26 @@
               listeners: {}, //
 
               // DOMinator hands over the ui which don't want to take care of. These are callback functions.
-              pageSettings: implementMessage,     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
-              showRevisions: implementMessage,    // the ui for selecting revisions saving them naming them making them live shedule delete them etc
-              shedule: implementMessage,          // the ui for saving and sheduling this revision
-              newPage: implementMessage,          // the ui for screating a new page
-              goLive: implementMessage,           // the ui for going live and saving a revision
-              exit: implementMessage,             // the ui for going live and saving a revision
-              photograph: implementMessage,             // the ui for going live and saving a revision
-              downloads: implementMessage,
-              carouselAddSlide: implementMessage,
-              carouselRemoveSlide: implementMessage,
-              carouselMoveSlideLeft: implementMessage,
-              carouselMoveSlideRight: implementMessage,
-              carouselToggleSetting: implementMessage,
+              pageSettings: this.implementMessage('pageSettings'),     // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
+              showRevisions: this.implementMessage('showRevisions'),    // the ui for selecting revisions saving them naming them making them live shedule delete them etc
+              shedule: this.implementMessage('shedule'),          // the ui for saving and sheduling this revision
+              newPage: this.implementMessage('newPage'),          // the ui for screating a new page
+              goLive: this.implementMessage('goLive'),           // the ui for going live and saving a revision
+              exit: this.implementMessage('exit'),             // the ui for going live and saving a revision
+              photograph: this.implementMessage('photograph'),             // the ui for going live and saving a revision
+              downloads: this.implementMessage('downloads'),
+
+              // carousel related'//'()
+              carouselAddSlide: this.implementMessage('carouselAddSlide'),
+              carouselRemoveSlide: this.implementMessage('carouselRemoveSlide'),
+              carouselMoveSlideLeft: this.implementMessage('carouselMoveSlideLeft'),
+              carouselMoveSlideRight: this.implementMessage('carouselMoveSlideRight'),
+              carouselToggleSetting: this.implementMessage('carouselToggleSetting'),
+
+              carouselUpdateButton: ()=>{},
+              carouselGet: ()=>{},
+              carouselSet: this.implementMessage('carouselSet'),
+
               paddingClasses: paddingClasses,
               marginClasses: marginClasses,
               textAlignClasses: {
@@ -22313,11 +22393,20 @@
 
       selectNode(pos){
           const newSelection = NodeSelection.create(this.menu.view.state.doc, pos);
-          this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection));
+          this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection)); //.scrollIntoView()
       }
 
       updateCarousel(html){
           changeAttributeOnNode(this.menu, 'html',  html);
+      }
+
+      implementMessage(key){
+          return () => {
+              console.log(this);
+              if(this.options.doNotWarn[key]) {
+                  console.warn(`"${key} is not implemented"`);
+              }
+          }
       }
   };
 

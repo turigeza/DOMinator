@@ -5,16 +5,23 @@ export default class DOMinatorMenuButton {
     // icon
     // tempIcon = the last icon which was appended to the dropdown is kept for reference so we can swap it
     constructor(options) {
+
         this.options = options;
         this.dom = document.createElement("button")
         this.dom.setAttribute('tabindex', '0');
         this.dom.className = "DOMinatorMenuButton DOMinatorMenuButton-"+this.options.key;
+        if(typeof this.options.key === 'string' && this.options.key.includes(' ')){
+            console.log('key is not allowed to have spaces - '+this.options.key);
+        }
+        if(typeof this.options.key === 'string' && this.options.key.includes('-')){
+            console.log('key is not allowed to have "-" '+this.options.key);
+        }
         if(options.classes){
             this.dom.className += options.classes
         }
 
         // title
-        const title = this.options.title || this.options.key.charAt(0).toUpperCase() + this.options.key.slice(1)
+        const title = this.options.title || this.options.key.charAt(0).toUpperCase() + this.options.key.replace(/_/g, ' ').slice(1)
         this.dom.setAttribute("title", title);
 
         //document.createTextNode("Hello World");

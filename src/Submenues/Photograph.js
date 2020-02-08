@@ -174,11 +174,11 @@ export default function(menu) {
         new DOMinatorMenuSeparator (),
 
         new DOMinatorMenuDropdown ({
-            key: 'change image size',
+            key: 'change_image_size',
             icon: 'expand',
             items: [
                 new DOMinatorMenuButton ({
-                    key: 'full size',
+                    key: 'full_size',
                     label: '100%',
                     update: (button) => {
                         return sizeButtonActivate('100', menu, button);
@@ -188,7 +188,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: '75 percent',
+                    key: '75_percent',
                     label: '75%',
                     update: (button) => {
                         return sizeButtonActivate('75', menu, button);
@@ -198,7 +198,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: '66 percent',
+                    key: '66_percent',
                     label: '66%',
                     update: (button) => {
                         return sizeButtonActivate('66', menu, button);
@@ -208,7 +208,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: '50 percent',
+                    key: '50_percent',
                     label: '50%',
                     update: (button) => {
                         return sizeButtonActivate('50', menu, button);
@@ -218,7 +218,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: '33 percent',
+                    key: '33_percent',
                     label: '33%',
                     update: (button) => {
                         return sizeButtonActivate('33', menu, button);
@@ -228,7 +228,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: '25 percent',
+                    key: '25_percent',
                     label: '25%',
                     update: (button) => {
                         return sizeButtonActivate('25', menu, button);
@@ -245,7 +245,7 @@ export default function(menu) {
             iconType: 'dics',
             items: [
                 new DOMinatorMenuButton ({
-                    key: 'float left of text',
+                    key: 'float_left_of_text',
                     icon: 'floatimage-left',
                     iconType: 'dics',
                     update: (button) => {
@@ -256,7 +256,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'align center and clear both side',
+                    key: 'align_center_and_clear_both_side',
                     icon: 'floatimage-none',
                     iconType: 'dics',
                     update: (button) => {
@@ -267,7 +267,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'float right of text',
+                    key: 'float_right_of_text',
                     icon: 'floatimage-right',
                     iconType: 'dics',
                     update: (button) => {

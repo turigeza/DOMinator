@@ -45,7 +45,7 @@ export default function(menu) {
             icon: 'header',
             items: [
                 new DOMinatorMenuButton({
-                    key: 'heading 1',
+                    key: 'heading_1',
                     label: 'H1',
                     action: () => {
                         convertBlock('heading', {
@@ -54,7 +54,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'heading 2',
+                    key: 'heading_2',
                     label: 'H2',
                     action: () => {
                         convertBlock('heading', {
@@ -63,7 +63,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'heading 3',
+                    key: 'heading_3',
                     label: 'H3',
                     action: () => {
                         convertBlock('heading', {
@@ -72,7 +72,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'heading 4',
+                    key: 'heading_4',
                     label: 'H4',
                     action: () => {
                         convertBlock('heading', {
@@ -81,7 +81,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'heading 5',
+                    key: 'heading_5',
                     label: 'H5',
                     action: () => {
                         convertBlock('heading', {
@@ -90,7 +90,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'heading 6',
+                    key: 'heading_6',
                     label: 'H6',
                     action: () => {
                         convertBlock('heading', {
@@ -106,7 +106,7 @@ export default function(menu) {
             icon: 'align-left',
             items: [
                 new DOMinatorMenuButton({
-                    key: 'align left',
+                    key: 'align_left',
                     icon: 'align-left',
                     update(button) {
                         return updateAlignmentButton(button, menu, 'left');
@@ -116,7 +116,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'align center',
+                    key: 'align_center',
                     icon: 'align-center',
                     update(button) {
                         return updateAlignmentButton(button, menu, 'center');
@@ -126,7 +126,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'align right',
+                    key: 'align_right',
                     icon: 'align-right',
                     update(button) {
                         return updateAlignmentButton(button, menu, 'right');
@@ -136,7 +136,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'clear alignment',
+                    key: 'clear_alignment',
                     icon: 'clearalignment',
                     iconType: 'dics',
                     action: () => {
@@ -147,7 +147,7 @@ export default function(menu) {
         }),
         // ul
         new DOMinatorMenuButton({
-            key: 'unordered list',
+            key: 'unordered_list',
             icon: 'list-ul',
             action: () => {
                 toggleList('bullet_list', menu);
@@ -155,7 +155,7 @@ export default function(menu) {
         }),
         // ol
         new DOMinatorMenuButton({
-            key: 'ordered list',
+            key: 'ordered_list',
             icon: 'list-ol',
             action: () => {
                 toggleList('ordered_list', menu);
@@ -201,12 +201,12 @@ export default function(menu) {
             iconType: 'dics',
             items: [
                 new DOMinatorMenuButton({
-                    key: 'big card',
+                    key: 'big_card',
                     icon: 'card',
                     iconType: 'dics'
                 }),
                 new DOMinatorMenuButton({
-                    key: 'small card',
+                    key: 'small_card',
                     icon: 'smallcard',
                     iconType: 'dics'
                 })
@@ -219,7 +219,7 @@ export default function(menu) {
             iconType: 'dics',
             items: [
                 new DOMinatorMenuButton({
-                    key: 'column 1 third - 2 third',
+                    key: 'column_1_third_and_2_third',
                     icon: 'columns12',
                     iconType: 'dics',
                     action: (button) => {
@@ -227,7 +227,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: 'column 2 third - 1 third',
+                    key: 'column_2_third_and_1_third',
                     icon: 'columns21',
                     iconType: 'dics',
                     action: (button) => {
@@ -235,7 +235,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: '4 columns',
+                    key: '4_columns',
                     icon: 'fourcolumns',
                     iconType: 'dics',
                     action: (button) => {
@@ -243,7 +243,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: '3 columns',
+                    key: '3_columns',
                     icon: 'threecolumns',
                     iconType: 'dics',
                     action: (button) => {
@@ -251,7 +251,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: '2 columns',
+                    key: '2_columns',
                     icon: 'twocolumns',
                     iconType: 'dics',
                     action: (button) => {
@@ -259,7 +259,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton({
-                    key: '1 column',
+                    key: '1_column',
                     icon: 'onecolumn',
                     iconType: 'dics',
                     action: (button) => {
@@ -278,7 +278,7 @@ export default function(menu) {
         }),
         // element id
         new DOMinatorMenuButton({
-            key: 'element id',
+            key: 'element_id',
             icon: 'hashtag',
             action: () => {
 
@@ -286,7 +286,7 @@ export default function(menu) {
         }),
         // custom html
         new DOMinatorMenuButton({
-            key: 'custom html',
+            key: 'custom_html',
             icon: 'code',
             action: (button) => {
                 menu.dominator.options.photo(menu, menu.dominator);

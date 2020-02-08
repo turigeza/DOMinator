@@ -3,26 +3,15 @@ import DOMinatorMenuInput from "./../DOMinatorMenuInput"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
-import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
-import {
-    NodeSelection
-} from "prosemirror-state"
-import {
-    clearFormatting,
-    changeAttributeOnMark,
-    toggleAttributeOnMark,
-    updateLinkStyleButton,
-    toggleClassOnMark
-} from "./../DOMinatorActions"
-
-function see(){
-
-}
 
 export default function(menu) {
 
     if( menu.dominator.options.menu.carousel ===  false){
         return null;
+    }
+
+    function updateButton(button){
+        menu.dominator.options.carouselUpdateButton(menu.dominator, button);
     }
 
     let items = [
@@ -31,82 +20,79 @@ export default function(menu) {
         }),
         new DOMinatorMenuSeparator (),
         new DOMinatorMenuButton ({
-            key: 'add a slide',
+            key: 'add_a_slide',
             icon: 'plus',
             action: (DOMinator) => {
                 menu.dominator.options.carouselAddSlide(menu.dominator);
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'remove current slide',
+            key: 'remove_current_slide',
             icon: 'minus',
             action: () => {
                 menu.dominator.options.carouselRemoveSlide(menu.dominator);
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'move slide left',
+            key: 'move_slide_left',
             icon: 'chevron-left',
             action: () => {
                 menu.dominator.options.carouselMoveSlideLeft(menu.dominator);
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'move slide right',
+            key: 'move_slide_right',
             icon: 'chevron-right',
             action: () => {
                 menu.dominator.options.carouselMoveSlideRight(menu.dominator);
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'auto play',
+            key: 'auto_play',
             icon: 'play',
             action: () => {
                 menu.dominator.options.carouselToggleSetting(menu.dominator, 'autoPlay');
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'toggle full screen option',
+            key: 'toggle_full_screen_button',
             icon: 'expand',
             action: () => {
                 menu.dominator.options.carouselToggleSetting(menu.dominator, 'fullscreen');
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuButton ({
-            key: 'link slide',
+            key: 'link_slide',
             icon: 'link',
             action: () => {
                 menu.activateSubmenu('carousel_link');
-            }
+            },
+            update: updateButton
         }),
         new DOMinatorMenuInput ({
             label: 'Title',
             update: (input) => {
-
+                input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'title'));
             },
-            key: 'href',
+            key: 'title',
             action: (val) => {
-
+                menu.dominator.options.carouselSet(menu.dominator, 'title', val);
             }
         }),
         new DOMinatorMenuInput ({
             label: 'Description',
             update: (input) => {
-
+                input.setValue(menu.dominator.options.carouselGet(menu.dominator, 'description'));
             },
-            key: 'href',
+            key: 'description',
             action: (val) => {
-
-            }
-        }),
-        new DOMinatorMenuInput ({
-            label: 'Link',
-            update: (input) => {
-
-            },
-            key: 'href',
-            action: (val) => {
-
+                menu.dominator.options.carouselSet(menu.dominator, 'description', val);
             }
         }),
     ];

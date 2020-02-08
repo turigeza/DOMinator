@@ -76,28 +76,28 @@ export default function(menu) {
             icon: 'align-left',
             items: [
                 new DOMinatorMenuButton ({
-                    key: 'align left',
+                    key: 'align_left',
                     icon: 'align-left',
                     action: (button) => {
                         alignSelection(menu.view, 'left', menu.dominator.options.textAlignClasses);
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'align center',
+                    key: 'align_center',
                     icon: 'align-center',
                     action: () => {
                         alignSelection(menu.view, 'center', menu.dominator.options.textAlignClasses);
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'align right',
+                    key: 'align_right',
                     icon: 'align-right',
                     action: () => {
                         alignSelection(menu.view, 'right', menu.dominator.options.textAlignClasses);
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'clear alignment',
+                    key: 'clear_alignment',
                     icon: 'clearalignment',
                     iconType: 'dics',
                     action: () => {

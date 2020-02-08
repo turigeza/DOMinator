@@ -18,6 +18,7 @@ import _Link from "./Submenues/Link"
 import _Heading from "./Submenues/Heading"
 import _Photograph from "./Submenues/Photograph"
 import _Carousel from "./Submenues/Carousel"
+import _CarouselLink from "./Submenues/CarouselLink"
 import _DownloadLink from "./Submenues/DownloadLink"
 import _BlockLink from "./Submenues/BlockLink"
 import _Layout from "./Submenues/Layout"
@@ -205,12 +206,13 @@ export default class DOMinatorMenu {
             margins: _Margins(this),
             photograph: _Photograph(this),
             carousel: _Carousel(this),
+            carousel_link: _CarouselLink(this),
             layout: _Layout(this),
             layoutcolumn: _LayoutColumn(this),
 
             download_link: _DownloadLink(this),
             download_title: new DOMinatorSubMenu({
-                key: 'download link',
+                key: 'download_link',
                 items: [
                     new DOMinatorMenuLabel({
                         label: 'Downloads Title'

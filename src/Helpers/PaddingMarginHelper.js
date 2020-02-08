@@ -7,13 +7,13 @@ import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 
 export function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
     const sizes = [
-        ['xxs', 'extra-extra small'],
-        ['xs', 'extra small'],
+        ['xxs', 'extra_extra_small'],
+        ['xs', 'extra_small'],
         ['s', 'small'],
         ['m', 'medium'],
         ['l', 'large'],
-        ['xl', 'extra large'],
-        ['xxl', 'extra-extra large'],
+        ['xl', 'extra_large'],
+        ['xxl', 'extra_extra_large'],
     ];
 
     let items = [];
@@ -64,13 +64,13 @@ export function generateDropdowns(paddingOrMargin, menu){
 
     const classes = paddingOrMargin === 'padding' ? menu.dominator.options.paddingClasses : menu.dominator.options.marginClasses;
     const dropdowns = [
-        [paddingOrMargin + ' all', 'allsides', 'all'],
-        [paddingOrMargin + ' top and bottom', 'ysides', 'y'],
-        [paddingOrMargin + ' left and right', 'xsides', 'x'],
-        [paddingOrMargin + ' top', 'topside', 'top'],
-        [paddingOrMargin + ' left', 'leftside', 'left'],
-        [paddingOrMargin + ' bottom', 'bottomside', 'bottom'],
-        [paddingOrMargin + ' right', 'rightside', 'right'],
+        [paddingOrMargin + '_all', 'allsides', 'all'],
+        [paddingOrMargin + '_top_and_bottom', 'ysides', 'y'],
+        [paddingOrMargin + '_left_and_right', 'xsides', 'x'],
+        [paddingOrMargin + '_top', 'topside', 'top'],
+        [paddingOrMargin + '_left', 'leftside', 'left'],
+        [paddingOrMargin + '_bottom', 'bottomside', 'bottom'],
+        [paddingOrMargin + '_right', 'rightside', 'right'],
     ];
 
     let items = [];

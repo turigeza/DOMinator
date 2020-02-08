@@ -197,7 +197,7 @@ body.dominatorMenuActive{
     line-height: 44px;
     font-size: 14px;
     color: white;
-
+    white-space: nowrap;
 }
 .DOMinatorMenuInput input{
     /* resets */

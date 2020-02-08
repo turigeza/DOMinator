@@ -38,7 +38,7 @@ export default function(menu) {
             dropdownCaret: false,
             items: [
                 new DOMinatorMenuButton ({
-                    key: 'page settings',
+                    key: 'page_settings',
                     icon: 'cog',
                     label: 'Page Settings',
                     action: (button) => {
@@ -62,7 +62,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'new page',
+                    key: 'new_page',
                     icon: 'file-o',
                     label: 'New Page',
                     action: () => {
@@ -70,7 +70,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'go live',
+                    key: 'go_live',
                     icon: 'check',
                     label: 'Go Live',
                     action: () => {
@@ -78,7 +78,7 @@ export default function(menu) {
                     }
                 }),
                 new DOMinatorMenuButton ({
-                    key: 'exit editor',
+                    key: 'exit_editor',
                     icon: 'close',
                     label: 'Exit',
                     action: () => {

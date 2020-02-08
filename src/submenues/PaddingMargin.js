@@ -17,7 +17,7 @@ export function paddings(menu) {
         }),
         ...generateDropdowns('padding', menu),
         new DOMinatorMenuButton({
-            key: 'clear all paddings',
+            key: 'clear_all_paddings',
             icon: 'clearpadding',
             iconType: 'dics',
             action: () => {
@@ -45,7 +45,7 @@ export function margins(menu) {
         }),
         ...generateDropdowns('margin', menu),
         new DOMinatorMenuButton({
-            key: 'clear all margins',
+            key: 'clear_all_margins',
             icon: 'clearmargin',
             iconType: 'dics',
             action: () => {
