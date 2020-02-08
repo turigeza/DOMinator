@@ -61,7 +61,7 @@ window.DOMinator = class DOMinator {
             exit: this.implementMessage('exit'),             // the ui for going live and saving a revision
             photograph: this.implementMessage('photograph'),             // the ui for going live and saving a revision
             downloads: this.implementMessage('downloads'),
-
+            custom_html: this.implementMessage('custom_html'),
             // carousel related
             carousel: this.implementMessage('carousel'),
             carouselAddSlide: this.implementMessage('carouselAddSlide'),
@@ -199,7 +199,7 @@ window.DOMinator = class DOMinator {
                                             view.dispatch(transaction.delete( before, after));
                                             return true;
                                         }else{
-                                            console.log('4');
+
                                         }
                                     }
                                 }
@@ -320,6 +320,23 @@ window.DOMinator = class DOMinator {
 
         const carousel = state.schema.nodes.carousel.create({ html: html });
 
+
+        let tr = state.tr.insert(pos+1, carousel);
+        view.dispatch(tr);
+
+        tr = view.state.tr;
+        tr.setMeta("addToHistory", false);
+        const newSelection = NodeSelection.create(view.state.doc, pos+1);
+        view.dispatch(tr.setSelection(newSelection));
+    }
+
+    insertHtml(html){
+        const view = this.menu.view;
+        const selection = view.state.selection;
+        const state = view.state;
+        const pos = selection.from;
+
+        const carousel = state.schema.nodes.custom_html.create({ html: html });
 
         let tr = state.tr.insert(pos+1, carousel);
         view.dispatch(tr);

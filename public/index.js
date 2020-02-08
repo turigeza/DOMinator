@@ -59,7 +59,9 @@ $( document ).ready(function(){
                 large: 'https://picsum.photos/1200/800?grayscale'
             });
         },
-
+        custom_html: (DOMinator) => {
+            DOMinator.insertHtml('Custom HTML');
+        },
         // carousel
         carousel: (DOMinator) => {
             const html = `<div class="carousel_wrapper">
@@ -280,7 +282,7 @@ $( document ).ready(function(){
         menu: {
             paragraph: (items) => {
                 items.splice(14,1);
-                items.splice(11,1);
+                // items.splice(11,1);
                 items.splice(9,1);
             }
         },
@@ -305,9 +307,9 @@ $( document ).ready(function(){
         }
     });
 
-    setTimeout(()=>{
-        editor.selectNode(10);
-    }, 500);
+    // setTimeout(()=>{
+    //     editor.selectNode(10);
+    // }, 500);
 
     initCarousels();
 
@@ -389,233 +391,3 @@ $( document ).ready(function(){
         });
     }
 });
-
-// var $edit = $('<button class="btn btn-default btn" title="Open in new window"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>');
-// $edit.on('click', function(event){
-//     tg_window_manager.open('tg_editor_carousel');
-// });
-//
-// priv.$carousel_link_new_window = $('<button class="btn btn-default btn" title="Open link in a new window"><i class="fa fa-external-link" aria-hidden="true"></i></button>');
-// priv.$carousel_link_new_window.on('click', function(event){
-//     priv.$carousel_link_new_window.toggleClass('btn-default btn-success');
-//     update_link();
-// });
-//
-// priv.$carousel_link_input = $('<input type="text" placeholder="The url this slide linkings to ..." class="form-control input">');
-// priv.$carousel_link_input.on('keyup', function (e) {
-//     if (e.keyCode == 13) {
-//         update_link();
-//     }
-// });
-//
-// priv.$carousel_link_input.on('blur', function (e) {
-//     update_link();
-// });
-//
-// function update_link(){
-//     var $carousel = get_carousel();
-//     //var flickity = $carousel.data('flickity');
-//
-//     $link = $carousel.find('.carousel-cell.is-selected .carousel_link');
-//     if($link.length === 0 && $carousel.length > 0){
-//         var $link = $('<a class="carousel_link" href="#"></a>');
-//         $carousel.find('.carousel-cell.is-selected').append($link);
-//     }
-//
-//     $link.attr('href',priv.$carousel_link_input.val());
-//     if(priv.$carousel_link_new_window.hasClass('btn-success')){
-//         $link.attr('target', '_blank');
-//     }else{
-//         $link.removeAttr('target');
-//     }
-// }
-//
-// var $add = $('<button class="btn btn-default btn" title="Add a new carousel cell"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>');
-// $add.on('click', function(event){
-//
-//     priv.init_window_photograph();
-//     var $carousel = get_carousel();
-//     var flickity = $carousel.data('flickity');
-//     var win = tg_window_manager.get('tg_photograph');
-//
-//     win.on_select = function(data){
-//         var uri = data.photograph_large;
-//         if(!uri || uri === "0"){
-//             uri = data.photograph_medium;
-//         }
-//         if(!uri || uri === "0"){
-//             editable_toast('editor_photo_not_large_enough');
-//             return;
-//         }
-//
-//         var $selected = priv.$selected;
-//
-//         var id = generate_uuid();
-//         var copyright = data.photograph_copyright ? '<p>&copy;'+data.photograph_copyright+'</p>' : '';
-//         var text = '<div class="tg_sub_editable carousel_text" data-sub_editable_id="'+id+'"> \
-//             <h3>'+data.photograph_title+'</h3>'
-//             +copyright+
-//         '</div>';
-//         var link = '<a class="carousel_link" href="#"></a>';
-//         var $cell = $('<div class="carousel-cell"><img src="'+uri+'" alt="'+data.photograph_title+'">'+text+link+'</div>');
-//
-//         pub.disable_editor($selected);
-//         $carousel.flickity( 'insert', $cell,  flickity.selectedIndex+1);
-//         $carousel.flickity( 'selectCell', flickity.selectedIndex+1, false, true);
-//         pub.enable_editor($selected);
-//
-//         setTimeout(function(){
-//             $carousel.flickity('reloadCells').flickity('resize');
-//             setTimeout(function(){
-//                 $carousel.flickity('reloadCells').flickity('resize');
-//             },500);
-//         },500);
-//
-//     };
-//
-//     win.open();
-// });
-//
-// var $remove = $('<button class="btn btn-default btn" title="Remove this carousel cell"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
-// $remove.on('click', function(event){
-//     var $carousel = get_carousel();
-//     var flickity = $carousel.data('flickity');
-//     if(flickity.cells.length === 1){
-//         editable_toast('editor_last_carousel_el');
-//         return;
-//     }
-//     $carousel.flickity( 'remove',  flickity.selectedElement);
-//     $carousel.flickity('reloadCells').flickity('resize');
-// });
-//
-// var $move_left = $('<button class="btn btn-default btn" title="Move cell to left"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>');
-// $move_left.on('click', function(event){
-//     var $carousel = get_carousel();
-//     var flickity = $carousel.data('flickity');
-//     var selected_el = flickity.selectedElement;
-//     var selected_index = flickity.selectedIndex;
-//
-//     if(selected_index > 0){
-//         var new_index =  flickity.selectedIndex-1;
-//     }else{
-//         var new_index = flickity.cells.length-1;
-//     }
-//
-//     $carousel.flickity( 'remove',  flickity.selectedElement);
-//     $carousel.flickity( 'insert',  selected_el, new_index);
-//     $carousel.flickity( 'selectCell', new_index, false, true);
-//
-// });
-//
-// var $move_right = $('<button class="btn btn-default btn" title="Move cell to right"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>');
-// $move_right.on('click', function(event){
-//     var $carousel = get_carousel();
-//     var flickity = $carousel.data('flickity');
-//     var selected_el = flickity.selectedElement;
-//     var selected_index = flickity.selectedIndex;
-//
-//     if(selected_index < flickity.cells.length-1){
-//         var new_index =  flickity.selectedIndex+1;
-//     }else{
-//         var new_index = 0;
-//     }
-//
-//     $carousel.flickity( 'remove',  flickity.selectedElement);
-//     $carousel.flickity( 'insert',  selected_el, new_index);
-//     $carousel.flickity( 'selectCell', new_index, false, true);
-// });
-//
-// var $options = $('<button class="btn btn-default btn" title="Carousel options"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button>');
-// $options.on('click', function(event){
-//     //tg_window_manager.open('tg_editor_carousel');
-//     priv.tooltips.carousel.close();
-//     priv.tooltips.caoursel_settings.open();
-// });
-//
-// priv.tooltips.carousel = new tg_tooltip({
-//     content: [priv.$carousel_link_input, priv.$carousel_link_new_window, $add,$remove, $move_left, $move_right, $options],
-//     classes: 'tg_editor_control',
-//     close_on_leave: false,
-//     on_open: function(pub, priv){
-//         $.when(pub.has_been_attached).then(function(){
-//
-//         })
-//     }
-// });
-//
-// var $o_fullscreen = $('<button class="btn btn-default btn" title="Enable fullscreen" data-key="fullscreen"><i class="fa fa-arrows-alt" aria-hidden="true"></i></button>');
-// $o_fullscreen.on('click', function(event){
-//     var $carousel = get_carousel();
-//     if($(this).hasClass('btn-success')){
-//         $carousel.closest('.carousel_wrapper').find('.toggle-fullscreen').hide();
-//     }else{
-//         $carousel.closest('.carousel_wrapper').find('.toggle-fullscreen').show();
-//     }
-//     save_options($(this));
-// });
-//
-// var $o_autoplay = $('<button class="btn btn-default btn" title="Autoplay On/Off" data-key="autoPlay"><i class="fa fa-play" aria-hidden="true"></i></button>');
-// $o_autoplay.on('click', function(event){
-//     save_options($(this));
-// });
-//
-// priv.tooltips.caoursel_settings = new tg_tooltip({
-//     content: [$o_fullscreen, $o_autoplay],
-//     classes: 'tg_editor_control',
-//     close_on_leave: false,
-//     on_open: function(pub, priv){
-//         var $carousel = get_carousel();
-//         var text = $carousel.closest('.carousel_wrapper').find('.flickity_json').text();
-//         var json = '';
-//         try{
-//             json = JSON.parse(text);
-//         }catch(err){
-//
-//         }
-//
-//         if(!json){
-//             editable_toast('editor_carousel_missing_settings');
-//             return;
-//         }
-//
-//         pub.$tooltip.find('.btn').each(function (i, el){
-//             var key = $(el).data('key');
-//             if(json[key]){
-//                 $(el).addClass('btn-success').removeClass('btn-default');
-//             }else{
-//                 $(el).addClass('btn-default').removeClass('btn-success');
-//             }
-//         });
-//
-//     }
-// });
-//
-// function save_options($el){
-//     var $carousel = get_carousel();
-//     var text = $carousel.closest('.carousel_wrapper').find('.flickity_json').text();
-//     var json = '';
-//     try{
-//         json = JSON.parse(text);
-//     }catch(err){
-//
-//     }
-//
-//     if(!json){
-//         new tg_toast('Settings object was missing.', 'd');
-//         return;
-//     }
-//
-//     $el.toggleClass('btn-default btn-success');
-//
-//     priv.tooltips.caoursel_settings.$tooltip.find('.btn').each(function (i, el){
-//         var key = $(el).data('key');
-//         var val = $(el).hasClass('btn-success') ? true : false;
-//         json[key] = val;
-//     });
-//
-//     $carousel.closest('.carousel_wrapper').find('.flickity_json').text(JSON.stringify(json));
-// }
-//
-// function get_carousel(){
-//     return priv.tooltips.carousel.$attached_to.find('.flickity-carousel').flickity();
-// }

@@ -289,7 +289,7 @@ export default function(menu) {
             key: 'custom_html',
             icon: 'code',
             action: (button) => {
-                menu.dominator.options.photo(menu, menu.dominator);
+                menu.dominator.options.custom_html(menu.dominator);
             }
         }),
         // paddings
