@@ -227,7 +227,7 @@
     }
 
 
-    .tg_subwidget_photograph.pull-right, .tg_subwidget_photograph.pull-left{
+    .d-photograph.pull-right, .d-photograph.pull-left{
         float: none;
         margin-left: 0;
         margin-right: 0;

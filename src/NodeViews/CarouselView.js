@@ -20,7 +20,6 @@ export default class CarouselView {
 
         // I don't get this bit but
         if(node.type.name !== 'carousel'){
-            console.error('WRONG TYPE NOT CAROUSEL');
             return false;
         }
 
@@ -37,7 +36,6 @@ export default class CarouselView {
 
     destroy() {
         this.dom.remove();
-        console.log('destroy --- CarouselHtmlView');
     }
 
 }

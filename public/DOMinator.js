@@ -13950,14 +13950,14 @@
           draggable: false,
           attrs: {
               class: {
-                  default: 'tg_subwidget_photograph'
+                  default: 'd-photograph'
               },
               id: {
                   default: null
               }
           },
           parseDOM: [{
-              tag: 'div.tg_subwidget_photograph',
+              tag: 'div.d-photograph',
               getAttrs: dom => {
                   return {
                       id: dom.getAttribute("id"),
@@ -13982,11 +13982,11 @@
           draggable: false,
           attrs: {
               class: {
-                  default: 'tg_subwidget_photograph_text'
+                  default: 'd-photograph-text'
               }
           },
           parseDOM: [{
-              tag: 'div.tg_subwidget_photograph_text',
+              tag: 'div.d-photograph-text',
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class")
@@ -14012,11 +14012,11 @@
                   default: null
               },
               html: {
-                  default: ''
+                  default: 'div.d-carousel'
               }
           },
           parseDOM: [{
-              tag: 'div.tg_subwidget_carousel',
+              tag: 'div.d-carousel',
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class"),
@@ -14039,11 +14039,11 @@
           draggable: false,
           attrs: {
               class: {
-                  default: 'tg_subwidget list-group tg_subwidget_download'
+                  default: 'list-group d-download'
               }
           },
           parseDOM: [{
-              tag: 'div.tg_subwidget_download',
+              tag: 'div.d-download',
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class")
@@ -14066,11 +14066,11 @@
           draggable: false,
           attrs: {
               class: {
-                  default: 'text-muted tg_subwidget_download_title'
+                  default: 'text-muted d-download-title'
               }
           },
           parseDOM: [{
-              tag: 'div.tg_subwidget_download_title',
+              tag: 'div.d-download-title',
               getAttrs: dom => {
                   return {
                       'class': dom.getAttribute("class")
@@ -21660,6 +21660,31 @@
               heading: _Heading(this),
               paddings: paddings(this),
               margins: margins(this),
+              list_item: new DOMinatorSubMenu({
+                  key: 'list_item',
+                  items: [
+                      new DOMinatorMenuLabel({
+                          label: 'List Item'
+                      }),
+                      new DOMinatorMenuSeparator (),
+                      new DOMinatorMenuLabel({
+                          label: ' - n/a - '
+                      }),
+                  ]
+              }),
+              ordered_list: new DOMinatorSubMenu({
+                  key: 'ordered_list',
+                  items: [
+                      new DOMinatorMenuLabel({
+                          label: 'Ordered List'
+                      }),
+                      new DOMinatorMenuSeparator (),
+                      new DOMinatorMenuLabel({
+                          label: ' - n/a - '
+                      }),
+                  ]
+              }),
+
               photograph: _Photograph(this),
               carousel: _Carousel(this),
               carousel_link: _CarouselLink(this),
@@ -22101,7 +22126,6 @@
 
           // I don't get this bit but
           if(node.type.name !== 'carousel'){
-              console.error('WRONG TYPE NOT CAROUSEL');
               return false;
           }
 
@@ -22118,7 +22142,6 @@
 
       destroy() {
           this.dom.remove();
-          console.log('destroy --- CarouselHtmlView');
       }
 
   }
@@ -22147,7 +22170,8 @@
               photograph: this.implementMessage('photograph'),             // the ui for going live and saving a revision
               downloads: this.implementMessage('downloads'),
 
-              // carousel related'//'()
+              // carousel related
+              carousel: this.implementMessage('carousel'),
               carouselAddSlide: this.implementMessage('carouselAddSlide'),
               carouselRemoveSlide: this.implementMessage('carouselRemoveSlide'),
               carouselMoveSlideLeft: this.implementMessage('carouselMoveSlideLeft'),
@@ -22396,16 +22420,31 @@
           this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection)); //.scrollIntoView()
       }
 
+      insertCarousel(html){
+          const view = this.menu.view;
+          const selection = view.state.selection;
+          const state = view.state;
+          const pos = selection.from;
+
+          const carousel = state.schema.nodes.carousel.create({ html: html });
+
+
+          let tr = state.tr.insert(pos+1, carousel);
+          view.dispatch(tr);
+
+          tr = view.state.tr;
+          tr.setMeta("addToHistory", false);
+          const newSelection = NodeSelection.create(view.state.doc, pos+1);
+          view.dispatch(tr.setSelection(newSelection));
+      }
+
       updateCarousel(html){
           changeAttributeOnNode(this.menu, 'html',  html);
       }
 
       implementMessage(key){
           return () => {
-              console.log(this);
-              if(this.options.doNotWarn[key]) {
-                  console.warn(`"${key} is not implemented"`);
-              }
+              console.warn(`"${key} is not implemented"`);
           }
       }
   };

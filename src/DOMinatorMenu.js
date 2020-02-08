@@ -204,6 +204,31 @@ export default class DOMinatorMenu {
             heading: _Heading(this),
             paddings: _Paddings(this),
             margins: _Margins(this),
+            list_item: new DOMinatorSubMenu({
+                key: 'list_item',
+                items: [
+                    new DOMinatorMenuLabel({
+                        label: 'List Item'
+                    }),
+                    new DOMinatorMenuSeparator (),
+                    new DOMinatorMenuLabel({
+                        label: ' - n/a - '
+                    }),
+                ]
+            }),
+            ordered_list: new DOMinatorSubMenu({
+                key: 'ordered_list',
+                items: [
+                    new DOMinatorMenuLabel({
+                        label: 'Ordered List'
+                    }),
+                    new DOMinatorMenuSeparator (),
+                    new DOMinatorMenuLabel({
+                        label: ' - n/a - '
+                    }),
+                ]
+            }),
+
             photograph: _Photograph(this),
             carousel: _Carousel(this),
             carousel_link: _CarouselLink(this),

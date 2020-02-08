@@ -62,7 +62,8 @@ window.DOMinator = class DOMinator {
             photograph: this.implementMessage('photograph'),             // the ui for going live and saving a revision
             downloads: this.implementMessage('downloads'),
 
-            // carousel related'//'()
+            // carousel related
+            carousel: this.implementMessage('carousel'),
             carouselAddSlide: this.implementMessage('carouselAddSlide'),
             carouselRemoveSlide: this.implementMessage('carouselRemoveSlide'),
             carouselMoveSlideLeft: this.implementMessage('carouselMoveSlideLeft'),
@@ -311,16 +312,31 @@ window.DOMinator = class DOMinator {
         this.menu.view.dispatch(this.menu.view.state.tr.setSelection(newSelection)); //.scrollIntoView()
     }
 
+    insertCarousel(html){
+        const view = this.menu.view;
+        const selection = view.state.selection;
+        const state = view.state;
+        const pos = selection.from;
+
+        const carousel = state.schema.nodes.carousel.create({ html: html });
+
+
+        let tr = state.tr.insert(pos+1, carousel);
+        view.dispatch(tr);
+
+        tr = view.state.tr;
+        tr.setMeta("addToHistory", false);
+        const newSelection = NodeSelection.create(view.state.doc, pos+1);
+        view.dispatch(tr.setSelection(newSelection));
+    }
+
     updateCarousel(html){
         changeAttributeOnNode(this.menu, 'html',  html);
     }
 
     implementMessage(key){
         return () => {
-            console.log(this);
-            if(this.options.doNotWarn[key]) {
-                console.warn(`"${key} is not implemented"`);
-            }
+            console.warn(`"${key} is not implemented"`);
         }
     }
 }

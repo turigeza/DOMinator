@@ -89,8 +89,8 @@
     outline: 4px dashed orange;
     outline-offset: -4px;
 }
-.ProseMirror-selectednode.tg_subwidget_carousel,
-.ProseMirror-selectednode.tg_subwidget_download,
+.ProseMirror-selectednode.d-carousel,
+.ProseMirror-selectednode.d-download,
 .ProseMirror-selectednode.d-block-link{
     outline-offset: 0px;
 }

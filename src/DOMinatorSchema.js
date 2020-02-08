@@ -492,14 +492,14 @@ export const nodes = {
         draggable: false,
         attrs: {
             class: {
-                default: 'tg_subwidget_photograph'
+                default: 'd-photograph'
             },
             id: {
                 default: null
             }
         },
         parseDOM: [{
-            tag: 'div.tg_subwidget_photograph',
+            tag: 'div.d-photograph',
             getAttrs: dom => {
                 return {
                     id: dom.getAttribute("id"),
@@ -524,11 +524,11 @@ export const nodes = {
         draggable: false,
         attrs: {
             class: {
-                default: 'tg_subwidget_photograph_text'
+                default: 'd-photograph-text'
             }
         },
         parseDOM: [{
-            tag: 'div.tg_subwidget_photograph_text',
+            tag: 'div.d-photograph-text',
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class")
@@ -554,11 +554,11 @@ export const nodes = {
                 default: null
             },
             html: {
-                default: ''
+                default: 'div.d-carousel'
             }
         },
         parseDOM: [{
-            tag: 'div.tg_subwidget_carousel',
+            tag: 'div.d-carousel',
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class"),
@@ -581,11 +581,11 @@ export const nodes = {
         draggable: false,
         attrs: {
             class: {
-                default: 'tg_subwidget list-group tg_subwidget_download'
+                default: 'list-group d-download'
             }
         },
         parseDOM: [{
-            tag: 'div.tg_subwidget_download',
+            tag: 'div.d-download',
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class")
@@ -608,11 +608,11 @@ export const nodes = {
         draggable: false,
         attrs: {
             class: {
-                default: 'text-muted tg_subwidget_download_title'
+                default: 'text-muted d-download-title'
             }
         },
         parseDOM: [{
-            tag: 'div.tg_subwidget_download_title',
+            tag: 'div.d-download-title',
             getAttrs: dom => {
                 return {
                     'class': dom.getAttribute("class")

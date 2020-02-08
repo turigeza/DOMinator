@@ -1,22 +1,45 @@
 $( document ).ready(function(){
 
-    // if the photo caption text marked as not to display you should empty it
-    $('.tg_subwidget_photograph_text[style="display: none;"]').empty();
+    function cleanUpHtml(){
+        // if the photo caption text marked as not to display you should empty it
+        $('.tg_subwidget_photograph_text[style="display: none;"]').empty();
 
-    // remove spans which are hidden in photo text
-    $('.tg_subwidget_photograph_text span[style="display: none;"]').remove();
+        // remove spans which are hidden in photo text
+        $('.tg_subwidget_photograph_text span[style="display: none;"]').remove();
 
-    // remove spansformating on the photograph captions
-    $('.tg_subwidget_photograph_text span').each(function() {
-        $(this).replaceWith(this.childNodes);
-    });
+        // remove spansformating on the photograph captions
+        $('.tg_subwidget_photograph_text span').each(function() {
+            $(this).replaceWith(this.childNodes);
+        });
 
-    // remove toggle fullscreen buttons we don't need them anymore
-    $('.toggle-fullscreen').remove();
+        $('.tg_subwidget_photograph').addClass('d-photograph').removeClass('tg_subwidget_photograph');
+        $('.tg_subwidget_photograph_text').addClass('d-photograph-text').removeClass('tg_subwidget_photograph_text');
 
-    // mark blocklink links with class d-block-link
-    $('.tg_subwidget_blocklink a .tg_sub_editable>*').unwrap();
-    $('.tg_subwidget_blocklink a').addClass('d-block-link').unwrap();
+        // remove toggle fullscreen buttons we don't need them anymore
+        $('.toggle-fullscreen').remove();
+
+        // mark blocklink links with class d-block-link
+        $('.tg_subwidget_blocklink a .tg_sub_editable>*').unwrap();
+        $('.tg_subwidget_blocklink a').addClass('d-block-link').unwrap();
+
+        // change tg_subwidget_carousel to d-carousel
+        $('.tg_subwidget_carousel').addClass('d-carousel').removeClass('tg_subwidget_carousel');
+
+        $('.tg_widget').removeClass('tg_widget');
+        $('.tg_editable').removeClass('tg_editable');
+
+        $('.tg_subwidget_download').addClass('d-download').removeClass('tg_subwidget_download');
+        $('.tg_subwidget_download_title').addClass('d-download-title').removeClass('tg_subwidget_download_title');
+
+
+        $('.ce-element').removeClass('ce-element');
+        $('.ce-element--type-download').removeClass('ce-element--type-download');
+
+        $('.tg_sub_editable').removeClass('tg_sub_editable');
+        $('.tg_subwidget').removeClass('tg_subwidget');
+    }
+
+    cleanUpHtml();
 
     var editor = new DOMinator({
         container: '#editor',
@@ -38,6 +61,23 @@ $( document ).ready(function(){
         },
 
         // carousel
+        carousel: (DOMinator) => {
+            const html = `<div class="carousel_wrapper">
+                <div class="flickity-carousel">
+                    <div class="carousel-cell" style="" aria-hidden="true">
+                        <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
+                        <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+                            <h3>Title of image</h3>
+                            <p>Description on the image</p>
+                        </div>
+                        <a class="carousel_link" href=""></a>
+                    </div>
+                </div>
+                <div class="flickity_json">{"wrapAround":true,"fullscreen":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
+                <a class="flickity_link" href="#"></a>
+            </div>`;
+            DOMinator.insertCarousel(html);
+        },
         carouselAddSlide: (DOMinator) => {
             const images = [
                 'https://i.picsum.photos/id/985/1200/800.jpg?grayscale',
@@ -117,7 +157,7 @@ $( document ).ready(function(){
         },
         carouselToggleSetting: (DOMinator, key) => {
             const { flickity, $flickity, $widget } = getCarousel();
-            const jsonString = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
+            const jsonString = $('.d-carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
             let settings = JSON.parse(jsonString);
             if(settings[key]){
                 settings[key] = false;
@@ -125,14 +165,14 @@ $( document ).ready(function(){
                 settings[key] = true;
             }
 
-            $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text(JSON.stringify(settings));
+            $('.d-carousel.ProseMirror-selectednode .flickity_json').text(JSON.stringify(settings));
             DOMinator.updateCarousel(getHtmlFromCarousel($widget));
             destroyCarousels();
             initCarousels();
         },
         carouselUpdateButton: (DOMinator, button) => {
             const { flickity, $flickity, $widget } = getCarousel();
-            const jsonString = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
+            const jsonString = $('.d-carousel.ProseMirror-selectednode .flickity_json').text() || '{}';
             let settings = JSON.parse(jsonString);
             const key = button.options.key;
             const $link = $flickity.find('.is-selected .carousel_link');
@@ -184,7 +224,7 @@ $( document ).ready(function(){
             }
         },
         carouselGet: (DOMinator, key) => {
-            const $selected = $('.tg_subwidget_carousel.ProseMirror-selectednode .is-selected');
+            const $selected = $('.d-carousel.ProseMirror-selectednode .is-selected');
             if(key === 'title'){
                 return $selected.find('.carousel_text h3').text();
             }else if(key === 'description'){
@@ -283,9 +323,9 @@ $( document ).ready(function(){
     }
 
     function getCarousel(){
-        const $flickity = $('.tg_subwidget_carousel.ProseMirror-selectednode .flickity-carousel');
+        const $flickity = $('.d-carousel.ProseMirror-selectednode .flickity-carousel');
         const flickity = $flickity.data('flickity');
-        const $widget = $('.tg_subwidget_carousel.ProseMirror-selectednode');
+        const $widget = $('.d-carousel.ProseMirror-selectednode');
 
         return { flickity, $flickity, $widget };
     }
@@ -303,7 +343,7 @@ $( document ).ready(function(){
     }
 
     function initCarousels (){
-        $('.tg_subwidget_carousel').each(function(){
+        $('.d-carousel').each(function(){
             var $this = $(this);
             var flickity = $this.find('.flickity-carousel').data('flickity')
             if(flickity){
