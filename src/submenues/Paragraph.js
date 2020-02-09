@@ -194,23 +194,45 @@ export default function(menu) {
                 menu.dominator.options.carousel(menu.dominator);
             }
         }),
-        // cards
-        new DOMinatorMenuDropdown({
-            key: 'cards',
+        // card
+        new DOMinatorMenuButton({
+            key: 'card',
             icon: 'card',
             iconType: 'dics',
-            items: [
-                new DOMinatorMenuButton({
-                    key: 'big_card',
-                    icon: 'card',
-                    iconType: 'dics'
-                }),
-                new DOMinatorMenuButton({
-                    key: 'small_card',
-                    icon: 'smallcard',
-                    iconType: 'dics'
-                })
-            ]
+            action: () => {
+
+                const view = menu.view;
+                const selection = view.state.selection;
+                const state = view.state;
+                const pos = selection.from;
+
+                // caption
+                const captionText = state.schema.text('Sample image from picsum.photos');
+                const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
+
+                const dom = view.domAtPos(pos);
+
+                // image
+                const imageAttrs = {
+                    'src': 'https://picsum.photos/900/600?grayscale',
+                    'data-photograph_id': null,
+                    'data-photograph_medium': 'https://picsum.photos/900/600?grayscale',
+                    'data-photograph_large': 'https://picsum.photos/900/600?grayscale',
+                };
+
+                const image = state.schema.nodes.image.create(imageAttrs);
+
+                const photograph = state.schema.nodes.photograph.create({}, [image, photographCaption]);
+
+                const card = state.schema.nodes.card.create({},[
+                    photograph,
+                    state.schema.nodes.heading.create({level: 3 }, state.schema.text('Card Title')),
+                    state.schema.nodes.paragraph.create({}, state.schema.text('Nulla in sollicitudin ligula. Quisque sit amet porta dolor. Nunc lobortis nisi magna, sed ultricies velit ultricies a. Ut a sapien et ipsum pulvinar blandit.'))
+                ]);
+
+                let tr = state.tr.insert(pos+1, card);
+                view.dispatch(tr);
+            }
         }),
         // layouts
         new DOMinatorMenuDropdown({
@@ -282,6 +304,15 @@ export default function(menu) {
             icon: 'hashtag',
             action: () => {
 
+            }
+        }),
+        // horizontal_rule
+        new DOMinatorMenuButton({
+            key: 'horizontal_rule',
+            icon: 'minus',
+            action: (button) => {
+                const hr = menu.view.state.schema.nodes.horizontal_rule.create({});
+                menu.view.dispatch(menu.view.state.tr.insert(menu.view.state.selection.from+1, hr));
             }
         }),
         // custom html

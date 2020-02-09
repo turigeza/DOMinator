@@ -7,7 +7,6 @@ export default class CarouselView {
 
         this.dom = document.createElement('div');
         this.dom.innerHTML = node.attrs.html;
-
         this.dom.setAttribute("class", node.attrs.class);
 
         // this where we need to reapply the carousel but not always

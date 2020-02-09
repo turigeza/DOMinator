@@ -20,7 +20,6 @@ export default class ImageView {
         });
     }
     
-    // Called when the node view is removed from the editor or the whole editor is destroyed.
     destroy() {
         this.dom.remove();
     }

@@ -14009,10 +14009,10 @@
           draggable: false,
           attrs: {
               class: {
-                  default: null
+                  default: 'd-carousel'
               },
               html: {
-                  default: 'div.d-carousel'
+                  default: ''
               }
           },
           parseDOM: [{
@@ -14165,6 +14165,34 @@
               ]
           }
       },
+      card: {
+          // content: "photograph{0,1} card_content{1}",
+          content: "(paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html)+",
+          group: "block",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {
+              'class': {
+                  default: 'd-card'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.d-card',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class"),
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
       custom_html: {
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
@@ -14219,12 +14247,11 @@
               'class': {
                   default: null
               },
-
           },
           excludes: 'span link',
           inclusive: false,
           parseDOM: [{
-              tag: "a:not(.list-group-item) a:not(.d-block-link)", //[href]
+              tag: "a:not(.list-group-item):not(.d-block-link)", //[href]
               getAttrs(dom) {
                   return {
                       href: dom.getAttribute("href"),
@@ -14694,7 +14721,7 @@
 
       constructor(options) {
           this.options = options;
-          
+
           this.items = options.items;
           this.dom = document.createElement("div");
           this.dom.className = "DOMinatorSubMenu DOMinatorSubMenu-"+this.options.key;
@@ -14707,9 +14734,15 @@
 
       update(menu){
           this.menu = menu;
+          if(typeof this.options.beforeUpdate === 'function'){
+              this.options.beforeUpdate(this);
+          }
           this.items.forEach(item=>{
               item.update(menu);
           });
+          if(typeof this.options.afterUpdate === 'function'){
+              this.options.afterUpdate(this);
+          }
       }
 
       hide(){
@@ -14770,6 +14803,16 @@
           if(this.options.className){
               this.dom.className += this.options.className;
           }
+      }
+
+      change(text){
+          // this.dom.innerHTML = '';
+          for (var child of this.dom.childNodes) {
+              child.remove();
+          }
+
+          this.text = document.createTextNode(text);
+          this.dom.appendChild(this.text);
       }
 
       update(){
@@ -20220,23 +20263,45 @@
                   menu.dominator.options.carousel(menu.dominator);
               }
           }),
-          // cards
-          new DOMinatorMenuDropdown({
-              key: 'cards',
+          // card
+          new DOMinatorMenuButton({
+              key: 'card',
               icon: 'card',
               iconType: 'dics',
-              items: [
-                  new DOMinatorMenuButton({
-                      key: 'big_card',
-                      icon: 'card',
-                      iconType: 'dics'
-                  }),
-                  new DOMinatorMenuButton({
-                      key: 'small_card',
-                      icon: 'smallcard',
-                      iconType: 'dics'
-                  })
-              ]
+              action: () => {
+
+                  const view = menu.view;
+                  const selection = view.state.selection;
+                  const state = view.state;
+                  const pos = selection.from;
+
+                  // caption
+                  const captionText = state.schema.text('Sample image from picsum.photos');
+                  const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
+
+                  const dom = view.domAtPos(pos);
+
+                  // image
+                  const imageAttrs = {
+                      'src': 'https://picsum.photos/900/600?grayscale',
+                      'data-photograph_id': null,
+                      'data-photograph_medium': 'https://picsum.photos/900/600?grayscale',
+                      'data-photograph_large': 'https://picsum.photos/900/600?grayscale',
+                  };
+
+                  const image = state.schema.nodes.image.create(imageAttrs);
+
+                  const photograph = state.schema.nodes.photograph.create({}, [image, photographCaption]);
+
+                  const card = state.schema.nodes.card.create({},[
+                      photograph,
+                      state.schema.nodes.heading.create({level: 3 }, state.schema.text('Card Title')),
+                      state.schema.nodes.paragraph.create({}, state.schema.text('Nulla in sollicitudin ligula. Quisque sit amet porta dolor. Nunc lobortis nisi magna, sed ultricies velit ultricies a. Ut a sapien et ipsum pulvinar blandit.'))
+                  ]);
+
+                  let tr = state.tr.insert(pos+1, card);
+                  view.dispatch(tr);
+              }
           }),
           // layouts
           new DOMinatorMenuDropdown({
@@ -20308,6 +20373,15 @@
               icon: 'hashtag',
               action: () => {
 
+              }
+          }),
+          // horizontal_rule
+          new DOMinatorMenuButton({
+              key: 'horizontal_rule',
+              icon: 'minus',
+              action: (button) => {
+                  const hr = menu.view.state.schema.nodes.horizontal_rule.create({});
+                  menu.view.dispatch(menu.view.state.tr.insert(menu.view.state.selection.from+1, hr));
               }
           }),
           // custom html
@@ -20492,22 +20566,43 @@
       });
   }
 
+  function _Span(menu) {
+
+      if( menu.dominator.options.menu.span ===  false){
+          return null;
+      }
+
+      let items = [
+          new DOMinatorMenuLabel({
+              label: 'Inline Style'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuLabel({
+              label: ' - n/a - '
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.span ===  'function'){
+          menu.dominator.options.menu.span(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'span',
+          items: items
+      });
+  }
+
   function _Link(menu) {
+      const options = menu.dominator.options;
+      const linkClasses = Object.keys(options.linkClasses).map(function(key) {
+          return options.linkClasses[key];
+      });
 
       const items = [
           new DOMinatorMenuLabel({
               label: 'Link'
           }),
           new DOMinatorMenuSeparator (),
-          new DOMinatorMenuInput ({
-              update: (input) => {
-                  input.setValue(menu.activeMark.attrs.href);
-              },
-              key: 'href',
-              action: (val) => {
-                  changeAttributeOnMark('href', val, menu);
-              }
-          }),
           new DOMinatorMenuButton ({
               key: 'unlink',
               icon: 'chain-broken',
@@ -20532,62 +20627,86 @@
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-default', button, menu);
+                  updateLinkStyleButton(options.linkClasses['default'], button, menu);
               },
               key: 'link_style_default',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-default', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['default'], linkClasses);
               }
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-primary', button, menu);
+                  updateLinkStyleButton(options.linkClasses['primary'], button, menu);
               },
               key: 'link_style_primary',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-primary', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['primary'], linkClasses);
               }
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-warning', button, menu);
+                  updateLinkStyleButton(options.linkClasses['warning'], button, menu);
               },
               key: 'link_style_warning',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-warning', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['warning'], linkClasses);
               }
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-danger', button, menu);
+                  updateLinkStyleButton(options.linkClasses['danger'], button, menu);
               },
               key: 'link_style_danger',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-danger', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['danger'], linkClasses);
               }
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-success', button, menu);
+                  updateLinkStyleButton(options.linkClasses['success'], button, menu);
               },
               key: 'link_style_success',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-success', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['success'], linkClasses);
               }
           }),
           new DOMinatorMenuButton ({
               update: (button) => {
-                  updateLinkStyleButton('button button-info', button, menu);
+                  updateLinkStyleButton(options.linkClasses['info'], button, menu);
               },
               key: 'link_style_info',
               icon: 'paint-brush',
               action: ()=>{
-                  toggleClassOnMark(menu, menu.activeMark, 'button button-info', linkClasses);
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['info'], linkClasses);
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Link',
+              update: (input) => {
+                  input.setValue(menu.activeMark.attrs.href);
+              },
+              key: 'href',
+              action: (val) => {
+                  if(val === ''){
+                      clearFormatting(menu);
+                  }else{
+                      changeAttributeOnMark('href', val, menu);
+                  }
+              }
+          }),
+          new DOMinatorMenuInput ({
+              label: 'Title',
+              update: (input) => {
+                  input.setValue(menu.activeMark.attrs.title);
+              },
+              key: 'href',
+              action: (val) => {
+                  changeAttributeOnMark('title', val, menu);
               }
           }),
       ];
@@ -21234,6 +21353,43 @@
       });
   }
 
+  function _Card(menu) {
+
+      if( menu.dominator.options.menu.card ===  false){
+          return null;
+      }
+
+      let items = [
+          new DOMinatorMenuLabel({
+              label: 'Card'
+          }),
+          new DOMinatorMenuSeparator (),
+          new DOMinatorMenuButton ({
+              key: 'shadow',
+              icon: 'window-restore',
+              action: (button) => {
+                  toggleClassOnNode(menu, 'd-card-raised');
+              },
+              update(button){
+                  if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-card-raised')){
+                      button.activate();
+                  }else{
+                      button.deactivate();
+                  }
+              }
+          }),
+      ];
+
+      if( typeof menu.dominator.options.menu.card ===  'function'){
+          menu.dominator.options.menu.card(items, menu);
+      }
+
+      return new DOMinatorSubMenu({
+          key: 'card',
+          items: items
+      });
+  }
+
   function _DownloadLink(menu) {
       if( menu.dominator.options.menu.download_link ===  false){
           return null;
@@ -21534,16 +21690,6 @@
           this.update();
           document.body.classList.add("dominatorMenuActive");
 
-          // this.dom.addEventListener("mousedown", e => {
-          //     e.preventDefault()
-          //     this.view.focus()
-          //     // this.items.forEach(({command, dom}) => {
-          //     //     if (dom.contains(e.target)){
-          //     //         command(this.view.state, this.view.dispatch, this.view);
-          //     //     }
-          //     // })
-          // })
-
           this.view.dom.addEventListener("mousedown", e => {
               this.mousedown = true;
           });
@@ -21566,11 +21712,6 @@
           let activeSubmenuKey = '';
 
           if(view){
-
-              // console.log('view');
-              // console.log(view.state);
-              // console.log('lastState');
-              // console.log(lastState);
 
               const selection = view.state.selection;
               if(selection.constructor.name === 'TextSelection'){
@@ -21597,7 +21738,7 @@
                       // there is a selection show inline menu
                       activeSubmenuKey = 'inline';
                   }
-
+                  
                   this.activeBlock = selection.$head.parent;
               }else if (selection.constructor.name === 'NodeSelection'){
                   if(selection.node.type.spec.menu){
@@ -21605,10 +21746,6 @@
                   }else{
                       activeSubmenuKey = selection.node.type.name;
                   }
-
-                  // if(this.submenus[selection.node.type.name]){
-                  //     activeSubmenuKey = selection.node.type.name;
-                  // }
 
                   this.activeBlock = selection.node;
               }else if(selection.constructor.name === 'AllSelection'){
@@ -21618,7 +21755,7 @@
               }
           }
 
-          if( !activeSubmenuKey || activeSubmenuKey === 'doc'){
+          if( !activeSubmenuKey ){
               activeSubmenuKey = "paragraph";
           }
 
@@ -21636,10 +21773,8 @@
       }
 
       activateSubmenu(key){
-
           if(!this.submenus[key]){
-              console.error(this.submenus);
-              throw 'Submenu does no texist with a key: ' + key;
+              key = '_default';
           }
 
           Object.keys(this.submenus).forEach(key=>{
@@ -21654,110 +21789,43 @@
       initMenu(){
 
           this.submenus = {
+              _default: new DOMinatorSubMenu({
+                  key: '_default',
+                  beforeUpdate: (sm)=>{
+                      let label = 'Editor';
+                      if(this.activeBlock){
+                          label = this.activeBlock.type.name.replace(/_/g, ' ');
+                      }
+                      sm.items[0].change(label);
+                  },
+                  items: [
+                      new DOMinatorMenuLabel({
+                          label: '_default'
+                      }),
+                      new DOMinatorMenuSeparator (),
+                      new DOMinatorMenuLabel({
+                          label: ' - n/a - '
+                      }),
+                  ]
+              }),
               inline: _Inline(this),
               link: _Link(this),
               paragraph: _Paragraph(this),
               heading: _Heading(this),
               paddings: paddings(this),
               margins: margins(this),
-              list_item: new DOMinatorSubMenu({
-                  key: 'list_item',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'List Item'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuLabel({
-                          label: ' - n/a - '
-                      }),
-                  ]
-              }),
-              ordered_list: new DOMinatorSubMenu({
-                  key: 'ordered_list',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'Ordered List'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuLabel({
-                          label: ' - n/a - '
-                      }),
-                  ]
-              }),
-
               photograph: _Photograph(this),
               carousel: _Carousel(this),
+              card: _Card(this),
               carousel_link: _CarouselLink(this),
               layout: _Layout(this),
               layoutcolumn: _LayoutColumn(this),
 
               download_link: _DownloadLink(this),
-              download_title: new DOMinatorSubMenu({
-                  key: 'download_link',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'Downloads Title'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuLabel({
-                          label: ' - n/a - '
-                      }),
-                  ]
-              }),
-              downloads: new DOMinatorSubMenu({
-                  key: 'downloads',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'Downloads'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuLabel({
-                          label: ' - n/a -'
-                      }),
-                  ]
-              }),
               blocklink: _BlockLink(this),
-              custom_html: new DOMinatorSubMenu({
-                  key: 'custom_html',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'Custom HTML'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuButton ({
-                          key: 'magic',
-                          icon: 'magic',
-                          action: ()=>{
-
-                          }
-                      }),
-                  ],
-              }),
-              span: new DOMinatorSubMenu({
-                  key: 'span',
-                  items: [
-                      new DOMinatorMenuLabel({
-                          label: 'Style'
-                      }),
-                      new DOMinatorMenuSeparator (),
-                      new DOMinatorMenuButton ({
-                          key: 'magic',
-                          icon: 'magic',
-                          action: ()=>{
-
-                          }
-                      }),
-                  ],
-              }),
+              span:  _Span(this)
           };
 
-          // if(typeof this.dominator.options.submenus === 'function'){
-          //     this.submenus = this.dominator.options.submenus(submenus);
-          // }else{
-          //     this.submenus = submenus;
-          // }
-
-          // this.submenus = { submenues, ...this.dominator.options.menus };
           this.dom = document.createElement("div");
           this.leftdom = document.createElement("div");
           this.rightdom = document.createElement("div");
@@ -21938,56 +22006,25 @@
 
           this.dom = document.createElement('div');
           this.dom.innerHTML = node.attrs.html;
+          this.dom.setAttribute("class", node.attrs.class);
 
-          if(node.attrs.class){
-              this.dom.setAttribute("class", node.attrs.class);
+          // this is in case we need to initialise any javascript after construction
+          if(view.$d_listeners && typeof view.$d_listeners.afterCustomHtmlConstruct === 'function'){
+              view.$d_listeners.afterCustomHtmlConstruct(this.dom, node, view, getPos);
           }
-
-          // this.dom.addEventListener("mousedown", event => {
-          //
-          //     // select node if not yet selected //event.metaKey &&
-          //     if(!this.dom.classList.contains("ProseMirror-selectednode")){
-          //         const selection = NodeSelection.create(
-          //             this.view.state.doc,
-          //             this.getPos()
-          //         );
-          //
-          //         this.view.dispatch(this.view.state.tr.setSelection(selection));
-          //         // event.stopPropagation();
-          //         // event.preventDefault();
-          //     }else{
-          //         // console.log('STOPSTOPSTOPSTOPSTOPSTOP');
-          //         // event.stopPropagation();
-          //         // event.preventDefault();
-          //     }
-          //
-          //     console.log('mousedown');
-          // });
       }
 
       update(node, decorations) {
-          console.log('update --- CustomHtmlView');
-      }
+          if(node.type.name !== 'custom_html'){
+              return false;
+          }
 
-      // stopEvent(event) {
-      //     const blacklisted = [
-      //         'dragstart',
-      //         'dragenter',
-      //         'dragover',
-      //         'dragend',
-      //         'drop',
-      //         'mousedown',
-      //     ];
-      //
-      //     if( blacklisted.indexOf(event.type) > -1 ){
-      //         return true;
-      //     }
-      //
-      //     console.log(event.type);
-      //     return false;
-      //     // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
-      //     // Events for which this returns true are not handled by the editor.
-      // }
+          if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCustomHtmlUpdate === 'function'){
+              return this.view.$d_listeners.beforeCustomHtmlUpdate(this.dom, node);
+          }
+
+          return true;
+      }
 
       ignoreMutation() {
           return true;
@@ -21996,12 +22033,9 @@
           // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
       }
 
-      // Called when the node view is removed from the editor or the whole editor is destroyed.
       destroy() {
           this.dom.remove();
-          console.log('destroy --- CustomHtmlView');
       }
-
   }
 
   class PhotographCaptionView {
@@ -22033,9 +22067,8 @@
       }
 
       update(node, decorations) {
-          console.log('update --- PhotographCaption');
           if (node.type.name != "photograph_caption") {
-              return false
+              return false;
           }
           if (node.content.size > 0) {
               this.dom.classList.remove("empty");
@@ -22097,7 +22130,6 @@
           });
       }
       
-      // Called when the node view is removed from the editor or the whole editor is destroyed.
       destroy() {
           this.dom.remove();
       }
@@ -22113,7 +22145,6 @@
 
           this.dom = document.createElement('div');
           this.dom.innerHTML = node.attrs.html;
-
           this.dom.setAttribute("class", node.attrs.class);
 
           // this where we need to reapply the carousel but not always
@@ -22189,6 +22220,14 @@
                   right: 'text-right',
                   center: 'text-center',
                   // justify: 'text-justify',
+              },
+              linkClasses: {
+                  primary: 'd-button-primary',
+                  success: 'd-button-success',
+                  warning: 'd-button-warning',
+                  default: 'd-button-default',
+                  danger: 'd-button-danger',
+                  info: 'd-button-info'
               },
               photoFloatClasses: {
                   left: 'pull-left',
@@ -22311,22 +22350,17 @@
                                   }
 
                                   return false;
-                              }
+                              },
+                              attributes: {
+                                  class: "DOMinator"
+                              },
                           }
                       }),
                       keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
                       keymap(baseKeymap),
                       dropCursor(),
                       gapCursor(),
-                      history(),
-                      new Plugin({
-                          props: {
-                              attributes: {
-                                  class: "ProseMirror-example-setup-style"
-                              },
-
-                          }
-                      }),
+                      history()
                   ]
 
               }),
@@ -22408,8 +22442,10 @@
 
           tr = view.state.tr;
           tr.setMeta("addToHistory", false);
-          const newSelection = NodeSelection.create(view.state.doc, pos+1);
-          view.dispatch(tr.setSelection(newSelection));
+
+          // Uncaught TypeError: Cannot read property 'nodeSize' of null
+          // const newSelection = NodeSelection.create(view.state.doc, pos+1);
+          // view.dispatch(tr.setSelection(newSelection));
 
       }
 

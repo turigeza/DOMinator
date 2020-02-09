@@ -12,6 +12,16 @@ export default class DOMinatorMenuLabel {
         }
     }
 
+    change(text){
+        // this.dom.innerHTML = '';
+        for (var child of this.dom.childNodes) {
+            child.remove();
+        }
+
+        this.text = document.createTextNode(text);
+        this.dom.appendChild(this.text);
+    }
+
     update(){
         // just a dummy
     }

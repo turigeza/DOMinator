@@ -91,7 +91,8 @@
 }
 .ProseMirror-selectednode.d-carousel,
 .ProseMirror-selectednode.d-download,
-.ProseMirror-selectednode.d-block-link{
+.ProseMirror-selectednode.d-block-link,
+.ProseMirror-selectednode.d-card{
     outline-offset: 0px;
 }
 

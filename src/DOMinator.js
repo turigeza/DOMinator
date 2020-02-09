@@ -82,6 +82,14 @@ window.DOMinator = class DOMinator {
                 center: 'text-center',
                 // justify: 'text-justify',
             },
+            linkClasses: {
+                primary: 'd-button-primary',
+                success: 'd-button-success',
+                warning: 'd-button-warning',
+                default: 'd-button-default',
+                danger: 'd-button-danger',
+                info: 'd-button-info'
+            },
             photoFloatClasses: {
                 left: 'pull-left',
                 right: 'pull-right',
@@ -205,22 +213,17 @@ window.DOMinator = class DOMinator {
                                 }
 
                                 return false;
-                            }
+                            },
+                            attributes: {
+                                class: "DOMinator"
+                            },
                         }
                     }),
                     keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),
                     keymap(baseKeymap),
                     dropCursor(),
                     gapCursor(),
-                    history(),
-                    new Plugin({
-                        props: {
-                            attributes: {
-                                class: "ProseMirror-example-setup-style"
-                            },
-
-                        }
-                    }),
+                    history()
                 ]
 
             }),
@@ -302,8 +305,10 @@ window.DOMinator = class DOMinator {
 
         tr = view.state.tr;
         tr.setMeta("addToHistory", false);
-        const newSelection = NodeSelection.create(view.state.doc, pos+1);
-        view.dispatch(tr.setSelection(newSelection));
+
+        // Uncaught TypeError: Cannot read property 'nodeSize' of null
+        // const newSelection = NodeSelection.create(view.state.doc, pos+1);
+        // view.dispatch(tr.setSelection(newSelection));
 
     }
 

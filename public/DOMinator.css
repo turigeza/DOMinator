@@ -30,6 +30,9 @@
     flex-grow: 1;
     /* flex-grow: 0; */
 }
+.DOMinator .d-photograph-text.empty{
+    display: block;
+}
 .DOMinatorMenuSeparator{
     background-color: #eee;
     padding: 12px 1px;
@@ -221,7 +224,7 @@ body.dominatorMenuActive{
 
     padding: 0;
     height: 45px;
-    min-width: 280px;
+    min-width: 200px;
     background-color: #eee;
     font-size: 14px;
     padding-left: 15px;
@@ -247,6 +250,7 @@ body.dominatorMenuActive{
 
 .DOMinatorMenuLabel{
     /* font-weight: bold; */
+    text-transform: capitalize;
     font-size: 14px;
     padding-left: 13px;
     padding-right: 6px;

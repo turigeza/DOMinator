@@ -62,6 +62,19 @@ div,p,h1{
 blockquote{
     clear: both;
 }
+hr{
+    overflow: visible;
+    margin: 0;
+    border: none;
+    border-top: 1px solid #ccc;
+}
+
+hr:after {
+    content: " - ";
+    position: relative;
+    height: 15px;
+    color: transparent;
+}
 .animate> * {
     -webkit-transition:all 0.4s ease 0s;
     -moz-transition:all 0.4s ease 0s;
@@ -269,6 +282,9 @@ a:active{
 .yellow, a.yellow{
     color: #FFBF3F;
 }
+
+/* linkClasses */
+
 
 
 .green_background{
@@ -904,7 +920,8 @@ a.legal_link{
 img{
     vertical-align:bottom;
 }
-.button{
+
+.d-button-primary,.d-button-success,.d-button-warning,.d-button-default,.d-button-danger,.d-button-info{
     display: inline-block;
     margin-bottom: 0;
     font-weight: normal;
@@ -927,34 +944,37 @@ img{
     background-color: rgb(221, 221, 221);
     color:black;
 }
+
+.d-button-primary{
+    background-color: #009CDE;
+    color: white;
+}
+.d-button-success{
+    background-color: #509E2F;
+    color: white;
+}
+.d-button-warning{
+    background-color: #ed3308;
+    color: white;
+}
+.d-button-default{
+    background-color: #999;
+    color: white;
+}
+.d-button-danger{
+    background-color: #b1000b;
+    color: white;
+}
+.d-button-info{
+    background-color: #5936e0;
+    color: white;
+}
+
 .loading_image{
     vertical-align: middle;
     display: none;
 }
-.button-primary{
-    background-color: #009CDE;
-    color: white;
-}
-.button-success{
-    background-color: #509E2F;
-    color: white;
-}
-.button-warning{
-    background-color: #ed3308;
-    color: white;
-}
-.button-default{
-    background-color: #999;
-    color: white;
-}
-.button-danger{
-    background-color: #b1000b;
-    color: white;
-}
-.button-info{
-    background-color: #5936e0;
-    color: white;
-}
+
 .d-photograph{
     margin-bottom: 10px;
     overflow: auto;
@@ -975,6 +995,10 @@ img{
 .d-photograph img{
     max-width: 100%;
 }
+.d-photograph-text.empty{
+    display: none;
+}
+
 .d-photograph-text{
     position: absolute;
     font-size: 13px;
@@ -1138,6 +1162,39 @@ img{
     z-index: 501;
 }
 /* carousel ENDS */
+/* new card style */
+.d-card{
+    position: relative;
+    color: #333;
+    border: 1px solid #ccc;
+    display: block;
+    overflow: auto;
+    padding: 0;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+.d-card-raised{
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+.d-card p{
+    color: #666;
+    font-size: 15px;
+}
+.d-card>p, .d-card>h1, .d-card>h2, .d-card>h3, .d-card>h4, .d-card>h5, .d-card>h6, .d-card>.d-download.list-group, .d-card>blockquote{
+    /* padding: 0 15px; */
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.d-card .d-photograph{
+    margin: 0px;
+}
+.d-card .d-photograph.pull-left{
+    margin-right: 20px;
+}
+.d-card .d-photograph.pull-right{
+    margin-left: 20px;
+}
 
 /* the new block link style */
 a.d-block-link{
@@ -1439,7 +1496,6 @@ button.list-group-item-danger.active:focus {
     width: 25px;
     height: 25px;
     background: url('assets/save_alt-24px.svg') no-repeat;
-    fill: pink;
 }
 
 .d-block-link{

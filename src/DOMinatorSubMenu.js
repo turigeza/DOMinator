@@ -7,7 +7,7 @@ export default class DOMinatorSubMenu {
 
     constructor(options) {
         this.options = options;
-        
+
         this.items = options.items;
         this.dom = document.createElement("div");
         this.dom.className = "DOMinatorSubMenu DOMinatorSubMenu-"+this.options.key;
@@ -20,9 +20,15 @@ export default class DOMinatorSubMenu {
 
     update(menu){
         this.menu = menu;
+        if(typeof this.options.beforeUpdate === 'function'){
+            this.options.beforeUpdate(this);
+        }
         this.items.forEach(item=>{
             item.update(menu);
         });
+        if(typeof this.options.afterUpdate === 'function'){
+            this.options.afterUpdate(this);
+        }
     }
 
     hide(){

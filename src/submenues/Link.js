@@ -13,21 +13,16 @@ import {
 } from "./../DOMinatorActions"
 
 export default function(menu) {
+    const options = menu.dominator.options;
+    const linkClasses = Object.keys(options.linkClasses).map(function(key) {
+        return options.linkClasses[key];
+    });
 
     const items = [
         new DOMinatorMenuLabel({
             label: 'Link'
         }),
         new DOMinatorMenuSeparator (),
-        new DOMinatorMenuInput ({
-            update: (input) => {
-                input.setValue(menu.activeMark.attrs.href);
-            },
-            key: 'href',
-            action: (val) => {
-                changeAttributeOnMark('href', val, menu);
-            }
-        }),
         new DOMinatorMenuButton ({
             key: 'unlink',
             icon: 'chain-broken',
@@ -52,62 +47,86 @@ export default function(menu) {
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-default', button, menu);
+                updateLinkStyleButton(options.linkClasses['default'], button, menu);
             },
             key: 'link_style_default',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-default', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['default'], linkClasses);
             }
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-primary', button, menu);
+                updateLinkStyleButton(options.linkClasses['primary'], button, menu);
             },
             key: 'link_style_primary',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-primary', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['primary'], linkClasses);
             }
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-warning', button, menu);
+                updateLinkStyleButton(options.linkClasses['warning'], button, menu);
             },
             key: 'link_style_warning',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-warning', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['warning'], linkClasses);
             }
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-danger', button, menu);
+                updateLinkStyleButton(options.linkClasses['danger'], button, menu);
             },
             key: 'link_style_danger',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-danger', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['danger'], linkClasses);
             }
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-success', button, menu);
+                updateLinkStyleButton(options.linkClasses['success'], button, menu);
             },
             key: 'link_style_success',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-success', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['success'], linkClasses);
             }
         }),
         new DOMinatorMenuButton ({
             update: (button) => {
-                updateLinkStyleButton('button button-info', button, menu);
+                updateLinkStyleButton(options.linkClasses['info'], button, menu);
             },
             key: 'link_style_info',
             icon: 'paint-brush',
             action: ()=>{
-                toggleClassOnMark(menu, menu.activeMark, 'button button-info', linkClasses);
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['info'], linkClasses);
+            }
+        }),
+        new DOMinatorMenuInput ({
+            label: 'Link',
+            update: (input) => {
+                input.setValue(menu.activeMark.attrs.href);
+            },
+            key: 'href',
+            action: (val) => {
+                if(val === ''){
+                    clearFormatting(menu);
+                }else{
+                    changeAttributeOnMark('href', val, menu);
+                }
+            }
+        }),
+        new DOMinatorMenuInput ({
+            label: 'Title',
+            update: (input) => {
+                input.setValue(menu.activeMark.attrs.title);
+            },
+            key: 'href',
+            action: (val) => {
+                changeAttributeOnMark('title', val, menu);
             }
         }),
     ];

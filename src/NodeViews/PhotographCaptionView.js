@@ -32,9 +32,8 @@ export default class PhotographCaptionView {
     }
 
     update(node, decorations) {
-        console.log('update --- PhotographCaption');
         if (node.type.name != "photograph_caption") {
-            return false
+            return false;
         }
         if (node.content.size > 0) {
             this.dom.classList.remove("empty");

@@ -65,20 +65,21 @@ $( document ).ready(function(){
         // carousel
         carousel: (DOMinator) => {
             const html = `<div class="carousel_wrapper">
-                <div class="flickity-carousel">
-                    <div class="carousel-cell" style="" aria-hidden="true">
-                        <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
-                        <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
-                            <h3>Title of image</h3>
-                            <p>Description on the image</p>
-                        </div>
-                        <a class="carousel_link" href=""></a>
-                    </div>
-                </div>
-                <div class="flickity_json">{"wrapAround":true,"fullscreen":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
-                <a class="flickity_link" href="#"></a>
+            <div class="flickity-carousel">
+            <div class="carousel-cell" style="" aria-hidden="true">
+            <img src="https://i.picsum.photos/id/955/900/600.jpg?grayscale" alt="Branklyn">
+            <div class="tg_sub_editable carousel_text" data-sub_editable_id="first_content">
+            <h3>Title of image</h3>
+            <p>Description on the image</p>
+            </div>
+            <a class="carousel_link" href=""></a>
+            </div>
+            </div>
+            <div class="flickity_json">{"wrapAround":true,"fullscreen":true,"parallax":true,"adaptiveHeight":true,"imagesLoaded":true,"draggable":false}</div>
+            <a class="flickity_link" href="#"></a>
             </div>`;
             DOMinator.insertCarousel(html);
+            initCarousels();
         },
         carouselAddSlide: (DOMinator) => {
             const images = [
@@ -92,11 +93,11 @@ $( document ).ready(function(){
 
             const src = images[Math.floor(Math.random() * images.length)];
             const $slide = $(`<div class="carousel-cell">
-                <img src="${src}">
-                <div class="tg_sub_editable carousel_text">
-                    <h3>I have added this image</h3>
-                    <p>Description on the image</p>
-                </div>
+            <img src="${src}">
+            <div class="tg_sub_editable carousel_text">
+            <h3>I have added this image</h3>
+            <p>Description on the image</p>
+            </div>
             </div>`);
 
             const { flickity, $flickity, $widget } = getCarousel();
@@ -112,18 +113,17 @@ $( document ).ready(function(){
             });
         },
         carouselRemoveSlide: (DOMinator) => {
-            const { flickity, $flickity, $widget } = getCarousel();
 
             if(flickity.cells.length === 1){
                 alert('You can not remove the last element.');
-               // editable_toast('editor_last_carousel_el');
-               return;
-           }
+                // editable_toast('editor_last_carousel_el');
+                return;
+            }
 
-           flickity.remove(flickity.selectedElement);
-           flickity.reloadCells();
-           flickity.resize();
-           DOMinator.updateCarousel(getHtmlFromCarousel($widget));
+            flickity.remove(flickity.selectedElement);
+            flickity.reloadCells();
+            flickity.resize();
+            DOMinator.updateCarousel(getHtmlFromCarousel($widget));
         },
         carouselMoveSlideLeft: (DOMinator) => {
             const { flickity, $flickity, $widget } = getCarousel();

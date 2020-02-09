@@ -13,56 +13,25 @@ export default class CustomHtmlView {
 
         this.dom = document.createElement('div');
         this.dom.innerHTML = node.attrs.html;
+        this.dom.setAttribute("class", node.attrs.class);
 
-        if(node.attrs.class){
-            this.dom.setAttribute("class", node.attrs.class);
+        // this is in case we need to initialise any javascript after construction
+        if(view.$d_listeners && typeof view.$d_listeners.afterCustomHtmlConstruct === 'function'){
+            view.$d_listeners.afterCustomHtmlConstruct(this.dom, node, view, getPos);
         }
-
-        // this.dom.addEventListener("mousedown", event => {
-        //
-        //     // select node if not yet selected //event.metaKey &&
-        //     if(!this.dom.classList.contains("ProseMirror-selectednode")){
-        //         const selection = NodeSelection.create(
-        //             this.view.state.doc,
-        //             this.getPos()
-        //         );
-        //
-        //         this.view.dispatch(this.view.state.tr.setSelection(selection));
-        //         // event.stopPropagation();
-        //         // event.preventDefault();
-        //     }else{
-        //         // console.log('STOPSTOPSTOPSTOPSTOPSTOP');
-        //         // event.stopPropagation();
-        //         // event.preventDefault();
-        //     }
-        //
-        //     console.log('mousedown');
-        // });
     }
 
     update(node, decorations) {
-        console.log('update --- CustomHtmlView');
-    }
+        if(node.type.name !== 'custom_html'){
+            return false;
+        }
 
-    // stopEvent(event) {
-    //     const blacklisted = [
-    //         'dragstart',
-    //         'dragenter',
-    //         'dragover',
-    //         'dragend',
-    //         'drop',
-    //         'mousedown',
-    //     ];
-    //
-    //     if( blacklisted.indexOf(event.type) > -1 ){
-    //         return true;
-    //     }
-    //
-    //     console.log(event.type);
-    //     return false;
-    //     // Can be used to prevent the editor view from trying to handle some or all DOM events that bubble up from the node view.
-    //     // Events for which this returns true are not handled by the editor.
-    // }
+        if(this.view.$d_listeners && typeof this.view.$d_listeners.beforeCustomHtmlUpdate === 'function'){
+            return this.view.$d_listeners.beforeCustomHtmlUpdate(this.dom, node);
+        }
+
+        return true;
+    }
 
     ignoreMutation() {
         return true;
@@ -71,10 +40,7 @@ export default class CustomHtmlView {
         // Return false if the editor should re-read the selection or re-parse the range around the mutation, true if it can safely be ignored.
     }
 
-    // Called when the node view is removed from the editor or the whole editor is destroyed.
     destroy() {
         this.dom.remove();
-        console.log('destroy --- CustomHtmlView');
     }
-
 }

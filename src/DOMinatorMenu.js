@@ -14,11 +14,13 @@ import DOMinatorMenuLabel from "./DOMinatorMenuLabel"
 import { paddings as _Paddings, margins as _Margins} from "./Submenues/PaddingMargin"
 import _Paragraph from "./Submenues/Paragraph"
 import _Inline from "./Submenues/Inline"
+import _Span from "./Submenues/Span"
 import _Link from "./Submenues/Link"
 import _Heading from "./Submenues/Heading"
 import _Photograph from "./Submenues/Photograph"
 import _Carousel from "./Submenues/Carousel"
 import _CarouselLink from "./Submenues/CarouselLink"
+import _Card from "./Submenues/Card"
 import _DownloadLink from "./Submenues/DownloadLink"
 import _BlockLink from "./Submenues/BlockLink"
 import _Layout from "./Submenues/Layout"
@@ -77,16 +79,6 @@ export default class DOMinatorMenu {
         this.update();
         document.body.classList.add("dominatorMenuActive");
 
-        // this.dom.addEventListener("mousedown", e => {
-        //     e.preventDefault()
-        //     this.view.focus()
-        //     // this.items.forEach(({command, dom}) => {
-        //     //     if (dom.contains(e.target)){
-        //     //         command(this.view.state, this.view.dispatch, this.view);
-        //     //     }
-        //     // })
-        // })
-
         this.view.dom.addEventListener("mousedown", e => {
             this.mousedown = true;
         });
@@ -109,11 +101,6 @@ export default class DOMinatorMenu {
         let activeSubmenuKey = '';
 
         if(view){
-
-            // console.log('view');
-            // console.log(view.state);
-            // console.log('lastState');
-            // console.log(lastState);
 
             const selection = view.state.selection;
             if(selection.constructor.name === 'TextSelection'){
@@ -140,7 +127,7 @@ export default class DOMinatorMenu {
                     // there is a selection show inline menu
                     activeSubmenuKey = 'inline';
                 }
-
+                
                 this.activeBlock = selection.$head.parent;
             }else if (selection.constructor.name === 'NodeSelection'){
                 if(selection.node.type.spec.menu){
@@ -148,10 +135,6 @@ export default class DOMinatorMenu {
                 }else{
                     activeSubmenuKey = selection.node.type.name;
                 }
-
-                // if(this.submenus[selection.node.type.name]){
-                //     activeSubmenuKey = selection.node.type.name;
-                // }
 
                 this.activeBlock = selection.node;
             }else if(selection.constructor.name === 'AllSelection'){
@@ -161,7 +144,7 @@ export default class DOMinatorMenu {
             }
         }
 
-        if( !activeSubmenuKey || activeSubmenuKey === 'doc'){
+        if( !activeSubmenuKey ){
             activeSubmenuKey = "paragraph";
         }
 
@@ -179,11 +162,8 @@ export default class DOMinatorMenu {
     }
 
     activateSubmenu(key){
-
         if(!this.submenus[key]){
-            console.error(this.submenus);
-            throw 'Submenu does no texist with a key: ' + key;
-            return;
+            key = '_default';
         }
 
         Object.keys(this.submenus).forEach(key=>{
@@ -198,110 +178,43 @@ export default class DOMinatorMenu {
     initMenu(){
 
         this.submenus = {
+            _default: new DOMinatorSubMenu({
+                key: '_default',
+                beforeUpdate: (sm)=>{
+                    let label = 'Editor';
+                    if(this.activeBlock){
+                        label = this.activeBlock.type.name.replace(/_/g, ' ');
+                    }
+                    sm.items[0].change(label);
+                },
+                items: [
+                    new DOMinatorMenuLabel({
+                        label: '_default'
+                    }),
+                    new DOMinatorMenuSeparator (),
+                    new DOMinatorMenuLabel({
+                        label: ' - n/a - '
+                    }),
+                ]
+            }),
             inline: _Inline(this),
             link: _Link(this),
             paragraph: _Paragraph(this),
             heading: _Heading(this),
             paddings: _Paddings(this),
             margins: _Margins(this),
-            list_item: new DOMinatorSubMenu({
-                key: 'list_item',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'List Item'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuLabel({
-                        label: ' - n/a - '
-                    }),
-                ]
-            }),
-            ordered_list: new DOMinatorSubMenu({
-                key: 'ordered_list',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'Ordered List'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuLabel({
-                        label: ' - n/a - '
-                    }),
-                ]
-            }),
-
             photograph: _Photograph(this),
             carousel: _Carousel(this),
+            card: _Card(this),
             carousel_link: _CarouselLink(this),
             layout: _Layout(this),
             layoutcolumn: _LayoutColumn(this),
 
             download_link: _DownloadLink(this),
-            download_title: new DOMinatorSubMenu({
-                key: 'download_link',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'Downloads Title'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuLabel({
-                        label: ' - n/a - '
-                    }),
-                ]
-            }),
-            downloads: new DOMinatorSubMenu({
-                key: 'downloads',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'Downloads'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuLabel({
-                        label: ' - n/a -'
-                    }),
-                ]
-            }),
             blocklink: _BlockLink(this),
-            custom_html: new DOMinatorSubMenu({
-                key: 'custom_html',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'Custom HTML'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuButton ({
-                        key: 'magic',
-                        icon: 'magic',
-                        action: ()=>{
-
-                        }
-                    }),
-                ],
-            }),
-            span: new DOMinatorSubMenu({
-                key: 'span',
-                items: [
-                    new DOMinatorMenuLabel({
-                        label: 'Style'
-                    }),
-                    new DOMinatorMenuSeparator (),
-                    new DOMinatorMenuButton ({
-                        key: 'magic',
-                        icon: 'magic',
-                        action: ()=>{
-
-                        }
-                    }),
-                ],
-            }),
+            span:  _Span(this)
         }
 
-        // if(typeof this.dominator.options.submenus === 'function'){
-        //     this.submenus = this.dominator.options.submenus(submenus);
-        // }else{
-        //     this.submenus = submenus;
-        // }
-
-        // this.submenus = { submenues, ...this.dominator.options.menus };
         this.dom = document.createElement("div");
         this.leftdom = document.createElement("div");
         this.rightdom = document.createElement("div");

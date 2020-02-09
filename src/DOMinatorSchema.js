@@ -551,10 +551,10 @@ export const nodes = {
         draggable: false,
         attrs: {
             class: {
-                default: null
+                default: 'd-carousel'
             },
             html: {
-                default: 'div.d-carousel'
+                default: ''
             }
         },
         parseDOM: [{
@@ -707,6 +707,34 @@ export const nodes = {
             ]
         }
     },
+    card: {
+        // content: "photograph{0,1} card_content{1}",
+        content: "(paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html)+",
+        group: "block",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {
+            'class': {
+                default: 'd-card'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.d-card',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class"),
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
     custom_html: {
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
@@ -761,12 +789,11 @@ export const marks = {
             'class': {
                 default: null
             },
-
         },
         excludes: 'span link',
         inclusive: false,
         parseDOM: [{
-            tag: "a:not(.list-group-item) a:not(.d-block-link)", //[href]
+            tag: "a:not(.list-group-item):not(.d-block-link)", //[href]
             getAttrs(dom) {
                 return {
                     href: dom.getAttribute("href"),
