@@ -10,7 +10,8 @@ import {
 } from "prosemirror-view"
 import {
     Schema,
-    DOMParser
+    DOMParser,
+    DOMSerializer
 } from "prosemirror-model"
 import {
     addListNodes
@@ -190,6 +191,7 @@ window.DOMinator = class DOMinator {
             this.options.beforeOff(this);
         }
 
+        const html = this.getHTML();
         this.onButton.classList.remove('active');
         document.body.classList.remove("dominatorMenuActive");
         this.codeEditingWindowClose();
@@ -203,6 +205,7 @@ window.DOMinator = class DOMinator {
         this.options.target.style.display = 'none';
         this.options.source.style.display = 'block';
 
+        this.options.source.innerHTML = html;
         if ( typeof this.options.afterOff === 'function' ) {
             this.options.afterOff(this);
         }
@@ -348,11 +351,7 @@ window.DOMinator = class DOMinator {
         });
 
         this.view.$d_listeners = this.options.listeners;
-        // console.log(this.options.listeners);
-        // console.log(this.view.$d_listeners);
-        setTimeout(()=>{
 
-        }, 500);
         this.options.target.style.display = 'block';
         this.options.source.style.display = 'none';
         if (typeof this.options.afterOn === 'function') {
@@ -442,8 +441,8 @@ window.DOMinator = class DOMinator {
     getHTML() {
         const div = document.createElement('div')
         const fragment = DOMSerializer
-            .fromSchema(this.schema)
-            .serializeFragment(this.state.doc.content)
+            .fromSchema(this.editorSchema)
+            .serializeFragment(this.view.state.doc.content)
 
         div.appendChild(fragment)
 

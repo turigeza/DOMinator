@@ -3299,7 +3299,7 @@
 
   // ::- A DOM serializer knows how to convert ProseMirror nodes and
   // marks of various types to DOM nodes.
-  var DOMSerializer$1 = function DOMSerializer(nodes, marks) {
+  var DOMSerializer = function DOMSerializer(nodes, marks) {
     // :: Object<(node: Node) → DOMOutputSpec>
     // The node serialization functions.
     this.nodes = nodes || {};
@@ -3313,7 +3313,7 @@
   // not in the browser, the `document` option, containing a DOM
   // document, should be passed so that the serializer can create
   // nodes.
-  DOMSerializer$1.prototype.serializeFragment = function serializeFragment (fragment, options, target) {
+  DOMSerializer.prototype.serializeFragment = function serializeFragment (fragment, options, target) {
       var this$1 = this;
       if ( options === void 0 ) options = {};
 
@@ -3356,11 +3356,11 @@
   // document. To serialize a whole document, use
   // [`serializeFragment`](#model.DOMSerializer.serializeFragment) on
   // its [content](#model.Node.content).
-  DOMSerializer$1.prototype.serializeNode = function serializeNode (node, options) {
+  DOMSerializer.prototype.serializeNode = function serializeNode (node, options) {
       if ( options === void 0 ) options = {};
 
     var ref =
-        DOMSerializer$1.renderSpec(doc(options), this.nodes[node.type.name](node));
+        DOMSerializer.renderSpec(doc(options), this.nodes[node.type.name](node));
       var dom = ref.dom;
       var contentDOM = ref.contentDOM;
     if (contentDOM) {
@@ -3374,7 +3374,7 @@
     return dom
   };
 
-  DOMSerializer$1.prototype.serializeNodeAndMarks = function serializeNodeAndMarks (node, options) {
+  DOMSerializer.prototype.serializeNodeAndMarks = function serializeNodeAndMarks (node, options) {
       if ( options === void 0 ) options = {};
 
     var dom = this.serializeNode(node, options);
@@ -3388,18 +3388,18 @@
     return dom
   };
 
-  DOMSerializer$1.prototype.serializeMark = function serializeMark (mark, inline, options) {
+  DOMSerializer.prototype.serializeMark = function serializeMark (mark, inline, options) {
       if ( options === void 0 ) options = {};
 
     var toDOM = this.marks[mark.type.name];
-    return toDOM && DOMSerializer$1.renderSpec(doc(options), toDOM(mark, inline))
+    return toDOM && DOMSerializer.renderSpec(doc(options), toDOM(mark, inline))
   };
 
   // :: (dom.Document, DOMOutputSpec) → {dom: dom.Node, contentDOM: ?dom.Node}
   // Render an [output spec](#model.DOMOutputSpec) to a DOM node. If
   // the spec has a hole (zero) in it, `contentDOM` will point at the
   // node with the hole.
-  DOMSerializer$1.renderSpec = function renderSpec (doc, structure) {
+  DOMSerializer.renderSpec = function renderSpec (doc, structure) {
     if (typeof structure == "string")
       { return {dom: doc.createTextNode(structure)} }
     if (structure.nodeType != null)
@@ -3419,7 +3419,7 @@
           { throw new RangeError("Content hole must be the only child of its parent node") }
         return {dom: dom, contentDOM: dom}
       } else {
-        var ref = DOMSerializer$1.renderSpec(doc, child);
+        var ref = DOMSerializer.renderSpec(doc, child);
           var inner = ref.dom;
           var innerContent = ref.contentDOM;
         dom.appendChild(inner);
@@ -3435,15 +3435,15 @@
   // :: (Schema) → DOMSerializer
   // Build a serializer using the [`toDOM`](#model.NodeSpec.toDOM)
   // properties in a schema's node and mark specs.
-  DOMSerializer$1.fromSchema = function fromSchema (schema) {
+  DOMSerializer.fromSchema = function fromSchema (schema) {
     return schema.cached.domSerializer ||
-      (schema.cached.domSerializer = new DOMSerializer$1(this.nodesFromSchema(schema), this.marksFromSchema(schema)))
+      (schema.cached.domSerializer = new DOMSerializer(this.nodesFromSchema(schema), this.marksFromSchema(schema)))
   };
 
   // : (Schema) → Object<(node: Node) → DOMOutputSpec>
   // Gather the serializers in a schema's node specs into an object.
   // This can be useful as a base to build a custom serializer from.
-  DOMSerializer$1.nodesFromSchema = function nodesFromSchema (schema) {
+  DOMSerializer.nodesFromSchema = function nodesFromSchema (schema) {
     var result = gatherToDOM(schema.nodes);
     if (!result.text) { result.text = function (node) { return node.text; }; }
     return result
@@ -3451,7 +3451,7 @@
 
   // : (Schema) → Object<(mark: Mark) → DOMOutputSpec>
   // Gather the serializers in a schema's mark specs into an object.
-  DOMSerializer$1.marksFromSchema = function marksFromSchema (schema) {
+  DOMSerializer.marksFromSchema = function marksFromSchema (schema) {
     return gatherToDOM(schema.marks)
   };
 
@@ -3474,7 +3474,7 @@
     __proto__: null,
     ContentMatch: ContentMatch,
     DOMParser: DOMParser,
-    DOMSerializer: DOMSerializer$1,
+    DOMSerializer: DOMSerializer,
     Fragment: Fragment,
     Mark: Mark,
     MarkType: MarkType,
@@ -7362,7 +7362,7 @@
       var custom = view.nodeViews[mark.type.name];
       var spec = custom && custom(mark, view, inline);
       if (!spec || !spec.dom)
-        { spec = DOMSerializer$1.renderSpec(document, mark.type.spec.toDOM(mark, inline)); }
+        { spec = DOMSerializer.renderSpec(document, mark.type.spec.toDOM(mark, inline)); }
       return new MarkViewDesc(parent, mark, spec.dom, spec.contentDOM || spec.dom)
     };
 
@@ -7438,7 +7438,7 @@
         if (!dom) { dom = document.createTextNode(node.text); }
         else if (dom.nodeType != 3) { throw new RangeError("Text must be rendered as a DOM text node") }
       } else if (!dom) {
-  ((assign = DOMSerializer$1.renderSpec(document, node.type.spec.toDOM(node)), dom = assign.dom, contentDOM = assign.contentDOM));
+  ((assign = DOMSerializer.renderSpec(document, node.type.spec.toDOM(node)), dom = assign.dom, contentDOM = assign.contentDOM));
       }
       if (!contentDOM && !node.isText && dom.nodeName != "BR") { // Chrome gets confused by <br contenteditable=false>
         if (!dom.hasAttribute("contenteditable")) { dom.contentEditable = false; }
@@ -8947,7 +8947,7 @@
       content = node.content;
     }
 
-    var serializer = view.someProp("clipboardSerializer") || DOMSerializer$1.fromSchema(view.state.schema);
+    var serializer = view.someProp("clipboardSerializer") || DOMSerializer.fromSchema(view.state.schema);
     var doc = detachedDoc(), wrap = doc.createElement("div");
     wrap.appendChild(serializer.serializeFragment(content, {document: doc}));
 
@@ -22212,13 +22212,20 @@
           if (node.type.name != "photograph_caption") {
               return false;
           }
-          if (node.content.size > 0) {
-              this.dom.classList.remove("empty");
-          }  else {
-              this.dom.classList.add("empty");
+
+          if (node.content.size === 0 && !node.attrs.class.includes('empty')) {
+              const a = { ...node.attrs };
+              a.class += ' empty';
+              this.view.dispatch(this.view.state.tr.setNodeMarkup(this.getPos(), null, a));
+              return true;
+          }  else if(node.content.size > 0 && node.attrs.class.includes(' empty')){
+              const a = { ...node.attrs };
+              a.class = a.class.replace(' empty', '');
+              this.view.dispatch(this.view.state.tr.setNodeMarkup(this.getPos(), null, a));
+              return true;
           }
 
-          return true;
+          return false;
       }
 
       stopEvent(event) {
@@ -34612,6 +34619,7 @@
               this.options.beforeOff(this);
           }
 
+          const html = this.getHTML();
           this.onButton.classList.remove('active');
           document.body.classList.remove("dominatorMenuActive");
           this.codeEditingWindowClose();
@@ -34625,6 +34633,7 @@
           this.options.target.style.display = 'none';
           this.options.source.style.display = 'block';
 
+          this.options.source.innerHTML = html;
           if ( typeof this.options.afterOff === 'function' ) {
               this.options.afterOff(this);
           }
@@ -34768,11 +34777,7 @@
           });
 
           this.view.$d_listeners = this.options.listeners;
-          // console.log(this.options.listeners);
-          // console.log(this.view.$d_listeners);
-          setTimeout(()=>{
 
-          }, 500);
           this.options.target.style.display = 'block';
           this.options.source.style.display = 'none';
           if (typeof this.options.afterOn === 'function') {
@@ -34862,8 +34867,8 @@
       getHTML() {
           const div = document.createElement('div');
           const fragment = DOMSerializer
-              .fromSchema(this.schema)
-              .serializeFragment(this.state.doc.content);
+              .fromSchema(this.editorSchema)
+              .serializeFragment(this.view.state.doc.content);
 
           div.appendChild(fragment);
 

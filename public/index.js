@@ -332,7 +332,6 @@ $( document ).ready(function(){
         if(e.which === 69 && e.metaKey){
             editor.toggle();
         }
-
     });
 
     initCarousels();

@@ -35,13 +35,20 @@ export default class PhotographCaptionView {
         if (node.type.name != "photograph_caption") {
             return false;
         }
-        if (node.content.size > 0) {
-            this.dom.classList.remove("empty");
-        }  else {
-            this.dom.classList.add("empty")
+
+        if (node.content.size === 0 && !node.attrs.class.includes('empty')) {
+            const a = { ...node.attrs };
+            a.class += ' empty';
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(this.getPos(), null, a));
+            return true;
+        }  else if(node.content.size > 0 && node.attrs.class.includes(' empty')){
+            const a = { ...node.attrs };
+            a.class = a.class.replace(' empty', '');
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(this.getPos(), null, a));
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     stopEvent(event) {
