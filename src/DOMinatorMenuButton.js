@@ -1,8 +1,9 @@
 export default class DOMinatorMenuButton {
+    // options
+    // icon
     // dom
     // options
     // menu
-    // icon
     // tempIcon = the last icon which was appended to the dropdown is kept for reference so we can swap it
     constructor(options) {
 
@@ -123,7 +124,21 @@ export default class DOMinatorMenuButton {
     }
 
     destroy() {
-
+        document.body.removeEventListener('mousedown', this.clicked);
+        if(this.icon){
+            this.icon.remove();
+        }
+        if(this.tempIcon){
+            this.tempIcon.remove();
+        }
+        this.options = null;
+        this.icon = null;
+        this.options = null;
+        this.menu = null;
+        this.tempIcon = null;
+        this.dom.remove();
+        this.dom = null;
+        this.parent = null;
     }
 
     getDom(){

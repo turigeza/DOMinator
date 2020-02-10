@@ -312,6 +312,12 @@ $( document ).ready(function(){
             //     theme: 'base16-dark',
             //     lineNumbers: true,
             // });
+        },
+        afterOn(DOMinator){
+            setTimeout(()=>{
+                console.log('afterOn');
+                initCarousels();
+            }, 500);
         }
     });
 
@@ -359,7 +365,8 @@ $( document ).ready(function(){
             if(flickity){
                 flickity.destroy();
             }
-            initCarousel($this);
+            // initCarousel($this);
+            console.log('initCarousel');
         });
     }
 

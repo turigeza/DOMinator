@@ -5,8 +5,8 @@ export default class DOMinatorMenuInput {
     // menu
     // val
     // parent
-    // input
-    // label
+    // input - dom
+    // label - dom
 
     constructor(options) {
         this.options = options;
@@ -66,5 +66,11 @@ export default class DOMinatorMenuInput {
 
     destroy() {
         this.dom.remove();
+        this.dom = null;
+        this.options = null;
+        this.menu = null;
+        this.parent = null;
+        this.input = null;
+        this.label = null;
     }
 }

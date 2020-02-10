@@ -1,13 +1,17 @@
 import DOMinatorMenuButton from "./DOMinatorMenuButton"
 export default class DOMinatorMenuDropdown {
+    // options
+    // items - array
     // menu
     // dom
-    // items
-    // dropdown
-    // dropdownButton - object
-    // dropdownCaret - the small triangle on the right indicating the dropdown
+
+    // dropdown - dom element
+    // dropdownButton - DOMinatorMenuButton object
+    // dropdownCaret - dom element the small triangle on the right indicating the dropdown
     // activeItems = array of the active menu items
     // originalDropdownIcon
+
+    // mousedown - event listener
     constructor(options) {
         const settings = {
             autoclose: true
@@ -73,7 +77,6 @@ export default class DOMinatorMenuDropdown {
             this.dropdownButton.dom.classList.add('DOMinatorButtonWithCaret');
         }
 
-
         this.dropdown = document.createElement("div");
         this.dropdown.className = "DOMinatorDropDownContainer";
         this.dropdown.style.display = "none"
@@ -90,7 +93,7 @@ export default class DOMinatorMenuDropdown {
         });
 
         // add an event listener to the document so we can let dropdowns know that they ar unfocused
-        this.mousedown = (event)=>{
+        this.mousedown = (event) => {
             if(!this.dom.contains(event.target) && this.options.autoclose){
                 this.close();
             }
@@ -137,6 +140,19 @@ export default class DOMinatorMenuDropdown {
 
     destroy() {
         document.body.removeEventListener('mousedown', this.mousedown);
+
+        this.items.forEach(item => item.destroy() );
         this.dom.remove();
+        this.dropdownButton.destroy();
+
+        this.mousedown = null;
+        this.options = null;
+        this.items = null;
+        this.menu = null;
+        this.dom = null;
+        this.dropdown = null
+        this.dropdownButton = null;
+        this.dropdownCaret = null;
+        this.activeItems = null;
     }
 }

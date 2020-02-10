@@ -270,3 +270,37 @@ body.dominatorMenuActive{
     border-right: 6px solid #eee;
     /* box-shadow: 0 -5px 10px -5px rgba(0,0,0,0.1); */
 }
+
+#DOMinatorOnButton{
+    pointer-events: all;
+    border: none;
+    outline: none;
+    border-radius: 0;
+    margin: 0;
+    width: auto;
+    overflow: visible;
+    position: fixed;
+    bottom: 45px;
+    right: 45px;
+    z-index: 1;
+    text-align: center;
+    font: inherit;
+    cursor: pointer;
+
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+    -webkit-appearance: none;
+
+    font-size: 24px;
+    line-height: 56px;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+    transition: 0.4s;
+}
+#DOMinatorOnButton.active{
+    background-color: #009CDE;
+    color: white;
+}

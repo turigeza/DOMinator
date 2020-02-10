@@ -1,3 +1,4 @@
+// come from https://github.com/ProseMirror/prosemirror-example-setup/blob/master/src/keymap.js ProseMirror/prosemirror-example-setup
 import {
     wrapIn,
     setBlockType,
@@ -70,7 +71,7 @@ export function buildKeymap(schema, mapKeys) {
     bind("Mod-z", undo)
     bind("Shift-Mod-z", redo)
     bind("Backspace", undoInputRule)
-    if (!mac) bind("Mod-y", redo)
+    bind("Mod-y", redo)
 
     bind("Alt-ArrowUp", joinUp)
     bind("Alt-ArrowDown", joinDown)

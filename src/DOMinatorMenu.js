@@ -52,16 +52,18 @@ import {
 
 export default class DOMinatorMenu {
 
-    // items - menu items
-    // view - pose mirror view
-    // dom - menu div
-    // leftdom - menu div
-    // rightdom - menu div
-    // mousedown - true : false helps us debounce selection change
     // dominator
+    // view - pose mirror view
     // editorSchema
-    // leftMenuDom
-    // rightMenuDom
+    // mousedown - true : false helps us debounce selection change
+    // dom - menu div
+
+    // dominator
+
+    // leftdom
+    // rightMenu
+    // rightdom
+
     // submenus
     // activeMark - update sets this to match the menu showing
     // activeBlock - current parent or selected parent
@@ -240,18 +242,26 @@ export default class DOMinatorMenu {
 
     }
 
-    // Create an icon for a heading at the given level
-    heading(level) {
-        return {
-            command: setBlockType(this.editorSchema.nodes.heading, {
-                level
-            }),
-            dom: this.icon("H" + level, "heading")
-        }
-    }
     destroy() {
-        this.view.dom.removeEventListener("mouseup");
-        this.view.dom.removeEventListener("mousedown");
+        Object.keys(this.submenus).forEach(key=>{
+            this.submenus[key].destroy();
+        });
+        this.rightMenu.destroy();
         this.dom.remove();
+
+        this.dominator = null;
+        this.view = null;
+        this.editorSchema = null;
+        this.dom = null;
+        this.dominator = null;
+
+        this.leftdom.remove();
+        this.leftdom = null;
+        this.rightMenu = null;
+        this.rightdom.remove();
+        this.rightdom = null;
+        this.submenus = null;
+        this.activeMark = null;
+        this.activeBlock = null;
     }
 }

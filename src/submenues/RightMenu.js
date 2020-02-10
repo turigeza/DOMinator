@@ -82,7 +82,10 @@ export default function(menu) {
                     icon: 'close',
                     label: 'Exit',
                     action: () => {
-                        menu.dominator.options.exit(menu, menu.dominator);
+                        // for some reason it needs a bit of timeout : ) like me
+                        setTimeout(()=>{
+                            menu.dominator.off();
+                        }, 10);
                     }
                 }),
             ]

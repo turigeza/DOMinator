@@ -53,6 +53,9 @@ export default class DOMinatorSubMenu {
     }
 
     destroy() {
+        this.items.forEach(item => item.destroy());
         this.dom.remove();
+        this.menu = null;
+        this.options = null;
     }
 }
