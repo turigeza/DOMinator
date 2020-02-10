@@ -764,7 +764,7 @@ export const nodes = {
         toDOM(node) {
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
-            if(node.attrs){
+            if(node.attrs.class){
                 newDiv.setAttribute('class', node.attrs.class);
             }
 

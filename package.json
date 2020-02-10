@@ -17,6 +17,8 @@
         "url": "git://github.com/turigeza/DOMinator.git"
     },
     "dependencies": {
+        "codemirror": "^5.51.0",
+        "codemirror-formatting": "^1.0.0",
         "prosemirror-dropcursor": "^1.0.0",
         "prosemirror-gapcursor": "^1.0.0",
         "prosemirror-history": "^1.0.0",

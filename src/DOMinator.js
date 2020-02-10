@@ -1,9 +1,3 @@
-// import {
-//     Selection,
-//     ,
-//     NodeSelection,
-//     AllSelection
-// } from "prosemirror-state"
 import {
     Plugin,
     EditorState,
@@ -40,11 +34,19 @@ import {
 
 } from "./DOMinatorActions"
 
+import CodeMirror from "codemirror"
+// import xml from "codemirror/mode/xml/xml"
+// import javascript from "codemirror/mode/javascript/javascript"
+// import css from "codemirror/mode/css/css"
+import htmlmixed from "codemirror/mode/htmlmixed/htmlmixed"
+import formatting from "codemirror-formatting"
+
 window.DOMinator = class DOMinator {
     // editorSchema
     // view -view editors
     // menuItems
     // menu
+    // codemirror - instance for the code editing bit
     constructor(options) {
 
         // init options
@@ -69,10 +71,13 @@ window.DOMinator = class DOMinator {
             carouselMoveSlideLeft: this.implementMessage('carouselMoveSlideLeft'),
             carouselMoveSlideRight: this.implementMessage('carouselMoveSlideRight'),
             carouselToggleSetting: this.implementMessage('carouselToggleSetting'),
-
             carouselUpdateButton: ()=>{},
             carouselGet: ()=>{},
             carouselSet: this.implementMessage('carouselSet'),
+
+            // custom html related
+            // customHtmlSave: ()=>{},
+            customHtmlFormat: ()=>{},
 
             paddingClasses: paddingClasses,
             marginClasses: marginClasses,
@@ -242,6 +247,87 @@ window.DOMinator = class DOMinator {
         });
         this.view.$d_listeners = this.options.listeners;
 
+        this.initCodeEditingWindow();
+        if(typeof this.options.afterConstruct === 'function'){
+            this.options.afterConstruct(this);
+        }
+    }
+
+    initCodeEditingWindow(){
+        this.CodeEditorWindow = document.getElementById("DOMinatorCodeEditor");
+        if(!this.CodeEditorWindow){
+            this.CodeEditorWindow = document.createElement('div');
+            this.CodeEditorWindow.setAttribute('id', 'DOMinatorCodeEditor');
+            this.CodeEditorWindow.style.visibility = 'hidden';
+
+            document.body.appendChild(this.CodeEditorWindow);
+            this.codemirror = new CodeMirror(this.CodeEditorWindow, {
+                value: `
+                <h2>Where can I get some?</h2>
+                <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a
+                    passage of
+                    Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on
+                    the
+                    Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition,
+                    injected
+                    humour, or non-characteristic words etc.</p>
+                <div class="tg_widget layout layout_3333" data-category="layouts" data-key="layout_3333" data-widget_id="4a4961ac-99ee-4fa2-a147-dde426426fec">
+                    <div class="tg_editable cl_3" data-editable_id="content_1">
+                        <h3>Lorem Ipsum</h3>
+                        <p>Vivamus rhoncus justo vitae sem consequat, ac tristique neque maximus. Etiam et sapien vel ipsum tincidunt iaculis. Nullam sed purus mi. Morbi eu vestibulum augue, at dignissim metus.</p>
+                    </div>
+                    <div class="tg_editable cl_3" data-editable_id="content_2">
+                        <h3>Lorem Ipsum</h3>
+                        <p>Vivamus rhoncus justo vitae sem consequat, ac tristique neque maximus. Etiam et sapien vel ipsum tincidunt iaculis. Nullam sed purus mi. Morbi eu vestibulum augue, at dignissim metus.</p>
+                    </div>
+                    <div class="tg_editable cl_3" data-editable_id="content_3">
+                        <h3>Lorem Ipsum</h3>
+                        <p>Vivamus rhoncus justo vitae sem consequat, ac tristique neque maximus. Etiam et sapien vel ipsum tincidunt iaculis. Nullam sed purus mi. Morbi eu vestibulum augue, at dignissim metus.</p>
+                    </div>
+                    <div class="tg_editable cl_3" data-editable_id="content_4">
+                        <h3>Lorem Ipsum</h3>
+                        <p>Vivamus rhoncus justo vitae sem consequat, ac tristique neque maximus. Etiam et sapien vel ipsum tincidunt iaculis. Nullam sed purus mi. Morbi eu vestibulum augue, at dignissim metus.</p>
+                    </div>
+                </div>
+                `,
+                mode: "text/html",
+                // theme: 'base16-dark',
+                lineNumbers: true,
+                // extraKeys: this.codeMirrorKeymap()
+            });
+
+            let timeout = null;
+            this.codemirror.on('change', ()=>{
+                clearTimeout(timeout);
+                timeout = setTimeout(()=>{
+                    this.codeEditingWindowSave();
+                }, 500);
+            })
+        }
+    }
+
+    codeEditingWindowOpen(){
+        if(!this.menu.activeBlock || this.menu.activeBlock.type.name !== "custom_html"){
+            return;
+        }
+
+        this.codemirror.setValue(this.menu.activeBlock.attrs.html);
+        this.CodeEditorWindow.style.visibility="visible";
+    }
+    codeEditingWindowFormat(){
+        CodeMirror.commands["selectAll"](this.codemirror);
+        this.codemirror.autoFormatRange(this.codemirror.getCursor(true), this.codemirror.getCursor(false));
+    }
+
+    codeEditingWindowSave(){
+        const html = this.codemirror.getValue();
+        changeAttributeOnNode(this.menu, 'html',  html);
+    }
+
+    codeEditingWindowClose(){
+        if(this.CodeEditorWindow){
+            this.CodeEditorWindow.style.visibility="hidden";
+        }
     }
 
     // comes from TIPTAP https://tiptap.scrumpy.io/

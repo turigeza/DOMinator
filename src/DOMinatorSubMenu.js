@@ -33,12 +33,18 @@ export default class DOMinatorSubMenu {
 
     hide(){
         this.dom.style.display = "none";
+        if(typeof this.options.afterHide === 'function'){
+            this.options.afterHide(this);
+        }
     }
 
     show(menu){
         this.dom.style.display = "";
         if(menu){
             this.update(menu);
+        }
+        if(typeof this.options.afterShow === 'function'){
+            this.options.afterShow(this);
         }
     }
 

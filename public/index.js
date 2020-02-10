@@ -304,6 +304,14 @@ $( document ).ready(function(){
                 }
                 return true;
             },
+        },
+        afterConstruct: (DOMinator) => {
+            // // console.log(DOMinator.CodeEditorWindowTextarea);
+            // var myCodeMirror = CodeMirror.fromTextArea(DOMinator.CodeEditorWindowTextarea, {
+            //     mode: "text/html",
+            //     theme: 'base16-dark',
+            //     lineNumbers: true,
+            // });
         }
     });
 

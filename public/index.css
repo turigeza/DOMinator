@@ -22,3 +22,6 @@
     float: right; */
     display: none;
 }
+.CodeMirror{
+    height: 100%;
+}

@@ -8,7 +8,7 @@
 
     z-index: 100;
     border-bottom: 2px solid #eee;
-    box-shadow: 0 5px 10px -5px rgba(0,0,0,0.1);;
+    box-shadow: 0 5px 10px -5px rgba(0,0,0,0.1);
     height: 45px;
     display: flex;
     flex-direction: row;
@@ -259,4 +259,14 @@ body.dominatorMenuActive{
     white-space: nowrap;
     /* background-color: #eee; */
     /* height: 40px; */
+}
+#DOMinatorCodeEditor{
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    height: 40vh;
+    border-top: 6px solid #eee;
+    border-right: 6px solid #eee;
+    /* box-shadow: 0 -5px 10px -5px rgba(0,0,0,0.1); */
 }

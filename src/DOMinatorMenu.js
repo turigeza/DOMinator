@@ -25,7 +25,7 @@ import _DownloadLink from "./Submenues/DownloadLink"
 import _BlockLink from "./Submenues/BlockLink"
 import _Layout from "./Submenues/Layout"
 import _LayoutColumn from "./Submenues/LayoutColumn"
-
+import _CustomHtml from "./Submenues/CustomHtml"
 
 import smRightMenu from "./Submenues/RightMenu"
 
@@ -127,7 +127,7 @@ export default class DOMinatorMenu {
                     // there is a selection show inline menu
                     activeSubmenuKey = 'inline';
                 }
-                
+
                 this.activeBlock = selection.$head.parent;
             }else if (selection.constructor.name === 'NodeSelection'){
                 if(selection.node.type.spec.menu){
@@ -166,8 +166,10 @@ export default class DOMinatorMenu {
             key = '_default';
         }
 
-        Object.keys(this.submenus).forEach(key=>{
-            this.submenus[key].hide();
+        Object.keys(this.submenus).forEach(k=>{
+            if(k !== key){
+                this.submenus[k].hide();
+            }
         });
 
         // this also calls the update method on each element
@@ -212,7 +214,8 @@ export default class DOMinatorMenu {
 
             download_link: _DownloadLink(this),
             blocklink: _BlockLink(this),
-            span:  _Span(this)
+            span:  _Span(this),
+            custom_html: _CustomHtml(this),
         }
 
         this.dom = document.createElement("div");

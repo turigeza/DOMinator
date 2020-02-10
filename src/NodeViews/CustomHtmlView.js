@@ -1,19 +1,16 @@
-import {
-    TextSelection,
-    NodeSelection
-} from "prosemirror-state"
-
 export default class CustomHtmlView {
 
     constructor(node, view, getPos) {
-
         this.node = node
         this.view = view
         this.getPos = getPos
 
         this.dom = document.createElement('div');
         this.dom.innerHTML = node.attrs.html;
-        this.dom.setAttribute("class", node.attrs.class);
+
+        if(node.attrs.class){
+            this.dom.setAttribute("class", node.attrs.class);
+        }
 
         // this is in case we need to initialise any javascript after construction
         if(view.$d_listeners && typeof view.$d_listeners.afterCustomHtmlConstruct === 'function'){
@@ -30,7 +27,7 @@ export default class CustomHtmlView {
             return this.view.$d_listeners.beforeCustomHtmlUpdate(this.dom, node);
         }
 
-        return true;
+        return false;
     }
 
     ignoreMutation() {
