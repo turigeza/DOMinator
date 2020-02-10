@@ -16,7 +16,6 @@ export default class CarouselView {
     }
 
     update(node, decorations) {
-
         // I don't get this bit but
         if(node.type.name !== 'carousel'){
             return false;
@@ -26,7 +25,7 @@ export default class CarouselView {
             return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
         }
 
-        return true;
+        return false;
     }
 
     ignoreMutation() {

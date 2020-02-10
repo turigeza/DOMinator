@@ -490,6 +490,7 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
+        atom: true,
         attrs: {
             class: {
                 default: 'd-photograph'
@@ -674,6 +675,7 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
+        atom: true,
         attrs: {
             href: {
                 default: ''

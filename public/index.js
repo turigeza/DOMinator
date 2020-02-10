@@ -42,7 +42,8 @@ $( document ).ready(function(){
     cleanUpHtml();
 
     var editor = new DOMinator({
-        container: '#editor',
+        source: document.getElementById('content'),
+        target: document.getElementById('editor'),
         downloads: (DOMinator) => {
             DOMinator.insertDownloads([
                 { href: '/', title: 'I am the title.',  target: null },
@@ -62,6 +63,7 @@ $( document ).ready(function(){
         custom_html: (DOMinator) => {
             DOMinator.insertHtml('Custom HTML');
         },
+
         // carousel
         carousel: (DOMinator) => {
             const html = `<div class="carousel_wrapper">
@@ -290,7 +292,7 @@ $( document ).ready(function(){
             afterCarouselConstruct: (dom) => {
                 setTimeout(()=>{
                     initCarousels();
-                }, 10);
+                }, 100);
             },
             beforeCarouselUpdate: (dom, node) => {
                 const htmlInDom = getHtmlFromCarousel($(dom));
@@ -306,24 +308,32 @@ $( document ).ready(function(){
             },
         },
         afterConstruct: (DOMinator) => {
-            // // console.log(DOMinator.CodeEditorWindowTextarea);
-            // var myCodeMirror = CodeMirror.fromTextArea(DOMinator.CodeEditorWindowTextarea, {
-            //     mode: "text/html",
-            //     theme: 'base16-dark',
-            //     lineNumbers: true,
-            // });
+
         },
+        beforeOn(DOMinator){
+            destroyCarousels();
+        },
+
         afterOn(DOMinator){
-            setTimeout(()=>{
-                console.log('afterOn');
-                initCarousels();
-            }, 500);
+            // setTimeout(()=>{
+            //     //console.log('afterOn');
+            // }, 500);
+        },
+        afterOff(DOMinator){
+            initCarousels();
         }
     });
 
     // setTimeout(()=>{
     //     editor.selectNode(10);
     // }, 500);
+
+    $(document).on('keydown', (e) => {
+        if(e.which === 69 && e.metaKey){
+            editor.toggle();
+        }
+
+    });
 
     initCarousels();
 
@@ -365,8 +375,7 @@ $( document ).ready(function(){
             if(flickity){
                 flickity.destroy();
             }
-            // initCarousel($this);
-            console.log('initCarousel');
+            initCarousel($this);
         });
     }
 

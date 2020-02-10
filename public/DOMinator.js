@@ -13950,6 +13950,7 @@
           defining: true,
           selectable: true,
           draggable: false,
+          atom: true,
           attrs: {
               class: {
                   default: 'd-photograph'
@@ -14134,6 +14135,7 @@
           defining: true,
           selectable: true,
           draggable: false,
+          atom: true,
           attrs: {
               href: {
                   default: ''
@@ -21816,7 +21818,6 @@
           this.initMenu();
 
           this.update();
-          document.body.classList.add("dominatorMenuActive");
 
           this.view.dom.addEventListener("mousedown", e => {
               this.mousedown = true;
@@ -22295,7 +22296,6 @@
       }
 
       update(node, decorations) {
-
           // I don't get this bit but
           if(node.type.name !== 'carousel'){
               return false;
@@ -22305,7 +22305,7 @@
               return this.view.$d_listeners.beforeCarouselUpdate(this.dom, node);
           }
 
-          return true;
+          return false;
       }
 
       ignoreMutation() {
@@ -34498,11 +34498,14 @@
       // codemirror
       // menu
       // codemirror - instance for the code editing bit
+      // domNode
+      // dom
       constructor(options) {
 
           // init options
           const defaults = {
-              container: '',
+              source: null,
+              target: null,
               listeners: {}, //
 
               // DOMinator hands over the ui which don't want to take care of. These are callback functions.
@@ -34568,8 +34571,11 @@
               ...options
           };
 
-          if (!this.options.container) {
-              throw 'Container selector is empty!';
+          if (!this.options.source) {
+              throw 'Options must contain a source dom element. For example dom: document.getElementById("content").';
+          }
+          if (!this.options.target) {
+              throw 'Options must contain a target dom element. For example dom: document.getElementById("content").';
           }
 
           // init editorSchema
@@ -34589,10 +34595,26 @@
           }
       }
 
+      isOn(){
+          return this.view ? true : false;
+      }
+
+      toggle() {
+          if (this.isOn()) {
+              this.off();
+          }else{
+              this.on();
+          }
+      }
+
       off() {
           if (typeof this.options.beforeOff === 'function') {
               this.options.beforeOff(this);
           }
+
+          this.onButton.classList.remove('active');
+          document.body.classList.remove("dominatorMenuActive");
+          this.codeEditingWindowClose();
           this.view.$d_listeners = null;
           this.view.destroy();
           this.onButton.visibility = 'visible';
@@ -34600,7 +34622,10 @@
           this.view = null;
           this.menu = null;
 
-          if (typeof this.options.afterOff === 'function') {
+          this.options.target.style.display = 'none';
+          this.options.source.style.display = 'block';
+
+          if ( typeof this.options.afterOff === 'function' ) {
               this.options.afterOff(this);
           }
       }
@@ -34609,14 +34634,21 @@
           if (this.view) {
               return false;
           }
+
+          if (typeof this.options.beforeOn === 'function') {
+              this.options.beforeOn(this);
+          }
+
+          this.onButton.classList.add('active');
+          document.body.classList.add("dominatorMenuActive");
+
           var that = this;
           this.onButton.visibility = 'hidden';
 
           // init view
-          this.view = new EditorView(document.querySelector("#editor"), {
+          this.view = new EditorView(this.options.target, {
               state: EditorState.create({
-                  doc: DOMParser.fromSchema(this.editorSchema).parse(document.querySelector("#content")),
-                  // plugins: exampleSetup({schema: this.editorSchema}),
+                  doc: DOMParser.fromSchema(this.editorSchema).parse(this.options.source),
                   plugins: [
                       buildInputRules(this.editorSchema),
                       new Plugin({
@@ -34711,15 +34743,19 @@
               }),
               nodeViews: {
                   custom_html(node, view, getPos) {
+                      view.$d_listeners = that.options.listeners;
                       return new CustomHtmlView(node, view, getPos)
                   },
                   photograph_caption(node, view, getPos) {
+                      view.$d_listeners = that.options.listeners;
                       return new PhotographCaptionView(node, view, getPos)
                   },
                   carousel(node, view, getPos) {
+                      view.$d_listeners = that.options.listeners;
                       return new CarouselView(node, view, getPos)
                   },
                   image(node, view, getPos) {
+                      view.$d_listeners = that.options.listeners;
                       return new ImageView(node, view, getPos)
                   },
               },
@@ -34732,6 +34768,13 @@
           });
 
           this.view.$d_listeners = this.options.listeners;
+          // console.log(this.options.listeners);
+          // console.log(this.view.$d_listeners);
+          setTimeout(()=>{
+
+          }, 500);
+          this.options.target.style.display = 'block';
+          this.options.source.style.display = 'none';
           if (typeof this.options.afterOn === 'function') {
               this.options.afterOn(this);
           }

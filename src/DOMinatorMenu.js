@@ -79,7 +79,6 @@ export default class DOMinatorMenu {
         this.initMenu();
 
         this.update();
-        document.body.classList.add("dominatorMenuActive");
 
         this.view.dom.addEventListener("mousedown", e => {
             this.mousedown = true;

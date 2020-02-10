@@ -10,17 +10,11 @@
 }
 
 #editor{
-    /* background-color: LightSeaGreen; */
-    /* border: 2px solid LightSeaGreen; */
-    float: left;
-    overflow: visible;
+
 }
 
 #content{
-    /* background-color: Salmon; */
-    /* border: 2px solid Salmon;
-    float: right; */
-    display: none;
+
 }
 .CodeMirror{
     height: 100%;
