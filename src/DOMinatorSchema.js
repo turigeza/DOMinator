@@ -490,6 +490,7 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
+        canTakeMargin: true,
         atom: true,
         attrs: {
             class: {

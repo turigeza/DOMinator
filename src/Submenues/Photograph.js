@@ -278,10 +278,32 @@ export default function(menu) {
                 })
             ]
         }),
-        new DOMinatorMenuLabel({
-            label: 'Alt tag:'
+        // margins
+        new DOMinatorMenuButton({
+            key: 'margins',
+            icon: 'margin',
+            iconType: 'dics',
+            action: (button) => {
+                menu.activateSubmenu('margins');
+            },
+            update(button, menu, ) {
+                const block = menu.activeBlock;
+                if (block && block.type.spec.canTakeMargin) {
+                    button.enable();
+                    if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                        button.activate();
+                    } else {
+                        button.deactivate();
+                    }
+                } else {
+                    button.disable();
+                    button.deactivate();
+                }
+            }
         }),
+        // alt tag
         new DOMinatorMenuInput ({
+            label: 'Alt tag:',
             update: (input) => {
                 const {img} = getImage(menu);
                 if(!img){ return true; }

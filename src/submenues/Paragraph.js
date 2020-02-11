@@ -1,7 +1,6 @@
 import {
     alignSelection,
     updateAlignmentButton,
-    toggleClassOnNode
 } from "./../DOMinatorActions"
 
 import DOMinatorMenuButton from "./../DOMinatorMenuButton"
@@ -13,7 +12,8 @@ import {
     convertBlock,
     toggleList,
     toggleWrap,
-    insertLayout
+    insertLayout,
+    insertBlock
 } from "./../DOMinatorActions"
 
 export default function(menu) {
@@ -230,8 +230,7 @@ export default function(menu) {
                     state.schema.nodes.paragraph.create({}, state.schema.text('Nulla in sollicitudin ligula. Quisque sit amet porta dolor. Nunc lobortis nisi magna, sed ultricies velit ultricies a. Ut a sapien et ipsum pulvinar blandit.'))
                 ]);
 
-                let tr = state.tr.insert(pos+1, card);
-                view.dispatch(tr);
+                insertBlock(menu, card);
             }
         }),
         // layouts
@@ -312,7 +311,20 @@ export default function(menu) {
             icon: 'minus',
             action: (button) => {
                 const hr = menu.view.state.schema.nodes.horizontal_rule.create({});
-                menu.view.dispatch(menu.view.state.tr.insert(menu.view.state.selection.from+1, hr));
+                insertBlock(menu, hr);
+            }
+        }),
+        // blocklink
+        new DOMinatorMenuButton({
+            key: 'blocklink',
+            icon: 'link',
+            action: (button) => {
+                const blocklink = menu.view.state.schema.nodes.blocklink.create({},
+                    menu.view.state.schema.nodes.paragraph.create({},
+                        menu.view.state.schema.text(`This is a block link. All of the content here will link to a page. You can put text and other content here like an image. But please don't put other links in here.`)
+                    )
+                );
+                insertBlock(menu, blocklink);
             }
         }),
         // custom html

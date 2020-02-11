@@ -37,7 +37,7 @@ export default function(menu) {
     }
 
     return new DOMinatorSubMenu({
-        key: 'layout',
+        key: 'layout_column',
         items: items
     });
 }

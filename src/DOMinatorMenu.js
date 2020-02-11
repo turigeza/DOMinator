@@ -140,6 +140,8 @@ export default class DOMinatorMenu {
                 this.activeBlock = selection.node;
             }else if(selection.constructor.name === 'AllSelection'){
                 activeSubmenuKey = 'inline';
+            }else if(selection.constructor.name === 'GapCursor'){
+                activeSubmenuKey = "paragraph";
             }else{
                 console.error('Uknown selection !');
             }

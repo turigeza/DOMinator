@@ -358,13 +358,15 @@ export function insertLayout(menu, layoutKey){
             const columnNode = state.schema.nodes[columnKey].create({}, columnText);
             columns.push(columnNode);
             columnIndex++;
-            //  const columnParagraph = state.schema.text('Column '+ (i+1));
         }
     });
 
     const layoutNode = layout.create({}, columns);
-    const tr = state.tr.insert( selection.$head.after(1), layoutNode );
-    menu.view.dispatch(tr);
+    const pos = selection.$head.after(1);
+
+    let tr = state.tr.insert( pos, layoutNode );
+    tr.setSelection(TextSelection.create(tr.doc, pos +1));
+    menu.view.dispatch(tr.scrollIntoView());
 }
 
 export function canInsertDownloads(menu){
@@ -390,20 +392,105 @@ export function insertDownloads(menu, items){
         links.push( state.schema.nodes.download_link.create(item, state.schema.text(item.title)) );
     });
 
-    let append = null;
     const after = $cursor.after();
 
     // we are within a download
     if(grandParent && grandParent.type.name === 'downloads'){
-        append = links;
+        const tr = state.tr.insert( after, links );
+        menu.view.dispatch(tr.scrollIntoView());
     }else{
         const title = state.schema.nodes.download_title.create({}, state.schema.text('Download'));
         links.unshift(title);
-        append = state.schema.nodes.downloads.create({}, links);
+        const downloads = state.schema.nodes.downloads.create({}, links);
+        insertBlock(menu, downloads);
+    }
+}
+
+// export function canInsertBlock(menu, block){
+//
+// }
+
+export function insertBlock(menu, block){
+
+    const view = menu.view;
+    const selection = view.state.selection;
+    const state = view.state;
+    const pos = selection.from;
+    const $pos = selection.$from;
+
+    // start(depth: ?⁠number) → number
+    // The (absolute) position at the start of the node at the given level.
+    //
+    // end(depth: ?⁠number) → number
+    // The (absolute) position at the end of the node at the given level.
+    //
+    // before(depth: ?⁠number) → number
+    // The (absolute) position directly before the wrapping node at the given level, or, when depth is this.depth + 1, the original position.
+    //
+    // after(depth: ?⁠number) → number
+    // The (absolute) position directly after the wrapping node at the given level, or the original position when depth is this.depth + 1.
+    // // const $cursor = selection.$cursor;
+    // const grandParent = $cursor.node($cursor.depth-1);
+    // const before = $cursor.before();
+    // const after = $cursor.after();
+
+
+    // console.log(selection);
+    // // console.log('before');
+    // // console.log($pos.before());
+    // // console.log('after');
+    // // console.log($pos.after());
+    // console.log('start');
+    // console.log($pos.start());
+    // console.log('end');
+    // console.log($pos.end());
+
+    // console.log('nodeAfter');
+    // console.log($pos.nodeAfter);
+    // console.log('nodeBefore');
+    // console.log($pos.nodeBefore);
+    // console.log('selection.constructor.name');
+    // console.log(selection.constructor.name);
+
+    if(!selection.empty){
+        return;
     }
 
-    const tr = state.tr.insert( after, append );
-    menu.view.dispatch(tr);
+    let insertPosition = pos;
+    let tr = null;
+
+    if(selection.constructor.name === 'TextSelection'){
+        // selection is with the text
+        if($pos.nodeBefore && $pos.nodeBefore.type.name === 'text' && $pos.nodeAfter && $pos.nodeAfter.type.name === 'text' ){
+            // this behaves well on the most part except if you new line invisible characters in the html
+            console.log('text - text');
+        }else if(!$pos.nodeAfter && $pos.nodeBefore){
+            console.log('!$pos.nodeAfter');
+            // end of a text node would
+            insertPosition = pos+1;
+        }else if(!$pos.nodeBefore && $pos.nodeAfter){
+            console.log('!$pos.nodeBefore');
+            insertPosition = pos-1;
+        }else if(!$pos.nodeBefore && !$pos.nodeAfter){
+            console.log('!$pos.nodeBefore && !$pos.nodeAfter');
+            insertPosition = pos-1;
+        }else if($pos.nodeBefore && $pos.nodeAfter){
+            console.log('NODE = NODE - both node exist but not text');
+        }else{
+            console.error('We can not insert a block here');
+        }
+    }else if(selection.constructor.name === 'NodeSelection'){
+        // we don't care about this sceanrio it should not be possible to do this
+        // console.log('NodeSelection');
+        return false;
+    }else if(selection.constructor.name === 'GapCursor'){
+        // console.log('GapCursor');
+        // this behaves well out of the box
+    }
+
+    tr = state.tr.insert( insertPosition, block );
+    view.dispatch(tr.scrollIntoView());
+
 }
 
 export function toggleClassOnNode(menu, className){

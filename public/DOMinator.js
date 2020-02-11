@@ -13950,6 +13950,7 @@
           defining: true,
           selectable: true,
           draggable: false,
+          canTakeMargin: true,
           atom: true,
           attrs: {
               class: {
@@ -19836,13 +19837,15 @@
               const columnNode = state.schema.nodes[columnKey].create({}, columnText);
               columns.push(columnNode);
               columnIndex++;
-              //  const columnParagraph = state.schema.text('Column '+ (i+1));
           }
       });
 
       const layoutNode = layout.create({}, columns);
-      const tr = state.tr.insert( selection.$head.after(1), layoutNode );
-      menu.view.dispatch(tr);
+      const pos = selection.$head.after(1);
+
+      let tr = state.tr.insert( pos, layoutNode );
+      tr.setSelection(TextSelection.create(tr.doc, pos +1));
+      menu.view.dispatch(tr.scrollIntoView());
   }
 
   function canInsertDownloads(menu){
@@ -19868,20 +19871,102 @@
           links.push( state.schema.nodes.download_link.create(item, state.schema.text(item.title)) );
       });
 
-      let append = null;
       const after = $cursor.after();
 
       // we are within a download
       if(grandParent && grandParent.type.name === 'downloads'){
-          append = links;
+          const tr = state.tr.insert( after, links );
+          menu.view.dispatch(tr.scrollIntoView());
       }else{
           const title = state.schema.nodes.download_title.create({}, state.schema.text('Download'));
           links.unshift(title);
-          append = state.schema.nodes.downloads.create({}, links);
+          const downloads = state.schema.nodes.downloads.create({}, links);
+          insertBlock(menu, downloads);
+      }
+  }
+
+  // export function canInsertBlock(menu, block){
+  //
+  // }
+
+  function insertBlock(menu, block){
+
+      const view = menu.view;
+      const selection = view.state.selection;
+      const state = view.state;
+      const pos = selection.from;
+      const $pos = selection.$from;
+
+      // start(depth: ?⁠number) → number
+      // The (absolute) position at the start of the node at the given level.
+      //
+      // end(depth: ?⁠number) → number
+      // The (absolute) position at the end of the node at the given level.
+      //
+      // before(depth: ?⁠number) → number
+      // The (absolute) position directly before the wrapping node at the given level, or, when depth is this.depth + 1, the original position.
+      //
+      // after(depth: ?⁠number) → number
+      // The (absolute) position directly after the wrapping node at the given level, or the original position when depth is this.depth + 1.
+      // // const $cursor = selection.$cursor;
+      // const grandParent = $cursor.node($cursor.depth-1);
+      // const before = $cursor.before();
+      // const after = $cursor.after();
+
+
+      // console.log(selection);
+      // // console.log('before');
+      // // console.log($pos.before());
+      // // console.log('after');
+      // // console.log($pos.after());
+      // console.log('start');
+      // console.log($pos.start());
+      // console.log('end');
+      // console.log($pos.end());
+
+      // console.log('nodeAfter');
+      // console.log($pos.nodeAfter);
+      // console.log('nodeBefore');
+      // console.log($pos.nodeBefore);
+      // console.log('selection.constructor.name');
+      // console.log(selection.constructor.name);
+
+      if(!selection.empty){
+          return;
       }
 
-      const tr = state.tr.insert( after, append );
-      menu.view.dispatch(tr);
+      let insertPosition = pos;
+      let tr = null;
+
+      if(selection.constructor.name === 'TextSelection'){
+          // selection is with the text
+          if($pos.nodeBefore && $pos.nodeBefore.type.name === 'text' && $pos.nodeAfter && $pos.nodeAfter.type.name === 'text' ){
+              // this behaves well on the most part except if you new line invisible characters in the html
+              console.log('text - text');
+          }else if(!$pos.nodeAfter && $pos.nodeBefore){
+              console.log('!$pos.nodeAfter');
+              // end of a text node would
+              insertPosition = pos+1;
+          }else if(!$pos.nodeBefore && $pos.nodeAfter){
+              console.log('!$pos.nodeBefore');
+              insertPosition = pos-1;
+          }else if(!$pos.nodeBefore && !$pos.nodeAfter){
+              console.log('!$pos.nodeBefore && !$pos.nodeAfter');
+              insertPosition = pos-1;
+          }else if($pos.nodeBefore && $pos.nodeAfter){
+              console.log('NODE = NODE - both node exist but not text');
+          }else{
+              console.error('We can not insert a block here');
+          }
+      }else if(selection.constructor.name === 'NodeSelection'){
+          // we don't care about this sceanrio it should not be possible to do this
+          // console.log('NodeSelection');
+          return false;
+      }else if(selection.constructor.name === 'GapCursor');
+
+      tr = state.tr.insert( insertPosition, block );
+      view.dispatch(tr.scrollIntoView());
+
   }
 
   function toggleClassOnNode(menu, className){
@@ -20351,8 +20436,7 @@
                       state.schema.nodes.paragraph.create({}, state.schema.text('Nulla in sollicitudin ligula. Quisque sit amet porta dolor. Nunc lobortis nisi magna, sed ultricies velit ultricies a. Ut a sapien et ipsum pulvinar blandit.'))
                   ]);
 
-                  let tr = state.tr.insert(pos+1, card);
-                  view.dispatch(tr);
+                  insertBlock(menu, card);
               }
           }),
           // layouts
@@ -20433,7 +20517,20 @@
               icon: 'minus',
               action: (button) => {
                   const hr = menu.view.state.schema.nodes.horizontal_rule.create({});
-                  menu.view.dispatch(menu.view.state.tr.insert(menu.view.state.selection.from+1, hr));
+                  insertBlock(menu, hr);
+              }
+          }),
+          // blocklink
+          new DOMinatorMenuButton({
+              key: 'blocklink',
+              icon: 'link',
+              action: (button) => {
+                  const blocklink = menu.view.state.schema.nodes.blocklink.create({},
+                      menu.view.state.schema.nodes.paragraph.create({},
+                          menu.view.state.schema.text(`This is a block link. All of the content here will link to a page. You can put text and other content here like an image. But please don't put other links in here.`)
+                      )
+                  );
+                  insertBlock(menu, blocklink);
               }
           }),
           // custom html
@@ -21217,10 +21314,32 @@
                   })
               ]
           }),
-          new DOMinatorMenuLabel({
-              label: 'Alt tag:'
+          // margins
+          new DOMinatorMenuButton({
+              key: 'margins',
+              icon: 'margin',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('margins');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakeMargin) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
+                      button.deactivate();
+                  }
+              }
           }),
+          // alt tag
           new DOMinatorMenuInput ({
+              label: 'Alt tag:',
               update: (input) => {
                   const {img} = getImage(menu);
                   if(!img){ return true; }
@@ -21618,7 +21737,7 @@
       }
 
       return new DOMinatorSubMenu({
-          key: 'layout',
+          key: 'layout_column',
           items: items
       });
   }
@@ -21879,6 +21998,8 @@
                   this.activeBlock = selection.node;
               }else if(selection.constructor.name === 'AllSelection'){
                   activeSubmenuKey = 'inline';
+              }else if(selection.constructor.name === 'GapCursor'){
+                  activeSubmenuKey = "paragraph";
               }else{
                   console.error('Uknown selection !');
               }
@@ -34620,6 +34741,10 @@
           }
 
           const html = this.getHTML();
+
+          // const json = this.getJSON();
+          // console.log(json);
+
           this.onButton.classList.remove('active');
           document.body.classList.remove("dominatorMenuActive");
           this.codeEditingWindowClose();
@@ -34664,7 +34789,8 @@
                           key: 'DOMinatorMenu',
                           view(editorView) {
                               let menuView = new DOMinatorMenu(that, editorView);
-                              editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                              //editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                              document.body.prepend(menuView.dom);
                               that.menu = menuView;
                               return menuView;
                           },
@@ -34877,7 +35003,7 @@
 
       // comes from TIPTAP https://tiptap.scrumpy.io/
       getJSON() {
-          return this.state.doc.toJSON()
+          return this.view.state.doc.toJSON()
       }
 
       insertDownloads(items) {
@@ -34919,11 +35045,12 @@
           const image = state.schema.nodes.image.create(imageAttrs);
 
           const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
-          let tr = state.tr.insert(pos + 1, photograph);
-          view.dispatch(tr);
+          insertBlock(this.menu, photograph);
+          // let tr = state.tr.insert(pos-1, photograph);
+          // view.dispatch(tr);
 
-          tr = view.state.tr;
-          tr.setMeta("addToHistory", false);
+          // tr = view.state.tr;
+          // tr.setMeta("addToHistory", false);
 
           // Uncaught TypeError: Cannot read property 'nodeSize' of null
           // const newSelection = NodeSelection.create(view.state.doc, pos+1);
@@ -34945,15 +35072,15 @@
           const carousel = state.schema.nodes.carousel.create({
               html: html
           });
-
-
-          let tr = state.tr.insert(pos + 1, carousel);
-          view.dispatch(tr);
-
-          tr = view.state.tr;
-          tr.setMeta("addToHistory", false);
-          const newSelection = NodeSelection.create(view.state.doc, pos + 1);
-          view.dispatch(tr.setSelection(newSelection));
+          insertBlock(this.menu, carousel);
+          //
+          // let tr = state.tr.insert(pos + 1, carousel);
+          // view.dispatch(tr);
+          //
+          // tr = view.state.tr;
+          // tr.setMeta("addToHistory", false);
+          // const newSelection = NodeSelection.create(view.state.doc, pos + 1);
+          // view.dispatch(tr.setSelection(newSelection));
       }
 
       insertHtml(html) {
@@ -34962,17 +35089,11 @@
           const state = view.state;
           const pos = selection.from;
 
-          const carousel = state.schema.nodes.custom_html.create({
+          const htmlBlock = state.schema.nodes.custom_html.create({
               html: html
           });
 
-          let tr = state.tr.insert(pos + 1, carousel);
-          view.dispatch(tr);
-
-          tr = view.state.tr;
-          tr.setMeta("addToHistory", false);
-          const newSelection = NodeSelection.create(view.state.doc, pos + 1);
-          view.dispatch(tr.setSelection(newSelection));
+          insertBlock(this.menu, htmlBlock);
       }
 
       updateCarousel(html) {

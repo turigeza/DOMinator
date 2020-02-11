@@ -57,8 +57,8 @@ import CarouselView from "./NodeViews/CarouselView"
 // actions
 import {
     insertDownloads,
-    changeAttributeOnNode
-
+    changeAttributeOnNode,
+    insertBlock
 } from "./DOMinatorActions"
 
 import CodeMirror from "codemirror"
@@ -192,6 +192,10 @@ window.DOMinator = class DOMinator {
         }
 
         const html = this.getHTML();
+
+        // const json = this.getJSON();
+        // console.log(json);
+
         this.onButton.classList.remove('active');
         document.body.classList.remove("dominatorMenuActive");
         this.codeEditingWindowClose();
@@ -236,7 +240,8 @@ window.DOMinator = class DOMinator {
                         key: 'DOMinatorMenu',
                         view(editorView) {
                             let menuView = new DOMinatorMenu(that, editorView);
-                            editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                            //editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
+                            document.body.prepend(menuView.dom);
                             that.menu = menuView;
                             return menuView;
                         },
@@ -451,7 +456,7 @@ window.DOMinator = class DOMinator {
 
     // comes from TIPTAP https://tiptap.scrumpy.io/
     getJSON() {
-        return this.state.doc.toJSON()
+        return this.view.state.doc.toJSON()
     }
 
     insertDownloads(items) {
@@ -493,11 +498,12 @@ window.DOMinator = class DOMinator {
         const image = state.schema.nodes.image.create(imageAttrs);
 
         const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
-        let tr = state.tr.insert(pos + 1, photograph);
-        view.dispatch(tr);
+        insertBlock(this.menu, photograph);
+        // let tr = state.tr.insert(pos-1, photograph);
+        // view.dispatch(tr);
 
-        tr = view.state.tr;
-        tr.setMeta("addToHistory", false);
+        // tr = view.state.tr;
+        // tr.setMeta("addToHistory", false);
 
         // Uncaught TypeError: Cannot read property 'nodeSize' of null
         // const newSelection = NodeSelection.create(view.state.doc, pos+1);
@@ -519,15 +525,15 @@ window.DOMinator = class DOMinator {
         const carousel = state.schema.nodes.carousel.create({
             html: html
         });
-
-
-        let tr = state.tr.insert(pos + 1, carousel);
-        view.dispatch(tr);
-
-        tr = view.state.tr;
-        tr.setMeta("addToHistory", false);
-        const newSelection = NodeSelection.create(view.state.doc, pos + 1);
-        view.dispatch(tr.setSelection(newSelection));
+        insertBlock(this.menu, carousel);
+        //
+        // let tr = state.tr.insert(pos + 1, carousel);
+        // view.dispatch(tr);
+        //
+        // tr = view.state.tr;
+        // tr.setMeta("addToHistory", false);
+        // const newSelection = NodeSelection.create(view.state.doc, pos + 1);
+        // view.dispatch(tr.setSelection(newSelection));
     }
 
     insertHtml(html) {
@@ -536,17 +542,11 @@ window.DOMinator = class DOMinator {
         const state = view.state;
         const pos = selection.from;
 
-        const carousel = state.schema.nodes.custom_html.create({
+        const htmlBlock = state.schema.nodes.custom_html.create({
             html: html
         });
 
-        let tr = state.tr.insert(pos + 1, carousel);
-        view.dispatch(tr);
-
-        tr = view.state.tr;
-        tr.setMeta("addToHistory", false);
-        const newSelection = NodeSelection.create(view.state.doc, pos + 1);
-        view.dispatch(tr.setSelection(newSelection));
+        insertBlock(this.menu, htmlBlock);
     }
 
     updateCarousel(html) {

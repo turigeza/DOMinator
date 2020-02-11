@@ -333,6 +333,9 @@ $( document ).ready(function(){
             editor.toggle();
         }
     });
+    setTimeout(()=>{
+        editor.on();
+    }, 200);
 
     initCarousels();
 
