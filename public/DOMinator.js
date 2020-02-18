@@ -13992,12 +13992,21 @@
           parseDOM: [{
               tag: 'div.d-photograph-text',
               getAttrs: dom => {
+                  let cl = dom.getAttribute("class");
+                  const text = dom.textContent.trim();
+                  if(text === '' && !cl.includes(' empty')){
+                      cl += ' empty';
+                  }
                   return {
-                      'class': dom.getAttribute("class")
+                      'class': cl
                   };
               }
           }],
           toDOM(node) {
+              if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
+                  node.attrs.class += ' empty';
+              }
+      
               return [
                   "div",
                   node.attrs,
@@ -34628,6 +34637,7 @@
       // codemirror - instance for the code editing bit
       // domNode
       // dom
+      // onChangedTimeout = null; // for the debounce of the onChange
       constructor(options) {
 
           // init options
@@ -34691,6 +34701,8 @@
                   '75': 'width-75',
                   '100': 'width-100',
               },
+              scrollMargin: 150,
+              saveTimout: 500,
               menu: {}
           };
 
@@ -34764,6 +34776,17 @@
           }
       }
 
+      changed(){
+          // timeout for save
+          clearTimeout(this.onChangedTimeout);
+
+          this.onChangedTimeout = setTimeout(() => {
+              if(typeof this.options.onChange === 'function'){
+                  this.options.onChange(this);
+              }
+          }, this.options.saveTimout);
+      }
+
       on() {
           if (this.view) {
               return false;
@@ -34789,13 +34812,13 @@
                           key: 'DOMinatorMenu',
                           view(editorView) {
                               let menuView = new DOMinatorMenu(that, editorView);
-                              //editorView.dom.parentNode.insertBefore(menuView.dom, editorView.dom);
                               document.body.prepend(menuView.dom);
                               that.menu = menuView;
                               return menuView;
                           },
                           props: {
                               handleKeyDown: (view, event) => {
+                                  that.changed();
                                   if (event.which === 13 && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
                                       const selection = view.state.selection;
 
@@ -34867,6 +34890,7 @@
                               attributes: {
                                   class: "DOMinator"
                               },
+                              scrollMargin: that.options.scrollMargin
                           }
                       }),
                       keymap(buildKeymap(this.editorSchema, this.options.mapKeys)),

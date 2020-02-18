@@ -532,12 +532,21 @@ export const nodes = {
         parseDOM: [{
             tag: 'div.d-photograph-text',
             getAttrs: dom => {
+                let cl = dom.getAttribute("class");
+                const text = dom.textContent.trim();
+                if(text === '' && !cl.includes(' empty')){
+                    cl += ' empty';
+                }
                 return {
-                    'class': dom.getAttribute("class")
+                    'class': cl
                 };
             }
         }],
         toDOM(node) {
+            if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
+                node.attrs.class += ' empty';
+            }
+    
             return [
                 "div",
                 node.attrs,

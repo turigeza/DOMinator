@@ -51,32 +51,6 @@
 .DOMinatorMenuButtonLabel{
     font-size: 16px;
 }
-
-.DOMinatorMenuButton.labelAndIcon .DOMinatorMenuButtonLabel{
-    white-space: nowrap;
-    margin: 0 10px 0 15px;
-}
-.DOMinatorMenuButton.labelAndIcon .fa{
-    min-width: 25px;
-}
-
-body.dominatorMenuActive{
-    margin-top: 50px;
-}
-.DOMinatorSubMenu{
-    outline: 1px solid pink;
-    outline: none;
-    outline-offset: -1px;
-    display: flex;
-    background-color: white;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-}
-.DOMinatorSubMenu-right{
-    justify-content: flex-end;
-}
 .DOMinatorMenuButton{
     pointer-events: all;
     border: none;
@@ -104,6 +78,35 @@ body.dominatorMenuActive{
     align-items: center;
     transition: 0.4s;
 }
+.DOMinatorMenuButton.labelAndIcon .DOMinatorMenuButtonLabel{
+    white-space: nowrap;
+    margin: 0 10px 0 15px;
+}
+.DOMinatorMenuButton.labelAndIcon .fa{
+    min-width: 25px;
+}
+.DOMinatorButtonWithCaret{
+    padding-right: 7px;
+}
+
+body.dominatorMenuActive{
+    margin-top: 50px;
+}
+.DOMinatorSubMenu{
+    outline: 1px solid pink;
+    outline: none;
+    outline-offset: -1px;
+    display: flex;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+.DOMinatorSubMenu-right{
+    justify-content: flex-end;
+}
+
 .DOMinatorDropDownCaret{
     font-size: 12px;
     margin-left: 5px;
@@ -184,9 +187,7 @@ body.dominatorMenuActive{
     flex-wrap: nowrap;
     /* border: 1px solid #eee; */
 }
-.DOMinatorButtonWithCaret{
-    padding-right: 7px;
-}
+
 .DOMinatorMenuInput{
     display: flex;
     flex-wrap: nowrap;
@@ -270,7 +271,6 @@ body.dominatorMenuActive{
     border-right: 6px solid #eee;
     /* box-shadow: 0 -5px 10px -5px rgba(0,0,0,0.1); */
 }
-
 #DOMinatorOnButton{
     pointer-events: all;
     border: none;

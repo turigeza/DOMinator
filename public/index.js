@@ -37,6 +37,8 @@ $( document ).ready(function(){
 
         $('.tg_sub_editable').removeClass('tg_sub_editable');
         $('.tg_subwidget').removeClass('tg_subwidget');
+
+
     }
 
     cleanUpHtml();
@@ -321,6 +323,9 @@ $( document ).ready(function(){
         },
         afterOff(DOMinator){
             initCarousels();
+        },
+        onChange(DOMinatory){
+            console.log(DOMinatory);
         }
     });
 
@@ -334,7 +339,7 @@ $( document ).ready(function(){
         }
     });
     setTimeout(()=>{
-        editor.on();
+        //editor.on();
     }, 200);
 
     initCarousels();
