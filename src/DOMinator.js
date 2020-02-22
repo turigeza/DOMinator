@@ -90,10 +90,11 @@ window.DOMinator = class DOMinator {
 
             // DOMinator hands over the ui which don't want to take care of. These are callback functions.
             pageSettings: this.implementMessage('pageSettings'), // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
-            showRevisions: this.implementMessage('showRevisions'), // the ui for selecting revisions saving them naming them making them live shedule delete them etc
-            shedule: this.implementMessage('shedule'), // the ui for saving and sheduling this revision
+            // showRevisions: this.implementMessage('showRevisions'), this is beter managed outside of the editor
+            schedule: this.implementMessage('schedule'), // the ui for saving and sheduling this revision
             newPage: this.implementMessage('newPage'), // the ui for screating a new page
             goLive: this.implementMessage('goLive'), // the ui for going live and saving a revision
+            pageThumbnail: this.implementMessage('pageThumbnail'),
 
             photograph: this.implementMessage('photograph'), // the ui for going live and saving a revision
             downloads: this.implementMessage('downloads'),
@@ -130,12 +131,13 @@ window.DOMinator = class DOMinator {
                 danger: 'd-button-danger',
                 info: 'd-button-info'
             },
-            photoFloatClasses: {
+            floatClasses: {
                 left: 'pull-left',
                 right: 'pull-right',
                 center: 'horizontal-margin-auto',
             },
-            photoSizeClasses: {
+            blockSizeClasses: {
+                'auto': 'width-auto',
                 '25': 'width-25',
                 '33': 'width-33',
                 '50': 'width-50',
@@ -189,15 +191,18 @@ window.DOMinator = class DOMinator {
         }
     }
 
-    off() {
+    async off() {
+
         if (typeof this.options.beforeOff === 'function') {
-            this.options.beforeOff(this);
+            try {
+                await this.options.beforeOff(this);
+            } catch(e) {
+                console.warn('this.options.beforeOff was rejeted');
+                return false;
+            }
         }
 
         const html = this.getHTML();
-
-        // const json = this.getJSON();
-        // console.log(json);
 
         this.onButton.classList.remove('active');
         document.body.classList.remove("dominatorMenuActive");
@@ -213,6 +218,7 @@ window.DOMinator = class DOMinator {
         this.options.source.style.display = 'block';
 
         this.options.source.innerHTML = html;
+        clearTimeout(this.onChangedTimeout);
         if ( typeof this.options.afterOff === 'function' ) {
             this.options.afterOff(this);
         }
@@ -229,13 +235,19 @@ window.DOMinator = class DOMinator {
         }, this.options.saveTimout);
     }
 
-    on() {
+    async on() {
+
         if (this.view) {
             return false;
         }
 
         if (typeof this.options.beforeOn === 'function') {
-            this.options.beforeOn(this);
+            try {
+                await this.options.beforeOn(this);
+            } catch(e) {
+                console.warn('this.options.beforeOn was rejeted');
+                return false;
+            }
         }
 
         this.onButton.classList.add('active');
@@ -377,6 +389,8 @@ window.DOMinator = class DOMinator {
         if (typeof this.options.afterOn === 'function') {
             this.options.afterOn(this);
         }
+
+        return true;
     }
 
     initOnButton() {
@@ -393,13 +407,17 @@ window.DOMinator = class DOMinator {
 
             // this.CodeEditorWindow.style.visibility = 'hidden';
             document.body.appendChild(this.onButton);
-            this.onButton.addEventListener('click', () => {
+            this.onButton.addEventListener('click', async () => {
                 if (this.view) {
-                    this.off();
-                    this.onButton.classList.remove('active');
+                    const rs = await this.off();
+                    if(rs){
+                        this.onButton.classList.remove('active');
+                    }
                 } else {
-                    this.on();
-                    this.onButton.classList.add('active');
+                    const rs = await this.on();
+                    if(rs){
+                        this.onButton.classList.add('active');
+                    }
                 }
 
             });

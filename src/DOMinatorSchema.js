@@ -546,7 +546,7 @@ export const nodes = {
             if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
                 node.attrs.class += ' empty';
             }
-    
+
             return [
                 "div",
                 node.attrs,
@@ -685,6 +685,7 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
+        canTakeMargin: true,
         atom: true,
         attrs: {
             href: {
@@ -726,6 +727,8 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
+        canTakeMargin: true,
+        atom: true,
         attrs: {
             'class': {
                 default: 'd-card'

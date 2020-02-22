@@ -9,7 +9,6 @@ import DOMinatorMenuButton from "./../DOMinatorMenuButton"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 
-
 export function paddings(menu) {
     const items = [
         new DOMinatorMenuLabel({

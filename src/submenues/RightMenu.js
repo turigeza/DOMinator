@@ -10,6 +10,80 @@ import {
 
 import {undo, redo} from "prosemirror-history"
 export default function(menu) {
+
+    const mainDropDown = new DOMinatorMenuDropdown ({
+        key: 'menu',
+        icon: 'ellipsis-v',
+        dropdownCaret: false,
+        items: [
+            new DOMinatorMenuButton ({
+                key: 'page_settings',
+                icon: 'cog',
+                label: 'Page Settings',
+                action: (button) => {
+                    const rs = menu.dominator.options.pageSettings(menu, menu.dominator);
+                    if(rs !== false){
+                        closeMainDropDown();
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'thumbnail',
+                icon: 'picture-o',
+                label: 'Page Thumbnail',
+                action: () => {
+                    const rs = menu.dominator.options.pageThumbnail(menu, menu.dominator);
+                    if(rs !== false){
+                        closeMainDropDown();
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'shedule',
+                icon: 'calendar',
+                label: 'Shedule',
+                action: () => {
+                    const rs = menu.dominator.options.schedule(menu, menu.dominator);
+                    if(rs !== false){
+                        closeMainDropDown();
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'new_page',
+                icon: 'file-o',
+                label: 'New Page',
+                action: () => {
+                    const rs = menu.dominator.options.newPage(menu, menu.dominator);
+                    if(rs !== false){
+                        closeMainDropDown();
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'go_live',
+                icon: 'check',
+                label: 'Go Live',
+                action: () => {
+                    const rs = menu.dominator.options.goLive(menu, menu.dominator);
+                    if(rs !== false){
+                        closeMainDropDown();
+                    }
+                }
+            }),
+            new DOMinatorMenuButton ({
+                key: 'exit_editor',
+                icon: 'close',
+                label: 'Exit',
+                action: () => {
+                    // for some reason it needs a bit of timeout : ) like me
+                    setTimeout(()=>{
+                        menu.dominator.off();
+                    }, 10);
+                }
+            }),
+        ]
+    });
     const items = [
         new DOMinatorMenuSeparator (),
         new DOMinatorMenuButton ({
@@ -32,65 +106,12 @@ export default function(menu) {
                 redo(menu.view.state) ? button.enable() : button.disable();
             }
         }),
-        new DOMinatorMenuDropdown ({
-            key: 'menu',
-            icon: 'ellipsis-v',
-            dropdownCaret: false,
-            items: [
-                new DOMinatorMenuButton ({
-                    key: 'page_settings',
-                    icon: 'cog',
-                    label: 'Page Settings',
-                    action: (button) => {
-                        menu.dominator.options.pageSettings(menu, menu.dominator);
-                    }
-                }),
-                new DOMinatorMenuButton ({
-                    key: 'revisions',
-                    icon: 'clock-o',
-                    label: 'Show Revisions',
-                    action: () => {
-                        menu.dominator.options.showRevisions(menu, menu.dominator);
-                    }
-                }),
-                new DOMinatorMenuButton ({
-                    key: 'shedule',
-                    icon: 'calendar',
-                    label: 'Shedule',
-                    action: () => {
-                        menu.dominator.options.shedule(menu, menu.dominator);
-                    }
-                }),
-                new DOMinatorMenuButton ({
-                    key: 'new_page',
-                    icon: 'file-o',
-                    label: 'New Page',
-                    action: () => {
-                        menu.dominator.options.newPage(menu, menu.dominator);
-                    }
-                }),
-                new DOMinatorMenuButton ({
-                    key: 'go_live',
-                    icon: 'check',
-                    label: 'Go Live',
-                    action: () => {
-                        menu.dominator.options.goLive(menu, menu.dominator);
-                    }
-                }),
-                new DOMinatorMenuButton ({
-                    key: 'exit_editor',
-                    icon: 'close',
-                    label: 'Exit',
-                    action: () => {
-                        // for some reason it needs a bit of timeout : ) like me
-                        setTimeout(()=>{
-                            menu.dominator.off();
-                        }, 10);
-                    }
-                }),
-            ]
-        })
+        mainDropDown
     ];
+
+    function closeMainDropDown(){
+        mainDropDown.close();
+    }
 
     if( typeof menu.dominator.options.menu.right ===  'function'){
         menu.dominator.options.menu.right(items, menu);

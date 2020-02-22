@@ -49,15 +49,15 @@ function changeSize(sizeKey, menu){
 
     let pos = getPosition(selection);
 
-    const photoSizeClasses = menu.dominator.options.photoSizeClasses;
+    const blockSizeClasses = menu.dominator.options.blockSizeClasses;
     let node = menu.view.state.doc.nodeAt(pos);
     let classes = node.attrs.class;
 
-    Object.keys(photoSizeClasses).forEach(key => {
-        classes = classes.replace(photoSizeClasses[key], '').trim();
+    Object.keys(blockSizeClasses).forEach(key => {
+        classes = classes.replace(blockSizeClasses[key], '').trim();
     });
 
-    classes += ' ' + photoSizeClasses[sizeKey];
+    classes += ' ' + blockSizeClasses[sizeKey];
     classes = classes.trim();
 
     let attrs = { ...node.attrs, 'class': classes };
@@ -91,7 +91,7 @@ function changeSize(sizeKey, menu){
 
 function imageFloat(floatKey, menu){
     const selection = menu.view.state.selection;
-    const floatClasses = menu.dominator.options.photoFloatClasses;
+    const floatClasses = menu.dominator.options.floatClasses;
 
     let pos = getPosition(selection);
 
@@ -140,7 +140,7 @@ function setAlt(menu, alt){
 }
 
 function floatButtonActivate(floatKey, menu, btn){
-    const className = menu.dominator.options.photoFloatClasses[floatKey];
+    const className = menu.dominator.options.floatClasses[floatKey];
     const node = getNode(menu);
     if(!node) { return; }
     if(node.attrs.class && node.attrs.class.includes(className)){
@@ -153,7 +153,7 @@ function floatButtonActivate(floatKey, menu, btn){
 }
 
 function sizeButtonActivate(sizeKey, menu, btn){
-    const className = menu.dominator.options.photoSizeClasses[sizeKey];
+    const className = menu.dominator.options.blockSizeClasses[sizeKey];
     const node = getNode(menu);
     if(!node) { return; }
     if(node.attrs.class && node.attrs.class.includes(className)){

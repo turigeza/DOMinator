@@ -3,9 +3,13 @@ import DOMinatorMenuInput from "./../DOMinatorMenuInput"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
+
+import Sizes from "./../Helpers/Sizes"
+import Floats from "./../Helpers/Floats"
 import {
     toggleClassOnNode
 } from "./../DOMinatorActions"
+
 export default function(menu) {
 
     if( menu.dominator.options.menu.card ===  false){
@@ -27,6 +31,33 @@ export default function(menu) {
                 if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-card-raised')){
                     button.activate();
                 }else{
+                    button.deactivate();
+                }
+            }
+        }),
+
+        Sizes(menu),
+        Floats(menu),
+        
+        // margins
+        new DOMinatorMenuButton({
+            key: 'margins',
+            icon: 'margin',
+            iconType: 'dics',
+            action: (button) => {
+                menu.activateSubmenu('margins');
+            },
+            update(button, menu, ) {
+                const block = menu.activeBlock;
+                if (block && block.type.spec.canTakeMargin) {
+                    button.enable();
+                    if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                        button.activate();
+                    } else {
+                        button.deactivate();
+                    }
+                } else {
+                    button.disable();
                     button.deactivate();
                 }
             }

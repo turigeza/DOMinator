@@ -7,6 +7,7 @@ export let paddingClasses = {
         l:'d-pl-l',
         xl:'d-pl-xl',
         xxl:'d-pl-xxl',
+        none:'d-pl-none',
     },
     right: {
         xxs:'d-pr-xxs',
@@ -16,6 +17,7 @@ export let paddingClasses = {
         l:'d-pr-l',
         xl:'d-pr-xl',
         xxl:'d-pr-xxl',
+        none:'d-pr-none',
     },
     top: {
         xxs:'d-pt-xxs',
@@ -25,6 +27,7 @@ export let paddingClasses = {
         l:'d-pt-l',
         xl:'d-pt-xl',
         xxl:'d-pt-xxl',
+        none:'d-pt-none',
     },
     bottom: {
         xxs:'d-pb-xxs',
@@ -34,6 +37,7 @@ export let paddingClasses = {
         l:'d-pb-l',
         xl:'d-pb-xl',
         xxl:'d-pb-xxl',
+        none:'d-pb-none',
     },
     x: {
         xxs:'d-px-xxs',
@@ -43,6 +47,7 @@ export let paddingClasses = {
         l:'d-px-l',
         xl:'d-px-xl',
         xxl:'d-px-xxl',
+        none:'d-px-none',
     },
     y: {
         xxs:'d-py-xxs',
@@ -52,6 +57,7 @@ export let paddingClasses = {
         l:'d-py-l',
         xl:'d-py-xl',
         xxl:'d-py-xxl',
+        none:'d-py-none',
     },
     all: {
         xxs:'d-pa-xxs',
@@ -61,7 +67,8 @@ export let paddingClasses = {
         l:'d-pa-l',
         xl:'d-pa-xl',
         xxl:'d-pa-xxl',
-    }
+        none:'d-pa-none',
+    },
 };
 
 export let marginClasses = {
@@ -73,6 +80,7 @@ export let marginClasses = {
         l:'d-ml-l',
         xl:'d-ml-xl',
         xxl:'d-ml-xxl',
+        none:'d-ml-none',
     },
     right: {
         xxs:'d-mr-xxs',
@@ -82,6 +90,7 @@ export let marginClasses = {
         l:'d-mr-l',
         xl:'d-mr-xl',
         xxl:'d-mr-xxl',
+        none:'d-mr-none',
     },
     top: {
         xxs:'d-mt-xxs',
@@ -91,6 +100,7 @@ export let marginClasses = {
         l:'d-mt-l',
         xl:'d-mt-xl',
         xxl:'d-mt-xxl',
+        none:'d-mt-none',
     },
     bottom: {
         xxs:'d-mb-xxs',
@@ -100,6 +110,7 @@ export let marginClasses = {
         l:'d-mb-l',
         xl:'d-mb-xl',
         xxl:'d-mb-xxl',
+        none:'d-mb-none',
     },
     x: {
         xxs:'d-mx-xxs',
@@ -109,6 +120,7 @@ export let marginClasses = {
         l:'d-mx-l',
         xl:'d-mx-xl',
         xxl:'d-mx-xxl',
+        none:'d-mx-none',
     },
     y: {
         xxs:'d-my-xxs',
@@ -118,6 +130,7 @@ export let marginClasses = {
         l:'d-my-l',
         xl:'d-my-xl',
         xxl:'d-my-xxl',
+        none:'d-my-none',
     },
     all: {
         xxs:'d-ma-xxs',
@@ -127,5 +140,6 @@ export let marginClasses = {
         l:'d-ma-l',
         xl:'d-ma-xl',
         xxl:'d-ma-xxl',
+        none:'d-ma-none',
     }
 }

@@ -14006,7 +14006,7 @@
               if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
                   node.attrs.class += ' empty';
               }
-      
+
               return [
                   "div",
                   node.attrs,
@@ -14145,6 +14145,7 @@
           defining: true,
           selectable: true,
           draggable: false,
+          canTakeMargin: true,
           atom: true,
           attrs: {
               href: {
@@ -14186,6 +14187,8 @@
           defining: true,
           selectable: true,
           draggable: false,
+          canTakeMargin: true,
+          atom: true,
           attrs: {
               'class': {
                   default: 'd-card'
@@ -20100,6 +20103,7 @@
           ['l', 'large'],
           ['xl', 'extra_large'],
           ['xxl', 'extra_extra_large'],
+          ['none', 'none'],
       ];
 
       let items = [];
@@ -21094,15 +21098,15 @@
 
       let pos = getPosition(selection);
 
-      const photoSizeClasses = menu.dominator.options.photoSizeClasses;
+      const blockSizeClasses = menu.dominator.options.blockSizeClasses;
       let node = menu.view.state.doc.nodeAt(pos);
       let classes = node.attrs.class;
 
-      Object.keys(photoSizeClasses).forEach(key => {
-          classes = classes.replace(photoSizeClasses[key], '').trim();
+      Object.keys(blockSizeClasses).forEach(key => {
+          classes = classes.replace(blockSizeClasses[key], '').trim();
       });
 
-      classes += ' ' + photoSizeClasses[sizeKey];
+      classes += ' ' + blockSizeClasses[sizeKey];
       classes = classes.trim();
 
       let attrs = { ...node.attrs, 'class': classes };
@@ -21136,7 +21140,7 @@
 
   function imageFloat(floatKey, menu){
       const selection = menu.view.state.selection;
-      const floatClasses = menu.dominator.options.photoFloatClasses;
+      const floatClasses = menu.dominator.options.floatClasses;
 
       let pos = getPosition(selection);
 
@@ -21185,7 +21189,7 @@
   }
 
   function floatButtonActivate(floatKey, menu, btn){
-      const className = menu.dominator.options.photoFloatClasses[floatKey];
+      const className = menu.dominator.options.floatClasses[floatKey];
       const node = getNode(menu);
       if(!node) { return; }
       if(node.attrs.class && node.attrs.class.includes(className)){
@@ -21198,7 +21202,7 @@
   }
 
   function sizeButtonActivate(sizeKey, menu, btn){
-      const className = menu.dominator.options.photoSizeClasses[sizeKey];
+      const className = menu.dominator.options.blockSizeClasses[sizeKey];
       const node = getNode(menu);
       if(!node) { return; }
       if(node.attrs.class && node.attrs.class.includes(className)){
@@ -21533,6 +21537,220 @@
       });
   }
 
+  function getPosition$1(selection){
+      let pos;
+
+      // the selction must be in the photo text area
+      if(selection.constructor.name === 'TextSelection'){
+          pos = selection.$head.before()-2;
+      }else if(selection.constructor.name === 'NodeSelection'){
+          pos = selection.from;
+      }
+
+      return pos;
+  }
+
+  function getNode$1(menu){
+      let pos = getPosition$1(menu.view.state.selection);
+      let node = menu.view.state.doc.nodeAt(pos);
+      return node;
+  }
+
+  function changeSize$1(sizeKey, menu){
+      const selection = menu.view.state.selection;
+      let pos = getPosition$1(selection);
+
+      const blockSizeClasses = menu.dominator.options.blockSizeClasses;
+      let node = menu.view.state.doc.nodeAt(pos);
+      let classes = node.attrs.class;
+
+      Object.keys(blockSizeClasses).forEach(key => {
+          classes = classes.replace(blockSizeClasses[key], '').trim();
+      });
+
+      classes += ' ' + blockSizeClasses[sizeKey];
+      classes = classes.trim();
+
+      changeAttributeOnNode(menu, 'class', classes);
+  }
+
+  function sizeButtonActivate$1(sizeKey, menu, btn){
+      const className = menu.dominator.options.blockSizeClasses[sizeKey];
+      const node = getNode$1(menu);
+      if(!node) { return; }
+      if(node.attrs.class && node.attrs.class.includes(className)){
+          btn.activate();
+          return true;
+      }else{
+          btn.deactivate();
+          return false;
+      }
+  }
+
+  function Sizes(menu) {
+      const sizes = new DOMinatorMenuDropdown ({
+          key: 'change_image_size',
+          icon: 'expand',
+          items: [
+              new DOMinatorMenuButton ({
+                  key: 'full_size',
+                  label: '100%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('100', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('100', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: '75_percent',
+                  label: '75%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('75', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('75', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: '66_percent',
+                  label: '66%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('66', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('66', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: '50_percent',
+                  label: '50%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('50', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('50', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: '33_percent',
+                  label: '33%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('33', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('33', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: '25_percent',
+                  label: '25%',
+                  update: (button) => {
+                      return sizeButtonActivate$1('25', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('25', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'auto',
+                  label: 'AUTO',
+                  update: (button) => {
+                      return sizeButtonActivate$1('auto', menu, button);
+                  },
+                  action: () => {
+                      changeSize$1('auto', menu);
+                  }
+              }),
+          ]
+      });
+
+      return sizes;
+  }
+
+  function floatButtonActivate$1(floatKey, menu, btn){
+      const className = menu.dominator.options.floatClasses[floatKey];
+      const node = getNode$1(menu);
+      if(!node) { return; }
+      if(node.attrs.class && node.attrs.class.includes(className)){
+          btn.activate();
+          return true;
+      }else{
+          btn.deactivate();
+          return false;
+      }
+  }
+
+  function floatBlock(floatKey, menu){
+      const selection = menu.view.state.selection;
+      const floatClasses = menu.dominator.options.floatClasses;
+
+      let pos = getPosition$1(selection);
+
+      let node = menu.view.state.doc.nodeAt(pos);
+      let classes = node.attrs.class;
+
+      let removed = '';
+      Object.keys(floatClasses).forEach(key => {
+          if(classes.includes(floatClasses[key])){
+              removed = floatClasses[key];
+          }
+          classes = classes.replace(floatClasses[key], '').trim();
+      });
+
+      if(removed !== floatClasses[floatKey] ){
+          classes += ' ' + floatClasses[floatKey];
+          classes = classes.trim();
+      }
+
+      changeAttributeOnNode(menu, 'class', classes);
+  }
+
+  function Floats(menu) {
+      const floats = new DOMinatorMenuDropdown ({
+          key: 'alignment',
+          icon: 'floatimage-left',
+          iconType: 'dics',
+          items: [
+              new DOMinatorMenuButton ({
+                  key: 'float_left_of_text',
+                  icon: 'floatimage-left',
+                  iconType: 'dics',
+                  update: (button) => {
+                      return floatButtonActivate$1('left', menu, button);
+                  },
+                  action: (button) => {
+                      floatBlock('left', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'align_center_and_clear_both_side',
+                  icon: 'floatimage-none',
+                  iconType: 'dics',
+                  update: (button) => {
+                      return floatButtonActivate$1('center', menu, button);
+                  },
+                  action: () => {
+                      floatBlock('center', menu);
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'float_right_of_text',
+                  icon: 'floatimage-right',
+                  iconType: 'dics',
+                  update: (button) => {
+                      return floatButtonActivate$1('right', menu, button);
+                  },
+                  action: () => {
+                      floatBlock('right', menu);
+                  }
+              })
+          ]
+      });
+
+      return floats;
+  }
+
   function _Card(menu) {
 
       if( menu.dominator.options.menu.card ===  false){
@@ -21554,6 +21772,33 @@
                   if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-card-raised')){
                       button.activate();
                   }else{
+                      button.deactivate();
+                  }
+              }
+          }),
+
+          Sizes(menu),
+          Floats(menu),
+          
+          // margins
+          new DOMinatorMenuButton({
+              key: 'margins',
+              icon: 'margin',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('margins');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakeMargin) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
                       button.deactivate();
                   }
               }
@@ -21652,6 +21897,31 @@
                       button.deactivate();
                   }else{
                       button.activate();
+                  }
+              }
+          }),
+          Sizes(menu),
+          Floats(menu),
+          // margins
+          new DOMinatorMenuButton({
+              key: 'margins',
+              icon: 'margin',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('margins');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakeMargin) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
+                      button.deactivate();
                   }
               }
           }),
@@ -21825,6 +22095,80 @@
   }
 
   function smRightMenu(menu) {
+
+      const mainDropDown = new DOMinatorMenuDropdown ({
+          key: 'menu',
+          icon: 'ellipsis-v',
+          dropdownCaret: false,
+          items: [
+              new DOMinatorMenuButton ({
+                  key: 'page_settings',
+                  icon: 'cog',
+                  label: 'Page Settings',
+                  action: (button) => {
+                      const rs = menu.dominator.options.pageSettings(menu, menu.dominator);
+                      if(rs !== false){
+                          closeMainDropDown();
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'thumbnail',
+                  icon: 'picture-o',
+                  label: 'Page Thumbnail',
+                  action: () => {
+                      const rs = menu.dominator.options.pageThumbnail(menu, menu.dominator);
+                      if(rs !== false){
+                          closeMainDropDown();
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'shedule',
+                  icon: 'calendar',
+                  label: 'Shedule',
+                  action: () => {
+                      const rs = menu.dominator.options.schedule(menu, menu.dominator);
+                      if(rs !== false){
+                          closeMainDropDown();
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'new_page',
+                  icon: 'file-o',
+                  label: 'New Page',
+                  action: () => {
+                      const rs = menu.dominator.options.newPage(menu, menu.dominator);
+                      if(rs !== false){
+                          closeMainDropDown();
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'go_live',
+                  icon: 'check',
+                  label: 'Go Live',
+                  action: () => {
+                      const rs = menu.dominator.options.goLive(menu, menu.dominator);
+                      if(rs !== false){
+                          closeMainDropDown();
+                      }
+                  }
+              }),
+              new DOMinatorMenuButton ({
+                  key: 'exit_editor',
+                  icon: 'close',
+                  label: 'Exit',
+                  action: () => {
+                      // for some reason it needs a bit of timeout : ) like me
+                      setTimeout(()=>{
+                          menu.dominator.off();
+                      }, 10);
+                  }
+              }),
+          ]
+      });
       const items = [
           new DOMinatorMenuSeparator (),
           new DOMinatorMenuButton ({
@@ -21847,65 +22191,12 @@
                   redo(menu.view.state) ? button.enable() : button.disable();
               }
           }),
-          new DOMinatorMenuDropdown ({
-              key: 'menu',
-              icon: 'ellipsis-v',
-              dropdownCaret: false,
-              items: [
-                  new DOMinatorMenuButton ({
-                      key: 'page_settings',
-                      icon: 'cog',
-                      label: 'Page Settings',
-                      action: (button) => {
-                          menu.dominator.options.pageSettings(menu, menu.dominator);
-                      }
-                  }),
-                  new DOMinatorMenuButton ({
-                      key: 'revisions',
-                      icon: 'clock-o',
-                      label: 'Show Revisions',
-                      action: () => {
-                          menu.dominator.options.showRevisions(menu, menu.dominator);
-                      }
-                  }),
-                  new DOMinatorMenuButton ({
-                      key: 'shedule',
-                      icon: 'calendar',
-                      label: 'Shedule',
-                      action: () => {
-                          menu.dominator.options.shedule(menu, menu.dominator);
-                      }
-                  }),
-                  new DOMinatorMenuButton ({
-                      key: 'new_page',
-                      icon: 'file-o',
-                      label: 'New Page',
-                      action: () => {
-                          menu.dominator.options.newPage(menu, menu.dominator);
-                      }
-                  }),
-                  new DOMinatorMenuButton ({
-                      key: 'go_live',
-                      icon: 'check',
-                      label: 'Go Live',
-                      action: () => {
-                          menu.dominator.options.goLive(menu, menu.dominator);
-                      }
-                  }),
-                  new DOMinatorMenuButton ({
-                      key: 'exit_editor',
-                      icon: 'close',
-                      label: 'Exit',
-                      action: () => {
-                          // for some reason it needs a bit of timeout : ) like me
-                          setTimeout(()=>{
-                              menu.dominator.off();
-                          }, 10);
-                      }
-                  }),
-              ]
-          })
+          mainDropDown
       ];
+
+      function closeMainDropDown(){
+          mainDropDown.close();
+      }
 
       if( typeof menu.dominator.options.menu.right ===  'function'){
           menu.dominator.options.menu.right(items, menu);
@@ -22143,6 +22434,7 @@
           l:'d-pl-l',
           xl:'d-pl-xl',
           xxl:'d-pl-xxl',
+          none:'d-pl-none',
       },
       right: {
           xxs:'d-pr-xxs',
@@ -22152,6 +22444,7 @@
           l:'d-pr-l',
           xl:'d-pr-xl',
           xxl:'d-pr-xxl',
+          none:'d-pr-none',
       },
       top: {
           xxs:'d-pt-xxs',
@@ -22161,6 +22454,7 @@
           l:'d-pt-l',
           xl:'d-pt-xl',
           xxl:'d-pt-xxl',
+          none:'d-pt-none',
       },
       bottom: {
           xxs:'d-pb-xxs',
@@ -22170,6 +22464,7 @@
           l:'d-pb-l',
           xl:'d-pb-xl',
           xxl:'d-pb-xxl',
+          none:'d-pb-none',
       },
       x: {
           xxs:'d-px-xxs',
@@ -22179,6 +22474,7 @@
           l:'d-px-l',
           xl:'d-px-xl',
           xxl:'d-px-xxl',
+          none:'d-px-none',
       },
       y: {
           xxs:'d-py-xxs',
@@ -22188,6 +22484,7 @@
           l:'d-py-l',
           xl:'d-py-xl',
           xxl:'d-py-xxl',
+          none:'d-py-none',
       },
       all: {
           xxs:'d-pa-xxs',
@@ -22197,7 +22494,8 @@
           l:'d-pa-l',
           xl:'d-pa-xl',
           xxl:'d-pa-xxl',
-      }
+          none:'d-pa-none',
+      },
   };
 
   let marginClasses = {
@@ -22209,6 +22507,7 @@
           l:'d-ml-l',
           xl:'d-ml-xl',
           xxl:'d-ml-xxl',
+          none:'d-ml-none',
       },
       right: {
           xxs:'d-mr-xxs',
@@ -22218,6 +22517,7 @@
           l:'d-mr-l',
           xl:'d-mr-xl',
           xxl:'d-mr-xxl',
+          none:'d-mr-none',
       },
       top: {
           xxs:'d-mt-xxs',
@@ -22227,6 +22527,7 @@
           l:'d-mt-l',
           xl:'d-mt-xl',
           xxl:'d-mt-xxl',
+          none:'d-mt-none',
       },
       bottom: {
           xxs:'d-mb-xxs',
@@ -22236,6 +22537,7 @@
           l:'d-mb-l',
           xl:'d-mb-xl',
           xxl:'d-mb-xxl',
+          none:'d-mb-none',
       },
       x: {
           xxs:'d-mx-xxs',
@@ -22245,6 +22547,7 @@
           l:'d-mx-l',
           xl:'d-mx-xl',
           xxl:'d-mx-xxl',
+          none:'d-mx-none',
       },
       y: {
           xxs:'d-my-xxs',
@@ -22254,6 +22557,7 @@
           l:'d-my-l',
           xl:'d-my-xl',
           xxl:'d-my-xxl',
+          none:'d-my-none',
       },
       all: {
           xxs:'d-ma-xxs',
@@ -22263,6 +22567,7 @@
           l:'d-ma-l',
           xl:'d-ma-xl',
           xxl:'d-ma-xxl',
+          none:'d-ma-none',
       }
   };
 
@@ -34648,10 +34953,11 @@
 
               // DOMinator hands over the ui which don't want to take care of. These are callback functions.
               pageSettings: this.implementMessage('pageSettings'), // the ui which takes care of managing the page related information url, folder, tags, keyword, template etc
-              showRevisions: this.implementMessage('showRevisions'), // the ui for selecting revisions saving them naming them making them live shedule delete them etc
-              shedule: this.implementMessage('shedule'), // the ui for saving and sheduling this revision
+              // showRevisions: this.implementMessage('showRevisions'), this is beter managed outside of the editor
+              schedule: this.implementMessage('schedule'), // the ui for saving and sheduling this revision
               newPage: this.implementMessage('newPage'), // the ui for screating a new page
               goLive: this.implementMessage('goLive'), // the ui for going live and saving a revision
+              pageThumbnail: this.implementMessage('pageThumbnail'),
 
               photograph: this.implementMessage('photograph'), // the ui for going live and saving a revision
               downloads: this.implementMessage('downloads'),
@@ -34688,12 +34994,13 @@
                   danger: 'd-button-danger',
                   info: 'd-button-info'
               },
-              photoFloatClasses: {
+              floatClasses: {
                   left: 'pull-left',
                   right: 'pull-right',
                   center: 'horizontal-margin-auto',
               },
-              photoSizeClasses: {
+              blockSizeClasses: {
+                  'auto': 'width-auto',
                   '25': 'width-25',
                   '33': 'width-33',
                   '50': 'width-50',
@@ -34747,15 +35054,18 @@
           }
       }
 
-      off() {
+      async off() {
+
           if (typeof this.options.beforeOff === 'function') {
-              this.options.beforeOff(this);
+              try {
+                  await this.options.beforeOff(this);
+              } catch(e) {
+                  console.warn('this.options.beforeOff was rejeted');
+                  return false;
+              }
           }
 
           const html = this.getHTML();
-
-          // const json = this.getJSON();
-          // console.log(json);
 
           this.onButton.classList.remove('active');
           document.body.classList.remove("dominatorMenuActive");
@@ -34771,6 +35081,7 @@
           this.options.source.style.display = 'block';
 
           this.options.source.innerHTML = html;
+          clearTimeout(this.onChangedTimeout);
           if ( typeof this.options.afterOff === 'function' ) {
               this.options.afterOff(this);
           }
@@ -34787,13 +35098,19 @@
           }, this.options.saveTimout);
       }
 
-      on() {
+      async on() {
+
           if (this.view) {
               return false;
           }
 
           if (typeof this.options.beforeOn === 'function') {
-              this.options.beforeOn(this);
+              try {
+                  await this.options.beforeOn(this);
+              } catch(e) {
+                  console.warn('this.options.beforeOn was rejeted');
+                  return false;
+              }
           }
 
           this.onButton.classList.add('active');
@@ -34933,6 +35250,8 @@
           if (typeof this.options.afterOn === 'function') {
               this.options.afterOn(this);
           }
+
+          return true;
       }
 
       initOnButton() {
@@ -34949,13 +35268,17 @@
 
               // this.CodeEditorWindow.style.visibility = 'hidden';
               document.body.appendChild(this.onButton);
-              this.onButton.addEventListener('click', () => {
+              this.onButton.addEventListener('click', async () => {
                   if (this.view) {
-                      this.off();
-                      this.onButton.classList.remove('active');
+                      const rs = await this.off();
+                      if(rs){
+                          this.onButton.classList.remove('active');
+                      }
                   } else {
-                      this.on();
-                      this.onButton.classList.add('active');
+                      const rs = await this.on();
+                      if(rs){
+                          this.onButton.classList.add('active');
+                      }
                   }
 
               });

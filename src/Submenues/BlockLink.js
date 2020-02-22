@@ -4,15 +4,12 @@ import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
-    clearFormatting,
-    changeAttributeOnMark,
-    toggleAttributeOnMark,
-    updateLinkStyleButton,
-    toggleClassOnMark,
     changeAttributeOnNode,
-    insertDownloads,
     toggleClassOnNode
 } from "./../DOMinatorActions"
+
+import Sizes from "./../Helpers/Sizes"
+import Floats from "./../Helpers/Floats"
 
 export default function(menu) {
     if( menu.dominator.options.menu.block_link ===  false){
@@ -48,6 +45,31 @@ export default function(menu) {
                     button.deactivate();
                 }else{
                     button.activate();
+                }
+            }
+        }),
+        Sizes(menu),
+        Floats(menu),
+        // margins
+        new DOMinatorMenuButton({
+            key: 'margins',
+            icon: 'margin',
+            iconType: 'dics',
+            action: (button) => {
+                menu.activateSubmenu('margins');
+            },
+            update(button, menu, ) {
+                const block = menu.activeBlock;
+                if (block && block.type.spec.canTakeMargin) {
+                    button.enable();
+                    if (block.attrs.class && block.attrs.class.includes('d-m')) {
+                        button.activate();
+                    } else {
+                        button.deactivate();
+                    }
+                } else {
+                    button.disable();
+                    button.deactivate();
                 }
             }
         }),

@@ -37,8 +37,6 @@ $( document ).ready(function(){
 
         $('.tg_sub_editable').removeClass('tg_sub_editable');
         $('.tg_subwidget').removeClass('tg_subwidget');
-
-
     }
 
     cleanUpHtml();
@@ -117,7 +115,7 @@ $( document ).ready(function(){
             });
         },
         carouselRemoveSlide: (DOMinator) => {
-
+            const { flickity, $flickity, $widget } = getCarousel();
             if(flickity.cells.length === 1){
                 alert('You can not remove the last element.');
                 // editable_toast('editor_last_carousel_el');
@@ -314,18 +312,31 @@ $( document ).ready(function(){
         },
         beforeOn(DOMinator){
             destroyCarousels();
+            return true;
+            // return new Promise((resolve, reject) => {
+            //     setTimeout( function() {
+            //         resolve({ 'success': 'Yes' })  // Yay! Everything went well!
+            //
+            //     }, 2250);
+            // });
         },
-
         afterOn(DOMinator){
             // setTimeout(()=>{
             //     //console.log('afterOn');
             // }, 500);
         },
+        beforeOff(){
+            // return new Promise((resolve, reject) => {
+            //     setTimeout( function() {
+            //         resolve({ 'fail': 'Yes' });
+            //     }, 2250);
+            // });
+        },
         afterOff(DOMinator){
             initCarousels();
         },
         onChange(DOMinatory){
-            console.log(DOMinatory);
+            
         }
     });
 
@@ -339,7 +350,7 @@ $( document ).ready(function(){
         }
     });
     setTimeout(()=>{
-        //editor.on();
+        editor.on();
     }, 200);
 
     initCarousels();

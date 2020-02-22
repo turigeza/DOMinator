@@ -14,6 +14,7 @@ export function generateSizeButtons(paddingOrMargin, menu, classKey, classes){
         ['l', 'large'],
         ['xl', 'extra_large'],
         ['xxl', 'extra_extra_large'],
+        ['none', 'none'],
     ];
 
     let items = [];
