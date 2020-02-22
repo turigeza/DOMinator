@@ -335,29 +335,6 @@ export default function(menu) {
                 menu.dominator.options.custom_html(menu.dominator);
             }
         }),
-        // paddings
-        new DOMinatorMenuButton({
-            key: 'paddings',
-            icon: 'padding',
-            iconType: 'dics',
-            action: (button) => {
-                menu.activateSubmenu('paddings');
-            },
-            update(button, menu, ) {
-                const block = menu.activeBlock;
-                if (block && block.type.spec.canTakePadding) {
-                    button.enable();
-                    if (block.attrs.class && block.attrs.class.includes('d-p')) {
-                        button.activate();
-                    } else {
-                        button.deactivate();
-                    }
-                } else {
-                    button.disable();
-                    button.deactivate();
-                }
-            }
-        }),
         // margins
         new DOMinatorMenuButton({
             key: 'margins',
@@ -381,6 +358,30 @@ export default function(menu) {
                 }
             }
         }),
+        // paddings
+        new DOMinatorMenuButton({
+            key: 'paddings',
+            icon: 'padding',
+            iconType: 'dics',
+            action: (button) => {
+                menu.activateSubmenu('paddings');
+            },
+            update(button, menu, ) {
+                const block = menu.activeBlock;
+                if (block && block.type.spec.canTakePadding) {
+                    button.enable();
+                    if (block.attrs.class && block.attrs.class.includes('d-p')) {
+                        button.activate();
+                    } else {
+                        button.deactivate();
+                    }
+                } else {
+                    button.disable();
+                    button.deactivate();
+                }
+            }
+        }),
+
     ];
 
     if( typeof menu.dominator.options.menu.paragraph ===  'function'){

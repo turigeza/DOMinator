@@ -20554,29 +20554,6 @@
                   menu.dominator.options.custom_html(menu.dominator);
               }
           }),
-          // paddings
-          new DOMinatorMenuButton({
-              key: 'paddings',
-              icon: 'padding',
-              iconType: 'dics',
-              action: (button) => {
-                  menu.activateSubmenu('paddings');
-              },
-              update(button, menu, ) {
-                  const block = menu.activeBlock;
-                  if (block && block.type.spec.canTakePadding) {
-                      button.enable();
-                      if (block.attrs.class && block.attrs.class.includes('d-p')) {
-                          button.activate();
-                      } else {
-                          button.deactivate();
-                      }
-                  } else {
-                      button.disable();
-                      button.deactivate();
-                  }
-              }
-          }),
           // margins
           new DOMinatorMenuButton({
               key: 'margins',
@@ -20600,6 +20577,30 @@
                   }
               }
           }),
+          // paddings
+          new DOMinatorMenuButton({
+              key: 'paddings',
+              icon: 'padding',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('paddings');
+              },
+              update(button, menu, ) {
+                  const block = menu.activeBlock;
+                  if (block && block.type.spec.canTakePadding) {
+                      button.enable();
+                      if (block.attrs.class && block.attrs.class.includes('d-p')) {
+                          button.activate();
+                      } else {
+                          button.deactivate();
+                      }
+                  } else {
+                      button.disable();
+                      button.deactivate();
+                  }
+              }
+          }),
+
       ];
 
       if( typeof menu.dominator.options.menu.paragraph ===  'function'){
@@ -21078,23 +21079,6 @@
 
   function changeSize(sizeKey, menu){
       const selection = menu.view.state.selection;
-      // console.log(menu.activeBlock);
-      // console.log(selection);
-      // console.log(selection.$head.before())
-      // console.log(pos);
-      // console.log(menu.view.state.doc.nodeAt(from-2));
-      // console.log(menu.view.state.doc.nodeAt(from-1));
-      // console.log(menu.view.state.doc.nodeAt(from));
-      // // console.log(menu.view.state.doc);
-      // console.log('from');
-      // console.log(from);
-      // console.log('to');
-      // console.log(to);
-
-      // 'thumbnail_size' => 250,
-      // 'medium_size' => 665,
-      // 'large_size' => 1200,
-      // 'minimum_photo_size' => 1200,
 
       let pos = getPosition(selection);
 
@@ -21120,7 +21104,7 @@
       let newSrc;
       if(img.offsetWidth < 650 && img.dataset['photograph_medium'] && img.dataset['photograph_medium'] !== imageNode.attrs['src']){
           newSrc = img.dataset['photograph_medium'];
-      }else if(img.offsetWidth >= 650 && img.dataset['photograph_large'] && img.dataset['photograph_large'] !== imageNode.attrs['src']){
+      }else if(img.offsetWidth >= 650 && img.dataset['photograph_large'] && img.dataset['photograph_large'] !== '0' && img.dataset['photograph_large'] !== imageNode.attrs['src'] ){
           newSrc = img.dataset['photograph_large'];
       }
 
@@ -21283,6 +21267,16 @@
                       },
                       action: () => {
                           changeSize('25', menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton ({
+                      key: 'auto',
+                      label: 'AUTO',
+                      update: (button) => {
+                          return sizeButtonActivate('auto', menu, button);
+                      },
+                      action: () => {
+                          changeSize('auto', menu);
                       }
                   }),
               ]
@@ -22713,7 +22707,7 @@
               }
           });
       }
-      
+
       destroy() {
           this.dom.remove();
       }
@@ -35393,16 +35387,6 @@
 
           const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
           insertBlock(this.menu, photograph);
-          // let tr = state.tr.insert(pos-1, photograph);
-          // view.dispatch(tr);
-
-          // tr = view.state.tr;
-          // tr.setMeta("addToHistory", false);
-
-          // Uncaught TypeError: Cannot read property 'nodeSize' of null
-          // const newSelection = NodeSelection.create(view.state.doc, pos+1);
-          // view.dispatch(tr.setSelection(newSelection));
-
       }
 
       selectNode(pos) {

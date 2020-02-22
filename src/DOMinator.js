@@ -532,16 +532,6 @@ window.DOMinator = class DOMinator {
 
         const photograph = state.schema.nodes.photograph.create(photo, [image, photographCaption]);
         insertBlock(this.menu, photograph);
-        // let tr = state.tr.insert(pos-1, photograph);
-        // view.dispatch(tr);
-
-        // tr = view.state.tr;
-        // tr.setMeta("addToHistory", false);
-
-        // Uncaught TypeError: Cannot read property 'nodeSize' of null
-        // const newSelection = NodeSelection.create(view.state.doc, pos+1);
-        // view.dispatch(tr.setSelection(newSelection));
-
     }
 
     selectNode(pos) {

@@ -19,7 +19,7 @@ export default class ImageView {
             }
         });
     }
-    
+
     destroy() {
         this.dom.remove();
     }

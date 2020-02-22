@@ -29,23 +29,6 @@ function getPosition(selection){
 
 function changeSize(sizeKey, menu){
     const selection = menu.view.state.selection;
-    // console.log(menu.activeBlock);
-    // console.log(selection);
-    // console.log(selection.$head.before())
-    // console.log(pos);
-    // console.log(menu.view.state.doc.nodeAt(from-2));
-    // console.log(menu.view.state.doc.nodeAt(from-1));
-    // console.log(menu.view.state.doc.nodeAt(from));
-    // // console.log(menu.view.state.doc);
-    // console.log('from');
-    // console.log(from);
-    // console.log('to');
-    // console.log(to);
-
-    // 'thumbnail_size' => 250,
-    // 'medium_size' => 665,
-    // 'large_size' => 1200,
-    // 'minimum_photo_size' => 1200,
 
     let pos = getPosition(selection);
 
@@ -71,7 +54,7 @@ function changeSize(sizeKey, menu){
     let newSrc;
     if(img.offsetWidth < 650 && img.dataset['photograph_medium'] && img.dataset['photograph_medium'] !== imageNode.attrs['src']){
         newSrc = img.dataset['photograph_medium'];
-    }else if(img.offsetWidth >= 650 && img.dataset['photograph_large'] && img.dataset['photograph_large'] !== imageNode.attrs['src']){
+    }else if(img.offsetWidth >= 650 && img.dataset['photograph_large'] && img.dataset['photograph_large'] !== '0' && img.dataset['photograph_large'] !== imageNode.attrs['src'] ){
         newSrc = img.dataset['photograph_large'];
     }
 
@@ -234,6 +217,16 @@ export default function(menu) {
                     },
                     action: () => {
                         changeSize('25', menu);
+                    }
+                }),
+                new DOMinatorMenuButton ({
+                    key: 'auto',
+                    label: 'AUTO',
+                    update: (button) => {
+                        return sizeButtonActivate('auto', menu, button);
+                    },
+                    action: () => {
+                        changeSize('auto', menu);
                     }
                 }),
             ]
