@@ -14145,8 +14145,8 @@
           defining: true,
           selectable: true,
           draggable: false,
-          canTakeMargin: true,
           atom: true,
+          canTakeMargin: true,
           attrs: {
               href: {
                   default: ''
@@ -19600,6 +19600,8 @@
   function changeAttributeOnNode(menu, attribute, value){
       const {from, to} = getBlockRange(menu);
       const node = menu.view.state.doc.nodeAt(from);
+      const selection = menu.view.state.selection;
+
       let attrs;
       if(typeof attribute === "object" && attribute !== null){
           attrs = { ...node.attrs, ...attribute }; // to update multiple attributes at the same time
@@ -19609,6 +19611,12 @@
       }
 
       let rs = menu.view.dispatch(menu.view.state.tr.setNodeMarkup(from, null, attrs).scrollIntoView());
+
+      // none atom nodes require to be selected again to maintain the selection
+      if(selection.constructor.name === 'NodeSelection' && !node.type.isAtom){
+          const newSelection = NodeSelection.create(menu.view.state.doc, from);
+          menu.view.dispatch(menu.view.state.tr.setSelection(newSelection));
+      }
   }
 
   function normalizePaddingMargin(menu, paddingOrMargin, side, size){
@@ -21008,30 +21016,6 @@
               ]
           }),
           new DOMinatorMenuButton ({
-              key: 'paddings',
-              icon: 'padding',
-              iconType: 'dics',
-              action: (button) => {
-                  menu.activateSubmenu('paddings');
-              },
-              update(button, menu,){
-                  if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
-                      button.disable();
-                      button.deactivate();
-                  }else{
-                      button.enable();
-                      button.deactivate();
-                      if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
-                          button.activate();
-                          return true;
-                      }else{
-                          return false;
-                      }
-
-                  }
-              }
-          }),
-          new DOMinatorMenuButton ({
               key: 'margins',
               icon: 'margin',
               iconType: 'dics',
@@ -21046,6 +21030,30 @@
                       button.enable();
                       button.deactivate();
                       if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                          button.activate();
+                          return true;
+                      }else{
+                          return false;
+                      }
+
+                  }
+              }
+          }),
+          new DOMinatorMenuButton ({
+              key: 'paddings',
+              icon: 'padding',
+              iconType: 'dics',
+              action: (button) => {
+                  menu.activateSubmenu('paddings');
+              },
+              update(button, menu,){
+                  if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                      button.disable();
+                      button.deactivate();
+                  }else{
+                      button.enable();
+                      button.deactivate();
+                      if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
                           button.activate();
                           return true;
                       }else{
@@ -35002,7 +35010,7 @@
                   '75': 'width-75',
                   '100': 'width-100',
               },
-              scrollMargin: 150,
+              scrollMargin: 0,
               saveTimout: 500,
               menu: {}
           };

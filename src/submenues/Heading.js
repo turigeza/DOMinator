@@ -133,30 +133,6 @@ export default function(menu) {
             ]
         }),
         new DOMinatorMenuButton ({
-            key: 'paddings',
-            icon: 'padding',
-            iconType: 'dics',
-            action: (button) => {
-                menu.activateSubmenu('paddings');
-            },
-            update(button, menu,){
-                if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
-                    button.disable();
-                    button.deactivate();
-                }else{
-                    button.enable();
-                    button.deactivate();
-                    if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
-                        button.activate();
-                        return true;
-                    }else{
-                        return false;
-                    }
-
-                }
-            }
-        }),
-        new DOMinatorMenuButton ({
             key: 'margins',
             icon: 'margin',
             iconType: 'dics',
@@ -171,6 +147,30 @@ export default function(menu) {
                     button.enable();
                     button.deactivate();
                     if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
+                        button.activate();
+                        return true;
+                    }else{
+                        return false;
+                    }
+
+                }
+            }
+        }),
+        new DOMinatorMenuButton ({
+            key: 'paddings',
+            icon: 'padding',
+            iconType: 'dics',
+            action: (button) => {
+                menu.activateSubmenu('paddings');
+            },
+            update(button, menu,){
+                if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
+                    button.disable();
+                    button.deactivate();
+                }else{
+                    button.enable();
+                    button.deactivate();
+                    if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
                         button.activate();
                         return true;
                     }else{

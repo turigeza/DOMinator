@@ -145,7 +145,7 @@ window.DOMinator = class DOMinator {
                 '75': 'width-75',
                 '100': 'width-100',
             },
-            scrollMargin: 150,
+            scrollMargin: 0,
             saveTimout: 500,
             menu: {}
         };

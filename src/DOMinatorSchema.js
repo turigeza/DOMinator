@@ -685,8 +685,8 @@ export const nodes = {
         defining: true,
         selectable: true,
         draggable: false,
-        canTakeMargin: true,
         atom: true,
+        canTakeMargin: true,
         attrs: {
             href: {
                 default: ''
