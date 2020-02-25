@@ -163,11 +163,11 @@ window.DOMinator = class DOMinator {
         }
 
         // init editorSchema
-        let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
-        nodes = addListNodes(nodes, "paragraph block*", "block");
+        // let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
+        // nodes = addListNodes(nodes, "paragraph block*", "block");
 
         this.editorSchema = new Schema({
-            nodes: nodes,
+            nodes: schema.spec.nodes,
             marks: schema.spec.marks
         })
 

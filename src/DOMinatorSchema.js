@@ -73,19 +73,19 @@ export const nodes = {
                 let attrs = {};
 
                 // level
-                if(dom.nodeName === 'H1'){
+                if (dom.nodeName === 'H1') {
                     attrs.level = 1;
-                }else if(dom.nodeName === 'H2'){
+                } else if (dom.nodeName === 'H2') {
                     attrs.level = 2;
-                }else if(dom.nodeName === 'H3'){
+                } else if (dom.nodeName === 'H3') {
                     attrs.level = 3;
-                }else if(dom.nodeName === 'H4'){
+                } else if (dom.nodeName === 'H4') {
                     attrs.level = 4;
-                }else if(dom.nodeName === 'H5'){
+                } else if (dom.nodeName === 'H5') {
                     attrs.level = 5;
-                }else if(dom.nodeName === 'H6'){
+                } else if (dom.nodeName === 'H6') {
                     attrs.level = 6;
-                }else{
+                } else {
                     console.error('No way ! ' + dom.nodeName);
                 }
 
@@ -95,7 +95,7 @@ export const nodes = {
         }],
         toDOM(node) {
             let attrs = {};
-            if(node.attrs.class !== ''){
+            if (node.attrs.class !== '') {
                 attrs.class = node.attrs.class;
             }
             return ["h" + node.attrs.level, attrs, 0]
@@ -534,7 +534,7 @@ export const nodes = {
             getAttrs: dom => {
                 let cl = dom.getAttribute("class");
                 const text = dom.textContent.trim();
-                if(text === '' && !cl.includes(' empty')){
+                if (text === '' && !cl.includes(' empty')) {
                     cl += ' empty';
                 }
                 return {
@@ -543,7 +543,7 @@ export const nodes = {
             }
         }],
         toDOM(node) {
-            if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
+            if (node.content.size === 0 && !node.attrs.class.includes(' empty')) {
                 node.attrs.class += ' empty';
             }
 
@@ -665,7 +665,7 @@ export const nodes = {
                 return {
                     href: dom.getAttribute("href"),
                     title: dom.getAttribute("title"),
-                    target:  dom.getAttribute("target"),
+                    target: dom.getAttribute("target"),
                     'class': dom.getAttribute("class"),
                 }
             }
@@ -679,7 +679,7 @@ export const nodes = {
         }
     },
     blocklink: {
-        content: "block+",
+        content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
         group: "block",
         // marks: 'span b i code del sub sup u',
         defining: true,
@@ -707,7 +707,7 @@ export const nodes = {
                 return {
                     href: dom.getAttribute("href"),
                     title: dom.getAttribute("title"),
-                    target:  dom.getAttribute("target"),
+                    target: dom.getAttribute("target"),
                     'class': dom.getAttribute("class"),
                 };
             }
@@ -720,9 +720,74 @@ export const nodes = {
             ]
         }
     },
+    ordered_list: {
+        content: "list_item+",
+        group: "block",
+        selectable: true,
+        draggable: false,
+        attrs: {
+
+        },
+        parseDOM: [{
+            tag: 'ol',
+            getAttrs: dom => {
+                return {};
+            }
+        }],
+        toDOM(node) {
+            return [
+                "ol",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    bullet_list: {
+        content: "list_item+",
+        group: "block",
+        selectable: true,
+        draggable: false,
+        attrs: {
+
+        },
+        parseDOM: [{
+            tag: 'ul',
+            getAttrs: dom => {
+                return {};
+            }
+        }],
+        toDOM(node) {
+            return [
+                "ul",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    list_item: {
+        content: "( paragraph | horizontal_rule | photograph | downloads )+",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        attrs: {},
+        parseDOM: [{
+            tag: 'li',
+            getAttrs: dom => {
+                return {};
+            }
+        }],
+        toDOM(node) {
+            return [
+                "li",
+                node.attrs,
+                0
+            ]
+        }
+    },
+
     card: {
         // content: "photograph{0,1} card_content{1}",
-        content: "(paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html)+",
+        content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
         group: "block",
         defining: true,
         selectable: true,
@@ -750,6 +815,101 @@ export const nodes = {
             ]
         }
     },
+
+    // these are the cards for the masonry layout
+    masonary_card: {
+        // content: "photograph{0,1} card_content{1}",
+        content: "masonary_card_header{1} masonary_card_content{1}",
+        group: "block",
+        defining: true,
+        selectable: true,
+        draggable: false,
+        canTakeMargin: true,
+        atom: true,
+        attrs: {
+            'class': {
+                default: 'tg_card'
+            },
+            style: {
+                default: ''
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_card',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class"),
+                    'style': dom.getAttribute("style"),
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    masonary_card_header: {
+        content: "(paragraph | photograph )+",
+        group: "block",
+        defining: true,
+        selectable: false,
+        draggable: false,
+        canTakeMargin: true,
+        atom: true,
+        attrs: {
+            'class': {
+                default: 'tg_card_header'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_card_header',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
+    masonary_card_content: {
+        content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
+        group: "block",
+        defining: true,
+        selectable: false,
+        draggable: false,
+        canTakeMargin: true,
+        atom: true,
+        attrs: {
+            'class': {
+                default: 'tg_card_content'
+            }
+        },
+        parseDOM: [{
+            tag: 'div.tg_card_content',
+            getAttrs: dom => {
+                return {
+                    'class': dom.getAttribute("class")
+                };
+            }
+        }],
+        toDOM(node) {
+            return [
+                "div",
+                node.attrs,
+                0
+            ]
+        }
+    },
+
     custom_html: {
         group: "block",
         defining: true, // node is considered an important parent node during replace operations
@@ -779,7 +939,7 @@ export const nodes = {
         toDOM(node) {
             let newDiv = document.createElement("div");
             newDiv.innerHTML = node.attrs.html;
-            if(node.attrs.class){
+            if (node.attrs.class) {
                 newDiv.setAttribute('class', node.attrs.class);
             }
 
@@ -813,7 +973,7 @@ export const marks = {
                 return {
                     href: dom.getAttribute("href"),
                     title: dom.getAttribute("title"),
-                    target:  dom.getAttribute("target"),
+                    target: dom.getAttribute("target"),
                     'class': dom.getAttribute("class"),
                 }
             }
@@ -832,7 +992,7 @@ export const marks = {
             tag: "span",
             getAttrs: dom => {
                 return {
-                    'class':  dom.getAttribute("class") || null
+                    'class': dom.getAttribute("class") || null
                 }
             }
         }],

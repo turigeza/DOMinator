@@ -32,6 +32,10 @@ export default class CarouselView {
         return true;
     }
 
+    // stopEvent(event){
+    //     return false;
+    // }
+
     destroy() {
         this.dom.remove();
     }

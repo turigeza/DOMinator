@@ -11090,66 +11090,6 @@
   }
   //# sourceMappingURL=index.es.js.map
 
-  var olDOM = ["ol", 0], ulDOM = ["ul", 0], liDOM = ["li", 0];
-
-  // :: NodeSpec
-  // An ordered list [node spec](#model.NodeSpec). Has a single
-  // attribute, `order`, which determines the number at which the list
-  // starts counting, and defaults to 1. Represented as an `<ol>`
-  // element.
-  var orderedList = {
-    attrs: {order: {default: 1}},
-    parseDOM: [{tag: "ol", getAttrs: function getAttrs(dom) {
-      return {order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1}
-    }}],
-    toDOM: function toDOM(node) {
-      return node.attrs.order == 1 ? olDOM : ["ol", {start: node.attrs.order}, 0]
-    }
-  };
-
-  // :: NodeSpec
-  // A bullet list node spec, represented in the DOM as `<ul>`.
-  var bulletList = {
-    parseDOM: [{tag: "ul"}],
-    toDOM: function toDOM() { return ulDOM }
-  };
-
-  // :: NodeSpec
-  // A list item (`<li>`) spec.
-  var listItem = {
-    parseDOM: [{tag: "li"}],
-    toDOM: function toDOM() { return liDOM },
-    defining: true
-  };
-
-  function add(obj, props) {
-    var copy = {};
-    for (var prop in obj) { copy[prop] = obj[prop]; }
-    for (var prop$1 in props) { copy[prop$1] = props[prop$1]; }
-    return copy
-  }
-
-  // :: (OrderedMap<NodeSpec>, string, ?string) → OrderedMap<NodeSpec>
-  // Convenience function for adding list-related node types to a map
-  // specifying the nodes for a schema. Adds
-  // [`orderedList`](#schema-list.orderedList) as `"ordered_list"`,
-  // [`bulletList`](#schema-list.bulletList) as `"bullet_list"`, and
-  // [`listItem`](#schema-list.listItem) as `"list_item"`.
-  //
-  // `itemContent` determines the content expression for the list items.
-  // If you want the commands defined in this module to apply to your
-  // list structure, it should have a shape like `"paragraph block*"` or
-  // `"paragraph (ordered_list | bullet_list)*"`. `listGroup` can be
-  // given to assign a group name to the list node types, for example
-  // `"block"`.
-  function addListNodes(nodes, itemContent, listGroup) {
-    return nodes.append({
-      ordered_list: add(orderedList, {content: "list_item+", group: listGroup}),
-      bullet_list: add(bulletList, {content: "list_item+", group: listGroup}),
-      list_item: add(listItem, {content: itemContent})
-    })
-  }
-
   // :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
   // Returns a command function that wraps the selection in a list with
   // the given type an attributes. If `dispatch` is null, only return a
@@ -13533,19 +13473,19 @@
                   let attrs = {};
 
                   // level
-                  if(dom.nodeName === 'H1'){
+                  if (dom.nodeName === 'H1') {
                       attrs.level = 1;
-                  }else if(dom.nodeName === 'H2'){
+                  } else if (dom.nodeName === 'H2') {
                       attrs.level = 2;
-                  }else if(dom.nodeName === 'H3'){
+                  } else if (dom.nodeName === 'H3') {
                       attrs.level = 3;
-                  }else if(dom.nodeName === 'H4'){
+                  } else if (dom.nodeName === 'H4') {
                       attrs.level = 4;
-                  }else if(dom.nodeName === 'H5'){
+                  } else if (dom.nodeName === 'H5') {
                       attrs.level = 5;
-                  }else if(dom.nodeName === 'H6'){
+                  } else if (dom.nodeName === 'H6') {
                       attrs.level = 6;
-                  }else{
+                  } else {
                       console.error('No way ! ' + dom.nodeName);
                   }
 
@@ -13555,7 +13495,7 @@
           }],
           toDOM(node) {
               let attrs = {};
-              if(node.attrs.class !== ''){
+              if (node.attrs.class !== '') {
                   attrs.class = node.attrs.class;
               }
               return ["h" + node.attrs.level, attrs, 0]
@@ -13994,7 +13934,7 @@
               getAttrs: dom => {
                   let cl = dom.getAttribute("class");
                   const text = dom.textContent.trim();
-                  if(text === '' && !cl.includes(' empty')){
+                  if (text === '' && !cl.includes(' empty')) {
                       cl += ' empty';
                   }
                   return {
@@ -14003,7 +13943,7 @@
               }
           }],
           toDOM(node) {
-              if(node.content.size === 0 && !node.attrs.class.includes(' empty')){
+              if (node.content.size === 0 && !node.attrs.class.includes(' empty')) {
                   node.attrs.class += ' empty';
               }
 
@@ -14125,7 +14065,7 @@
                   return {
                       href: dom.getAttribute("href"),
                       title: dom.getAttribute("title"),
-                      target:  dom.getAttribute("target"),
+                      target: dom.getAttribute("target"),
                       'class': dom.getAttribute("class"),
                   }
               }
@@ -14139,7 +14079,7 @@
           }
       },
       blocklink: {
-          content: "block+",
+          content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
           group: "block",
           // marks: 'span b i code del sub sup u',
           defining: true,
@@ -14167,7 +14107,7 @@
                   return {
                       href: dom.getAttribute("href"),
                       title: dom.getAttribute("title"),
-                      target:  dom.getAttribute("target"),
+                      target: dom.getAttribute("target"),
                       'class': dom.getAttribute("class"),
                   };
               }
@@ -14180,9 +14120,74 @@
               ]
           }
       },
+      ordered_list: {
+          content: "list_item+",
+          group: "block",
+          selectable: true,
+          draggable: false,
+          attrs: {
+
+          },
+          parseDOM: [{
+              tag: 'ol',
+              getAttrs: dom => {
+                  return {};
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "ol",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      bullet_list: {
+          content: "list_item+",
+          group: "block",
+          selectable: true,
+          draggable: false,
+          attrs: {
+
+          },
+          parseDOM: [{
+              tag: 'ul',
+              getAttrs: dom => {
+                  return {};
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "ul",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      list_item: {
+          content: "( paragraph | horizontal_rule | photograph | downloads )+",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          attrs: {},
+          parseDOM: [{
+              tag: 'li',
+              getAttrs: dom => {
+                  return {};
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "li",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+
       card: {
           // content: "photograph{0,1} card_content{1}",
-          content: "(paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html)+",
+          content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
           group: "block",
           defining: true,
           selectable: true,
@@ -14210,6 +14215,101 @@
               ]
           }
       },
+
+      // these are the cards for the masonry layout
+      masonary_card: {
+          // content: "photograph{0,1} card_content{1}",
+          content: "masonary_card_header{1} masonary_card_content{1}",
+          group: "block",
+          defining: true,
+          selectable: true,
+          draggable: false,
+          canTakeMargin: true,
+          atom: true,
+          attrs: {
+              'class': {
+                  default: 'tg_card'
+              },
+              style: {
+                  default: ''
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_card',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class"),
+                      'style': dom.getAttribute("style"),
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      masonary_card_header: {
+          content: "(paragraph | photograph )+",
+          group: "block",
+          defining: true,
+          selectable: false,
+          draggable: false,
+          canTakeMargin: true,
+          atom: true,
+          attrs: {
+              'class': {
+                  default: 'tg_card_header'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_card_header',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+      masonary_card_content: {
+          content: "( paragraph | blockquote | horizontal_rule | heading | code_block | photograph | carousel | downloads | custom_html | ordered_list | bullet_list )+",
+          group: "block",
+          defining: true,
+          selectable: false,
+          draggable: false,
+          canTakeMargin: true,
+          atom: true,
+          attrs: {
+              'class': {
+                  default: 'tg_card_content'
+              }
+          },
+          parseDOM: [{
+              tag: 'div.tg_card_content',
+              getAttrs: dom => {
+                  return {
+                      'class': dom.getAttribute("class")
+                  };
+              }
+          }],
+          toDOM(node) {
+              return [
+                  "div",
+                  node.attrs,
+                  0
+              ]
+          }
+      },
+
       custom_html: {
           group: "block",
           defining: true, // node is considered an important parent node during replace operations
@@ -14239,7 +14339,7 @@
           toDOM(node) {
               let newDiv = document.createElement("div");
               newDiv.innerHTML = node.attrs.html;
-              if(node.attrs.class){
+              if (node.attrs.class) {
                   newDiv.setAttribute('class', node.attrs.class);
               }
 
@@ -14273,7 +14373,7 @@
                   return {
                       href: dom.getAttribute("href"),
                       title: dom.getAttribute("title"),
-                      target:  dom.getAttribute("target"),
+                      target: dom.getAttribute("target"),
                       'class': dom.getAttribute("class"),
                   }
               }
@@ -14292,7 +14392,7 @@
               tag: "span",
               getAttrs: dom => {
                   return {
-                      'class':  dom.getAttribute("class") || null
+                      'class': dom.getAttribute("class") || null
                   }
               }
           }],
@@ -20243,6 +20343,44 @@
 
   }
 
+  function insertCard(menu, large) {
+
+      const view = menu.view;
+      const selection = view.state.selection;
+      const state = view.state;
+      const pos = selection.from;
+
+      // caption
+      const captionText = state.schema.text('Card Title');
+      const photographCaption = state.schema.nodes.photograph_caption.create({}, captionText);
+
+      const dom = view.domAtPos(pos);
+
+      // image
+      const imageAttrs = {
+          'src': 'https://picsum.photos/900/600?grayscale',
+          'data-photograph_id': null,
+          'data-photograph_medium': 'https://picsum.photos/900/600?grayscale',
+          'data-photograph_large': 'https://picsum.photos/900/600?grayscale',
+      };
+
+      const image = state.schema.nodes.image.create(imageAttrs);
+
+      const photograph = state.schema.nodes.photograph.create({}, [image, photographCaption]);
+      const masonary_card_header = state.schema.nodes.masonary_card_header.create({}, [photograph]);
+
+      const paragraph = state.schema.nodes.paragraph.create({}, state.schema.text('The content of the card a aample image from picsum.photos.'));
+
+      const masonary_card_content = state.schema.nodes.masonary_card_content.create({}, [paragraph]);
+      const attr = large ? { 'class': 'tg_card tg_card_large' } : { 'class': 'tg_card tg_card_small' };
+      const card = state.schema.nodes.masonary_card.create(attr, [
+          masonary_card_header,
+          masonary_card_content,
+      ]);
+
+      insertBlock(menu, card);
+  }
+
   function _Paragraph(menu) {
 
       const items = [
@@ -20459,6 +20597,30 @@
 
                   insertBlock(menu, card);
               }
+          }),
+          // masonary_cards
+          new DOMinatorMenuDropdown({
+              key: 'masonary_cards',
+              icon: 'card',
+              iconType: 'dics',
+              items: [
+                  new DOMinatorMenuButton({
+                      key: 'small_card',
+                      icon: 'smallcard',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertCard(menu);
+                      }
+                  }),
+                  new DOMinatorMenuButton({
+                      key: 'large_card',
+                      icon: 'card',
+                      iconType: 'dics',
+                      action: (button) => {
+                          insertCard(menu, 'large');
+                      }
+                  })
+              ]
           }),
           // layouts
           new DOMinatorMenuDropdown({
@@ -22755,6 +22917,10 @@
       ignoreMutation() {
           return true;
       }
+
+      // stopEvent(event){
+      //     return false;
+      // }
 
       destroy() {
           this.dom.remove();
@@ -35028,11 +35194,11 @@
           }
 
           // init editorSchema
-          let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
-          nodes = addListNodes(nodes, "paragraph block*", "block");
+          // let nodes = addListNodes(schema.spec.nodes, "paragraph block*", "block");
+          // nodes = addListNodes(nodes, "paragraph block*", "block");
 
           this.editorSchema = new Schema({
-              nodes: nodes,
+              nodes: schema.spec.nodes,
               marks: schema.spec.marks
           });
 

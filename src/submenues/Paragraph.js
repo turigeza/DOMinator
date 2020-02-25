@@ -8,6 +8,7 @@ import DOMinatorMenuDropdown from "./../DOMinatorMenuDropdown"
 import DOMinatorSubMenu from "./../DOMinatorSubMenu"
 import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
+import insertCard from "./../Helpers/insertCard"
 import {
     convertBlock,
     toggleList,
@@ -232,6 +233,30 @@ export default function(menu) {
 
                 insertBlock(menu, card);
             }
+        }),
+        // masonary_cards
+        new DOMinatorMenuDropdown({
+            key: 'masonary_cards',
+            icon: 'card',
+            iconType: 'dics',
+            items: [
+                new DOMinatorMenuButton({
+                    key: 'small_card',
+                    icon: 'smallcard',
+                    iconType: 'dics',
+                    action: (button) => {
+                        insertCard(menu);
+                    }
+                }),
+                new DOMinatorMenuButton({
+                    key: 'large_card',
+                    icon: 'card',
+                    iconType: 'dics',
+                    action: (button) => {
+                        insertCard(menu, 'large');
+                    }
+                })
+            ]
         }),
         // layouts
         new DOMinatorMenuDropdown({

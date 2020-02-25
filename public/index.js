@@ -336,7 +336,7 @@ $( document ).ready(function(){
             initCarousels();
         },
         onChange(DOMinatory){
-            
+
         }
     });
 
@@ -354,6 +354,7 @@ $( document ).ready(function(){
     }, 200);
 
     initCarousels();
+    const carouselNavigationEvent = new Event('carouselNavigation');
 
     function getHtmlFromCarousel($widget){
         const $clone = $widget.clone(false);
@@ -417,7 +418,7 @@ $( document ).ready(function(){
                 //lazyLoad: 2,
             }
         }
-
+        // settings.accessibility = false;
         settings.draggable = true;
         const $carousel = $dom.find('.flickity-carousel');
         $carousel.flickity(settings);
@@ -425,10 +426,16 @@ $( document ).ready(function(){
         const existingIndex = $carousel.attr('index') || 0;
         const flickity = $carousel.data('flickity');
 
-        flickity.select(existingIndex, false, true);
+        if(!editor || !editor.isOn()){
+            flickity.select(existingIndex, false, true);
+        }
 
+        $carousel.closest('.carousel_wrapper').on('carouselNavigationEvent', function(){
+            console.log('carouselNavigationEvent');
+        })
         // this so we can reinstate the index after reinitialiseing the cartousel
         $carousel.on( 'change.flickity', function( event, index ) {
+            const carouselNavigationEvent = new CustomEvent('carouselNavigation', { bubbles: true });
             $carousel.attr('index', index);
         });
     }
