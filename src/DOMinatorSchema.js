@@ -919,7 +919,7 @@ export const nodes = {
         // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
         attrs: {
             class: {
-                default: null
+                default: 'custom_html'
             },
             html: {
                 default: ''

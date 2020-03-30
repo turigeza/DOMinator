@@ -5612,6 +5612,18 @@
     AllSelection.prototype = Object.create( Selection && Selection.prototype );
     AllSelection.prototype.constructor = AllSelection;
 
+    AllSelection.prototype.replace = function replace (tr, content) {
+      if ( content === void 0 ) content = Slice.empty;
+
+      if (content == Slice.empty) {
+        tr.delete(0, tr.doc.content.size);
+        var sel = Selection.atStart(tr.doc);
+        if (!sel.eq(tr.selection)) { tr.setSelection(sel); }
+      } else {
+        Selection.prototype.replace.call(this, tr, content);
+      }
+    };
+
     AllSelection.prototype.toJSON = function toJSON () { return {type: "all"} };
 
     AllSelection.fromJSON = function fromJSON (doc) { return new AllSelection(doc) };
@@ -12292,33 +12304,40 @@
     };
 
     GapCursor.findFrom = function findFrom ($pos, dir, mustMove) {
-      if (!mustMove && GapCursor.valid($pos)) { return $pos }
-
-      var pos = $pos.pos, next = null;
-      // Scan up from this position
-      for (var d = $pos.depth;; d--) {
-        var parent = $pos.node(d);
-        if (dir > 0 ? $pos.indexAfter(d) < parent.childCount : $pos.index(d) > 0) {
-          next = parent.maybeChild(dir > 0 ? $pos.indexAfter(d) : $pos.index(d) - 1);
-          break
-        } else if (d == 0) {
-          return null
+      search: for (;;) {
+        if (!mustMove && GapCursor.valid($pos)) { return $pos }
+        var pos = $pos.pos, next = null;
+        // Scan up from this position
+        for (var d = $pos.depth;; d--) {
+          var parent = $pos.node(d);
+          if (dir > 0 ? $pos.indexAfter(d) < parent.childCount : $pos.index(d) > 0) {
+            next = parent.child(dir > 0 ? $pos.indexAfter(d) : $pos.index(d) - 1);
+            break
+          } else if (d == 0) {
+            return null
+          }
+          pos += dir;
+          var $cur = $pos.doc.resolve(pos);
+          if (GapCursor.valid($cur)) { return $cur }
         }
-        pos += dir;
-        var $cur = $pos.doc.resolve(pos);
-        if (GapCursor.valid($cur)) { return $cur }
-      }
 
-      // And then down into the next node
-      for (;;) {
-        next = dir > 0 ? next.firstChild : next.lastChild;
-        if (!next) { break }
-        pos += dir;
-        var $cur$1 = $pos.doc.resolve(pos);
-        if (GapCursor.valid($cur$1)) { return $cur$1 }
-      }
+        // And then down into the next node
+        for (;;) {
+          var inside = dir > 0 ? next.firstChild : next.lastChild;
+          if (!inside) {
+            if (NodeSelection.isSelectable(next)) { break }
+            $pos = $pos.doc.resolve(pos + next.nodeSize * dir);
+            mustMove = false;
+            continue search
+          }
+          next = inside;
+          pos += dir;
+          var $cur$1 = $pos.doc.resolve(pos);
+          if (GapCursor.valid($cur$1)) { return $cur$1 }
+        }
 
-      return null
+        return null
+      }
     };
 
     return GapCursor;
@@ -12402,7 +12421,7 @@
       var sel = state.selection;
       var $start = dir > 0 ? sel.$to : sel.$from, mustMove = sel.empty;
       if (sel instanceof TextSelection) {
-        if (!view.endOfTextblock(dirStr)) { return false }
+        if (!view.endOfTextblock(dirStr) || $start.depth == 0) { return false }
         mustMove = false;
         $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
       }
@@ -14319,7 +14338,7 @@
           // isolating: true, // When enabled (default is false), the sides of nodes of this type count as boundaries that regular editing operations, like backspacing or lifting, won't cross.
           attrs: {
               class: {
-                  default: null
+                  default: 'custom_html'
               },
               html: {
                   default: ''
@@ -14676,14 +14695,14 @@
               update: (menu)=>{
                   if (typeof this.options.update === 'function'){
                       this.options.update(this);
-                  }else if(this.options.update === 'appendToDropDownLabel');else{
+                  }else if(this.options.update === 'appendToDropDownLabel');else {
                       if(this.activeItems && this.activeItems.length > 0){
                           this.dropdownButton.activate();
                           if(this.activeItems.length === 1){
                               const i = this.activeItems[0].getIcon();
                               this.dropdownButton.swapIcon(i);
                           }
-                      }else{
+                      }else {
                           this.dropdownButton.deactivate();
                           this.dropdownButton.reinstateIcon();
                       }
@@ -14702,7 +14721,7 @@
               if(typeof this.options.dropdownCaret === 'undefined'){
                   this.dropdownCaret = document.createElement("i");
                   this.dropdownCaret.className = "fa fa-caret-down DOMinatorDropDownCaret";
-              }else{
+              }else {
                   this.dropdownCaret = this.options.dropdownCaret;
               }
               this.dropdownButton.dom.appendChild(this.dropdownCaret);
@@ -14737,7 +14756,7 @@
       toggleMenu(){
           if(this.dropdown.style.display === 'none'){
               this.open();
-          }else{
+          }else {
               this.close();
           }
       }
@@ -19572,7 +19591,7 @@
           let temp = parent.content.content[i];
           if(mark.isInSet(temp.marks)){
               to += temp.nodeSize;
-          }else{
+          }else {
               break;
           }
       }
@@ -19582,7 +19601,7 @@
           let temp = parent.content.content[i];
           if(mark.isInSet(temp.marks)){
               from -= temp.nodeSize;
-          }else{
+          }else {
               break;
           }
       }
@@ -19705,7 +19724,7 @@
       let attrs;
       if(typeof attribute === "object" && attribute !== null){
           attrs = { ...node.attrs, ...attribute }; // to update multiple attributes at the same time
-      }else{
+      }else {
           attrs = { ...node.attrs };
           attrs[attribute] = value;
       }
@@ -19804,7 +19823,7 @@
           } else if(rs.stripped.y){
               className += ' ' + classes.bottom[rs.stripped.y];
           }
-      }else{
+      }else {
           let rs = stripPaddingMarginClasses(className, ['all', 'y', 'x', 'top', 'bottom', 'left', 'right'], classes);
           className = rs.string;
       }
@@ -19997,7 +20016,7 @@
       if(grandParent && grandParent.type.name === 'downloads'){
           const tr = state.tr.insert( after, links );
           menu.view.dispatch(tr.scrollIntoView());
-      }else{
+      }else {
           const title = state.schema.nodes.download_title.create({}, state.schema.text('Download'));
           links.unshift(title);
           const downloads = state.schema.nodes.downloads.create({}, links);
@@ -20075,7 +20094,7 @@
               insertPosition = pos-1;
           }else if($pos.nodeBefore && $pos.nodeAfter){
               console.log('NODE = NODE - both node exist but not text');
-          }else{
+          }else {
               console.error('We can not insert a block here');
           }
       }else if(selection.constructor.name === 'NodeSelection'){
@@ -20118,7 +20137,7 @@
 
       if(classNameNow.includes(className)){
           newClassName = classNameNow.replace(className, '').trim();
-      }else{
+      }else {
           newClassName = classNameNow + ' ' + className;
           newClassName = newClassName.trim();
       }
@@ -20132,7 +20151,7 @@
       let newSelection;
       if(selectionType === 'node'){
           newSelection = NodeSelection.create(menu.view.state.doc, pos);
-      }else{
+      }else {
           newSelection = TextSelection.create(menu.view.state.doc, selection.$cursor.pos);
       }
 
@@ -20947,7 +20966,7 @@
               update: (button) => {
                   if(menu.activeMark.attrs.target === '_blank'){
                       button.activate();
-                  }else{
+                  }else {
                       button.deactivate();
                   }
               },
@@ -21027,7 +21046,7 @@
               action: (val) => {
                   if(val === ''){
                       clearFormatting(menu);
-                  }else{
+                  }else {
                       changeAttributeOnMark('href', val, menu);
                   }
               }
@@ -21057,7 +21076,7 @@
   function activateHeaderButton(level, menu, button){
       if(menu.activeBlock && menu.activeBlock.attrs.level === level){
           button.activate();
-      }else{
+      }else {
           button.deactivate();
       }
   }
@@ -21188,13 +21207,13 @@
                   if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
                       button.disable();
                       button.deactivate();
-                  }else{
+                  }else {
                       button.enable();
                       button.deactivate();
                       if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-m')){
                           button.activate();
                           return true;
-                      }else{
+                      }else {
                           return false;
                       }
 
@@ -21212,13 +21231,13 @@
                   if(!menu.activeBlock || (menu.activeBlock && typeof menu.activeBlock.type.attrs.class === 'undefined')){
                       button.disable();
                       button.deactivate();
-                  }else{
+                  }else {
                       button.enable();
                       button.deactivate();
                       if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-p')){
                           button.activate();
                           return true;
-                      }else{
+                      }else {
                           return false;
                       }
 
@@ -21349,7 +21368,7 @@
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
-      }else{
+      }else {
           btn.deactivate();
           return false;
       }
@@ -21362,7 +21381,7 @@
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
-      }else{
+      }else {
           btn.deactivate();
           return false;
       }
@@ -21745,7 +21764,7 @@
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
-      }else{
+      }else {
           btn.deactivate();
           return false;
       }
@@ -21839,7 +21858,7 @@
       if(node.attrs.class && node.attrs.class.includes(className)){
           btn.activate();
           return true;
-      }else{
+      }else {
           btn.deactivate();
           return false;
       }
@@ -21935,7 +21954,7 @@
               update(button){
                   if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-card-raised')){
                       button.activate();
-                  }else{
+                  }else {
                       button.deactivate();
                   }
               }
@@ -22045,7 +22064,7 @@
               update(button){
                   if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-block-link-flat')){
                       button.deactivate();
-                  }else{
+                  }else {
                       button.activate();
                   }
               }
@@ -22059,7 +22078,7 @@
               update(button){
                   if(menu.activeBlock.attrs.class && menu.activeBlock.attrs.class.includes('d-block-link-no-outline')){
                       button.deactivate();
-                  }else{
+                  }else {
                       button.activate();
                   }
               }
@@ -22205,7 +22224,7 @@
                       menu.dominator.codeEditingWindowClose();
                       isOpen = false;
                       toggleButtons();
-                  }else{
+                  }else {
                       menu.dominator.codeEditingWindowOpen();
                       isOpen = true;
                       toggleButtons();
@@ -22230,13 +22249,13 @@
               if(button.options && button.options.key !== 'edit' && typeof button.enable === 'function'){
                   if(isOpen){
                       button.enable();
-                  }else{
+                  }else {
                       button.disable();
                   }
               }else if(button.options && button.options.key === 'edit'){
                   if(isOpen){
                       button.activate();
-                  }else{
+                  }else {
                       button.deactivate();
                   }
               }
@@ -22439,14 +22458,14 @@
                                   break;
                               }
                           }
-                      }else{
+                      }else {
                           if(selection.$head.parent.type.spec.menu){
                               activeSubmenuKey = selection.$head.parent.type.spec.menu;
-                          }else{
+                          }else {
                               activeSubmenuKey = selection.$head.parent.type.name;
                           }
                       }
-                  }else{
+                  }else {
                       // there is a selection show inline menu
                       activeSubmenuKey = 'inline';
                   }
@@ -22455,7 +22474,7 @@
               }else if (selection.constructor.name === 'NodeSelection'){
                   if(selection.node.type.spec.menu){
                       activeSubmenuKey = selection.node.type.spec.menu;
-                  }else{
+                  }else {
                       activeSubmenuKey = selection.node.type.name;
                   }
 
@@ -22464,7 +22483,7 @@
                   activeSubmenuKey = 'inline';
               }else if(selection.constructor.name === 'GapCursor'){
                   activeSubmenuKey = "paragraph";
-              }else{
+              }else {
                   console.error('Uknown selection !');
               }
           }
@@ -22477,7 +22496,7 @@
           if(this.stayOnMenu && this.activeSubmenuKey){
               this.stayOnMenu = false;
               this.submenus[this.activeSubmenuKey].update(this);
-          }else{
+          }else {
               this.activeSubmenuKey = activeSubmenuKey;
               this.activateSubmenu(this.activeSubmenuKey);
           }
@@ -23413,14 +23432,15 @@
             for (++i$7; i$7 < len && countsAsLeft.test(types[i$7]); ++i$7) {}
             order.push(new BidiSpan(0, start, i$7));
           } else {
-            var pos = i$7, at = order.length;
+            var pos = i$7, at = order.length, isRTL = direction == "rtl" ? 1 : 0;
             for (++i$7; i$7 < len && types[i$7] != "L"; ++i$7) {}
             for (var j$2 = pos; j$2 < i$7;) {
               if (countsAsNum.test(types[j$2])) {
-                if (pos < j$2) { order.splice(at, 0, new BidiSpan(1, pos, j$2)); }
+                if (pos < j$2) { order.splice(at, 0, new BidiSpan(1, pos, j$2)); at += isRTL; }
                 var nstart = j$2;
                 for (++j$2; j$2 < i$7 && countsAsNum.test(types[j$2]); ++j$2) {}
                 order.splice(at, 0, new BidiSpan(2, nstart, j$2));
+                at += isRTL;
                 pos = j$2;
               } else { ++j$2; }
             }
@@ -26478,7 +26498,7 @@
     }
 
     function setScrollTop(cm, val, forceScroll) {
-      val = Math.min(cm.display.scroller.scrollHeight - cm.display.scroller.clientHeight, val);
+      val = Math.max(0, Math.min(cm.display.scroller.scrollHeight - cm.display.scroller.clientHeight, val));
       if (cm.display.scroller.scrollTop == val && !forceScroll) { return }
       cm.doc.scrollTop = val;
       cm.display.scrollbars.setScrollTop(val);
@@ -26488,7 +26508,7 @@
     // Sync scroller and scrollbar, ensure the gutter elements are
     // aligned.
     function setScrollLeft(cm, val, isScroller, forceScroll) {
-      val = Math.min(val, cm.display.scroller.scrollWidth - cm.display.scroller.clientWidth);
+      val = Math.max(0, Math.min(val, cm.display.scroller.scrollWidth - cm.display.scroller.clientWidth));
       if ((isScroller ? val == cm.doc.scrollLeft : Math.abs(cm.doc.scrollLeft - val) < 2) && !forceScroll) { return }
       cm.doc.scrollLeft = val;
       alignHorizontally(cm);
@@ -27075,6 +27095,8 @@
           update.visible = visibleLines(cm.display, cm.doc, viewport);
           if (update.visible.from >= cm.display.viewFrom && update.visible.to <= cm.display.viewTo)
             { break }
+        } else if (first) {
+          update.visible = visibleLines(cm.display, cm.doc, viewport);
         }
         if (!updateDisplayIfNeeded(cm, update)) { break }
         updateHeightsInViewport(cm);
@@ -29424,7 +29446,7 @@
                                 text.filter(function (t) { return t != null; }).join(cm.doc.lineSeparator())),
                             origin: "paste"};
               makeChange(cm.doc, change);
-              setSelectionReplaceHistory(cm.doc, simpleSelection(pos, changeEnd(change)));
+              setSelectionReplaceHistory(cm.doc, simpleSelection(clipPos(cm.doc, pos), clipPos(cm.doc, changeEnd(change))));
             })();
           }
         };
@@ -29757,7 +29779,7 @@
 
     function endOfLine(visually, cm, lineObj, lineNo, dir) {
       if (visually) {
-        if (cm.getOption("direction") == "rtl") { dir = -dir; }
+        if (cm.doc.direction == "rtl") { dir = -dir; }
         var order = getOrder(lineObj, cm.doc.direction);
         if (order) {
           var part = dir < 0 ? lst(order) : order[0];
@@ -30012,7 +30034,7 @@
       var line = getLine(cm.doc, start.line);
       var order = getOrder(line, cm.doc.direction);
       if (!order || order[0].level == 0) {
-        var firstNonWS = Math.max(0, line.text.search(/\S/));
+        var firstNonWS = Math.max(start.ch, line.text.search(/\S/));
         var inWS = pos.line == start.line && pos.ch <= firstNonWS && pos.ch;
         return Pos(start.line, inWS ? 0 : firstNonWS, start.sticky)
       }
@@ -31568,7 +31590,7 @@
       var oldPos = pos;
       var origDir = dir;
       var lineObj = getLine(doc, pos.line);
-      var lineDir = visually && doc.cm && doc.cm.getOption("direction") == "rtl" ? -dir : dir;
+      var lineDir = visually && doc.direction == "rtl" ? -dir : dir;
       function findNextLine() {
         var l = pos.line + lineDir;
         if (l < doc.first || l >= doc.first + doc.size) { return false }
@@ -31733,7 +31755,7 @@
 
     ContentEditableInput.prototype.prepareSelection = function () {
       var result = prepareSelection(this.cm, false);
-      result.focus = this.cm.state.focused;
+      result.focus = document.activeElement == this.div;
       return result
     };
 
@@ -31829,7 +31851,7 @@
 
     ContentEditableInput.prototype.focus = function () {
       if (this.cm.options.readOnly != "nocursor") {
-        if (!this.selectionInEditor())
+        if (!this.selectionInEditor() || document.activeElement != this.div)
           { this.showSelection(this.prepareSelection(), true); }
         this.div.focus();
       }
@@ -32661,7 +32683,7 @@
 
     addLegacyProps(CodeMirror);
 
-    CodeMirror.version = "5.51.0";
+    CodeMirror.version = "5.52.2";
 
     return CodeMirror;
 
@@ -33491,7 +33513,7 @@
     }
     function parenExpr(type) {
       if (type != "(") return pass()
-      return cont(pushlex(")"), expression, expect(")"), poplex)
+      return cont(pushlex(")"), maybeexpression, expect(")"), poplex)
     }
     function expressionInner(type, value, noComma) {
       if (cx.state.fatArrowAt == cx.stream.start) {
@@ -33520,7 +33542,7 @@
     }
 
     function maybeoperatorComma(type, value) {
-      if (type == ",") return cont(expression);
+      if (type == ",") return cont(maybeexpression);
       return maybeoperatorNoComma(type, value, false);
     }
     function maybeoperatorNoComma(type, value, noComma) {
@@ -34456,81 +34478,98 @@
       "alignment-baseline", "anchor-point", "animation", "animation-delay",
       "animation-direction", "animation-duration", "animation-fill-mode",
       "animation-iteration-count", "animation-name", "animation-play-state",
-      "animation-timing-function", "appearance", "azimuth", "backface-visibility",
-      "background", "background-attachment", "background-blend-mode", "background-clip",
-      "background-color", "background-image", "background-origin", "background-position",
-      "background-repeat", "background-size", "baseline-shift", "binding",
-      "bleed", "bookmark-label", "bookmark-level", "bookmark-state",
-      "bookmark-target", "border", "border-bottom", "border-bottom-color",
-      "border-bottom-left-radius", "border-bottom-right-radius",
-      "border-bottom-style", "border-bottom-width", "border-collapse",
-      "border-color", "border-image", "border-image-outset",
+      "animation-timing-function", "appearance", "azimuth", "backdrop-filter",
+      "backface-visibility", "background", "background-attachment",
+      "background-blend-mode", "background-clip", "background-color",
+      "background-image", "background-origin", "background-position",
+      "background-position-x", "background-position-y", "background-repeat",
+      "background-size", "baseline-shift", "binding", "bleed", "block-size",
+      "bookmark-label", "bookmark-level", "bookmark-state", "bookmark-target",
+      "border", "border-bottom", "border-bottom-color", "border-bottom-left-radius",
+      "border-bottom-right-radius", "border-bottom-style", "border-bottom-width",
+      "border-collapse", "border-color", "border-image", "border-image-outset",
       "border-image-repeat", "border-image-slice", "border-image-source",
-      "border-image-width", "border-left", "border-left-color",
-      "border-left-style", "border-left-width", "border-radius", "border-right",
-      "border-right-color", "border-right-style", "border-right-width",
-      "border-spacing", "border-style", "border-top", "border-top-color",
-      "border-top-left-radius", "border-top-right-radius", "border-top-style",
-      "border-top-width", "border-width", "bottom", "box-decoration-break",
-      "box-shadow", "box-sizing", "break-after", "break-before", "break-inside",
-      "caption-side", "caret-color", "clear", "clip", "color", "color-profile", "column-count",
-      "column-fill", "column-gap", "column-rule", "column-rule-color",
-      "column-rule-style", "column-rule-width", "column-span", "column-width",
-      "columns", "content", "counter-increment", "counter-reset", "crop", "cue",
-      "cue-after", "cue-before", "cursor", "direction", "display",
-      "dominant-baseline", "drop-initial-after-adjust",
-      "drop-initial-after-align", "drop-initial-before-adjust",
-      "drop-initial-before-align", "drop-initial-size", "drop-initial-value",
-      "elevation", "empty-cells", "fit", "fit-position", "flex", "flex-basis",
-      "flex-direction", "flex-flow", "flex-grow", "flex-shrink", "flex-wrap",
-      "float", "float-offset", "flow-from", "flow-into", "font", "font-feature-settings",
-      "font-family", "font-kerning", "font-language-override", "font-size", "font-size-adjust",
-      "font-stretch", "font-style", "font-synthesis", "font-variant",
-      "font-variant-alternates", "font-variant-caps", "font-variant-east-asian",
-      "font-variant-ligatures", "font-variant-numeric", "font-variant-position",
-      "font-weight", "grid", "grid-area", "grid-auto-columns", "grid-auto-flow",
-      "grid-auto-rows", "grid-column", "grid-column-end", "grid-column-gap",
-      "grid-column-start", "grid-gap", "grid-row", "grid-row-end", "grid-row-gap",
-      "grid-row-start", "grid-template", "grid-template-areas", "grid-template-columns",
-      "grid-template-rows", "hanging-punctuation", "height", "hyphens",
-      "icon", "image-orientation", "image-rendering", "image-resolution",
-      "inline-box-align", "justify-content", "justify-items", "justify-self", "left", "letter-spacing",
-      "line-break", "line-height", "line-stacking", "line-stacking-ruby",
+      "border-image-width", "border-left", "border-left-color", "border-left-style",
+      "border-left-width", "border-radius", "border-right", "border-right-color",
+      "border-right-style", "border-right-width", "border-spacing", "border-style",
+      "border-top", "border-top-color", "border-top-left-radius",
+      "border-top-right-radius", "border-top-style", "border-top-width",
+      "border-width", "bottom", "box-decoration-break", "box-shadow", "box-sizing",
+      "break-after", "break-before", "break-inside", "caption-side", "caret-color",
+      "clear", "clip", "color", "color-profile", "column-count", "column-fill",
+      "column-gap", "column-rule", "column-rule-color", "column-rule-style",
+      "column-rule-width", "column-span", "column-width", "columns", "contain",
+      "content", "counter-increment", "counter-reset", "crop", "cue", "cue-after",
+      "cue-before", "cursor", "direction", "display", "dominant-baseline",
+      "drop-initial-after-adjust", "drop-initial-after-align",
+      "drop-initial-before-adjust", "drop-initial-before-align", "drop-initial-size",
+      "drop-initial-value", "elevation", "empty-cells", "fit", "fit-position",
+      "flex", "flex-basis", "flex-direction", "flex-flow", "flex-grow",
+      "flex-shrink", "flex-wrap", "float", "float-offset", "flow-from", "flow-into",
+      "font", "font-family", "font-feature-settings", "font-kerning",
+      "font-language-override", "font-optical-sizing", "font-size",
+      "font-size-adjust", "font-stretch", "font-style", "font-synthesis",
+      "font-variant", "font-variant-alternates", "font-variant-caps",
+      "font-variant-east-asian", "font-variant-ligatures", "font-variant-numeric",
+      "font-variant-position", "font-variation-settings", "font-weight", "gap",
+      "grid", "grid-area", "grid-auto-columns", "grid-auto-flow", "grid-auto-rows",
+      "grid-column", "grid-column-end", "grid-column-gap", "grid-column-start",
+      "grid-gap", "grid-row", "grid-row-end", "grid-row-gap", "grid-row-start",
+      "grid-template", "grid-template-areas", "grid-template-columns",
+      "grid-template-rows", "hanging-punctuation", "height", "hyphens", "icon",
+      "image-orientation", "image-rendering", "image-resolution", "inline-box-align",
+      "inset", "inset-block", "inset-block-end", "inset-block-start", "inset-inline",
+      "inset-inline-end", "inset-inline-start", "isolation", "justify-content",
+      "justify-items", "justify-self", "left", "letter-spacing", "line-break",
+      "line-height", "line-height-step", "line-stacking", "line-stacking-ruby",
       "line-stacking-shift", "line-stacking-strategy", "list-style",
       "list-style-image", "list-style-position", "list-style-type", "margin",
-      "margin-bottom", "margin-left", "margin-right", "margin-top",
-      "marks", "marquee-direction", "marquee-loop",
-      "marquee-play-count", "marquee-speed", "marquee-style", "max-height",
-      "max-width", "min-height", "min-width", "mix-blend-mode", "move-to", "nav-down", "nav-index",
-      "nav-left", "nav-right", "nav-up", "object-fit", "object-position",
-      "opacity", "order", "orphans", "outline",
-      "outline-color", "outline-offset", "outline-style", "outline-width",
-      "overflow", "overflow-style", "overflow-wrap", "overflow-x", "overflow-y",
-      "padding", "padding-bottom", "padding-left", "padding-right", "padding-top",
-      "page", "page-break-after", "page-break-before", "page-break-inside",
-      "page-policy", "pause", "pause-after", "pause-before", "perspective",
-      "perspective-origin", "pitch", "pitch-range", "place-content", "place-items", "place-self", "play-during", "position",
-      "presentation-level", "punctuation-trim", "quotes", "region-break-after",
-      "region-break-before", "region-break-inside", "region-fragment",
-      "rendering-intent", "resize", "rest", "rest-after", "rest-before", "richness",
-      "right", "rotation", "rotation-point", "ruby-align", "ruby-overhang",
-      "ruby-position", "ruby-span", "shape-image-threshold", "shape-inside", "shape-margin",
-      "shape-outside", "size", "speak", "speak-as", "speak-header",
-      "speak-numeral", "speak-punctuation", "speech-rate", "stress", "string-set",
-      "tab-size", "table-layout", "target", "target-name", "target-new",
-      "target-position", "text-align", "text-align-last", "text-decoration",
+      "margin-bottom", "margin-left", "margin-right", "margin-top", "marks",
+      "marquee-direction", "marquee-loop", "marquee-play-count", "marquee-speed",
+      "marquee-style", "max-block-size", "max-height", "max-inline-size",
+      "max-width", "min-block-size", "min-height", "min-inline-size", "min-width",
+      "mix-blend-mode", "move-to", "nav-down", "nav-index", "nav-left", "nav-right",
+      "nav-up", "object-fit", "object-position", "offset", "offset-anchor",
+      "offset-distance", "offset-path", "offset-position", "offset-rotate",
+      "opacity", "order", "orphans", "outline", "outline-color", "outline-offset",
+      "outline-style", "outline-width", "overflow", "overflow-style",
+      "overflow-wrap", "overflow-x", "overflow-y", "padding", "padding-bottom",
+      "padding-left", "padding-right", "padding-top", "page", "page-break-after",
+      "page-break-before", "page-break-inside", "page-policy", "pause",
+      "pause-after", "pause-before", "perspective", "perspective-origin", "pitch",
+      "pitch-range", "place-content", "place-items", "place-self", "play-during",
+      "position", "presentation-level", "punctuation-trim", "quotes",
+      "region-break-after", "region-break-before", "region-break-inside",
+      "region-fragment", "rendering-intent", "resize", "rest", "rest-after",
+      "rest-before", "richness", "right", "rotate", "rotation", "rotation-point",
+      "row-gap", "ruby-align", "ruby-overhang", "ruby-position", "ruby-span",
+      "scale", "scroll-behavior", "scroll-margin", "scroll-margin-block",
+      "scroll-margin-block-end", "scroll-margin-block-start", "scroll-margin-bottom",
+      "scroll-margin-inline", "scroll-margin-inline-end",
+      "scroll-margin-inline-start", "scroll-margin-left", "scroll-margin-right",
+      "scroll-margin-top", "scroll-padding", "scroll-padding-block",
+      "scroll-padding-block-end", "scroll-padding-block-start",
+      "scroll-padding-bottom", "scroll-padding-inline", "scroll-padding-inline-end",
+      "scroll-padding-inline-start", "scroll-padding-left", "scroll-padding-right",
+      "scroll-padding-top", "scroll-snap-align", "scroll-snap-type",
+      "shape-image-threshold", "shape-inside", "shape-margin", "shape-outside",
+      "size", "speak", "speak-as", "speak-header", "speak-numeral",
+      "speak-punctuation", "speech-rate", "stress", "string-set", "tab-size",
+      "table-layout", "target", "target-name", "target-new", "target-position",
+      "text-align", "text-align-last", "text-combine-upright", "text-decoration",
       "text-decoration-color", "text-decoration-line", "text-decoration-skip",
-      "text-decoration-style", "text-emphasis", "text-emphasis-color",
-      "text-emphasis-position", "text-emphasis-style", "text-height",
-      "text-indent", "text-justify", "text-outline", "text-overflow", "text-shadow",
-      "text-size-adjust", "text-space-collapse", "text-transform", "text-underline-position",
-      "text-wrap", "top", "transform", "transform-origin", "transform-style",
-      "transition", "transition-delay", "transition-duration",
-      "transition-property", "transition-timing-function", "unicode-bidi",
-      "user-select", "vertical-align", "visibility", "voice-balance", "voice-duration",
-      "voice-family", "voice-pitch", "voice-range", "voice-rate", "voice-stress",
-      "voice-volume", "volume", "white-space", "widows", "width", "will-change", "word-break",
-      "word-spacing", "word-wrap", "z-index",
+      "text-decoration-skip-ink", "text-decoration-style", "text-emphasis",
+      "text-emphasis-color", "text-emphasis-position", "text-emphasis-style",
+      "text-height", "text-indent", "text-justify", "text-orientation",
+      "text-outline", "text-overflow", "text-rendering", "text-shadow",
+      "text-size-adjust", "text-space-collapse", "text-transform",
+      "text-underline-position", "text-wrap", "top", "transform", "transform-origin",
+      "transform-style", "transition", "transition-delay", "transition-duration",
+      "transition-property", "transition-timing-function", "translate",
+      "unicode-bidi", "user-select", "vertical-align", "visibility", "voice-balance",
+      "voice-duration", "voice-family", "voice-pitch", "voice-range", "voice-rate",
+      "voice-stress", "voice-volume", "volume", "white-space", "widows", "width",
+      "will-change", "word-break", "word-spacing", "word-wrap", "writing-mode", "z-index",
       // SVG-specific
       "clip-path", "clip-rule", "mask", "enable-background", "filter", "flood-color",
       "flood-opacity", "lighting-color", "stop-color", "stop-opacity", "pointer-events",
@@ -34544,16 +34583,28 @@
     ], propertyKeywords = keySet(propertyKeywords_);
 
     var nonStandardPropertyKeywords_ = [
+      "border-block", "border-block-color", "border-block-end",
+      "border-block-end-color", "border-block-end-style", "border-block-end-width",
+      "border-block-start", "border-block-start-color", "border-block-start-style",
+      "border-block-start-width", "border-block-style", "border-block-width",
+      "border-inline", "border-inline-color", "border-inline-end",
+      "border-inline-end-color", "border-inline-end-style",
+      "border-inline-end-width", "border-inline-start", "border-inline-start-color",
+      "border-inline-start-style", "border-inline-start-width",
+      "border-inline-style", "border-inline-width", "margin-block",
+      "margin-block-end", "margin-block-start", "margin-inline", "margin-inline-end",
+      "margin-inline-start", "padding-block", "padding-block-end",
+      "padding-block-start", "padding-inline", "padding-inline-end",
+      "padding-inline-start", "scroll-snap-stop", "scrollbar-3d-light-color",
       "scrollbar-arrow-color", "scrollbar-base-color", "scrollbar-dark-shadow-color",
       "scrollbar-face-color", "scrollbar-highlight-color", "scrollbar-shadow-color",
-      "scrollbar-3d-light-color", "scrollbar-track-color", "shape-inside",
-      "searchfield-cancel-button", "searchfield-decoration", "searchfield-results-button",
-      "searchfield-results-decoration", "zoom"
+      "scrollbar-track-color", "searchfield-cancel-button", "searchfield-decoration",
+      "searchfield-results-button", "searchfield-results-decoration", "shape-inside", "zoom"
     ], nonStandardPropertyKeywords = keySet(nonStandardPropertyKeywords_);
 
     var fontProperties_ = [
-      "font-family", "src", "unicode-range", "font-variant", "font-feature-settings",
-      "font-stretch", "font-weight", "font-style"
+      "font-display", "font-family", "src", "unicode-range", "font-variant",
+       "font-feature-settings", "font-stretch", "font-weight", "font-style"
     ], fontProperties = keySet(fontProperties_);
 
     var counterDescriptors_ = [
@@ -35217,7 +35268,7 @@
       toggle() {
           if (this.isOn()) {
               this.off();
-          }else{
+          }else {
               this.on();
           }
       }
