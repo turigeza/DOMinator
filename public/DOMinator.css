@@ -141,28 +141,6 @@ body.dominatorMenuActive{
     color: #FEC63E;
 }
 
-.DOMinatorMenuButton-link_style_default:hover{
-    color: #999;
-}
-.DOMinatorMenuButton-link_style_warning:hover{
-    color: #ff7518;
-}
-.DOMinatorMenuButton-link_style_danger:hover{
-    color: #b1000b;
-}
-.DOMinatorMenuButton-link_style_primary:hover{
-    color: #009CDE;
-}
-.DOMinatorMenuButton-link_style_success:hover{
-    color: #509E2F;
-}
-.DOMinatorMenuButton-link_style_info:hover{
-    color: #5936e0;
-}
-.DOMinatorMenuButton-link_style_brand:hover{
-    color: #FEC63E;
-}
-
 .DOMinatorMenuButton-link_style_default:active, .DOMinatorMenuButton-link_style_default.button-active{
     color: white;
     background-color: #999;
