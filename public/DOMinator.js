@@ -14531,7 +14531,13 @@
           if(this.options.icon){
               if(!this.options.iconType){
                   this.icon = document.createElement("i");
-                  this.icon.className = 'fa fa-'+this.options.icon;
+                  
+                  if(!this.options.iconClass){
+                      this.icon.className = 'fa fa-'+this.options.icon;
+                  }else {
+                      this.icon.className = this.options.iconClass;
+                  }
+                  
                   this.icon.setAttribute('aria-hidden', 'true');
                   this.dom.appendChild(this.icon);
               }else if(this.options.iconType === 'dics'){
@@ -22056,6 +22062,25 @@
           }),
           new DOMinatorMenuSeparator (),
           new DOMinatorMenuButton ({
+              update: (button) => {
+                  if(menu.activeBlock.attrs.target == "_blank"){
+                      button.activate();
+                  }else {
+                      button.deactivate();
+                  }
+              },
+              key: 'link_external',
+              icon: 'external-link',
+              action: (state, dispatch, view)=>{
+                  // attribute, value, menu, mark                
+                  if(menu.activeBlock.attrs.target == "_blank"){
+                      changeAttributeOnNode(menu, 'target', null);
+                  }else {
+                      changeAttributeOnNode(menu, 'target', '_blank');
+                  }
+              }
+          }),
+          new DOMinatorMenuButton ({
               key: 'shadow',
               icon: 'window-restore',
               action: (button) => {
@@ -22072,6 +22097,7 @@
           new DOMinatorMenuButton ({
               key: 'outline',
               icon: 'square-o',
+              iconClass: 'fa-regular fa-square',
               action: (button) => {
                   toggleClassOnNode(menu, 'd-block-link-no-outline');
               },

@@ -29,7 +29,13 @@ export default class DOMinatorMenuButton {
         if(this.options.icon){
             if(!this.options.iconType){
                 this.icon = document.createElement("i");
-                this.icon.className = 'fa fa-'+this.options.icon
+                
+                if(!this.options.iconClass){
+                    this.icon.className = 'fa fa-'+this.options.icon
+                }else{
+                    this.icon.className = this.options.iconClass
+                }
+                
                 this.icon.setAttribute('aria-hidden', 'true');
                 this.dom.appendChild(this.icon);
             }else if(this.options.iconType === 'dics'){

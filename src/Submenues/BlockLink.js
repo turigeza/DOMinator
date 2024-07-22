@@ -5,6 +5,7 @@ import DOMinatorMenuLabel from "./../DOMinatorMenuLabel"
 import DOMinatorMenuSeparator from "./../DOMinatorMenuSeparator"
 import {
     changeAttributeOnNode,
+    // toggleAttributeOnMark,
     toggleClassOnNode
 } from "./../DOMinatorActions"
 
@@ -20,6 +21,25 @@ export default function(menu) {
             label: 'Block Link'
         }),
         new DOMinatorMenuSeparator (),
+        new DOMinatorMenuButton ({
+            update: (button) => {
+                if(menu.activeBlock.attrs.target == "_blank"){
+                    button.activate();
+                }else{
+                    button.deactivate();
+                }
+            },
+            key: 'link_external',
+            icon: 'external-link',
+            action: (state, dispatch, view)=>{
+                // attribute, value, menu, mark                
+                if(menu.activeBlock.attrs.target == "_blank"){
+                    changeAttributeOnNode(menu, 'target', null);
+                }else{
+                    changeAttributeOnNode(menu, 'target', '_blank');
+                }
+            }
+        }),
         new DOMinatorMenuButton ({
             key: 'shadow',
             icon: 'window-restore',
@@ -37,6 +57,7 @@ export default function(menu) {
         new DOMinatorMenuButton ({
             key: 'outline',
             icon: 'square-o',
+            iconClass: 'fa-regular fa-square',
             action: (button) => {
                 toggleClassOnNode(menu, 'd-block-link-no-outline');
             },
