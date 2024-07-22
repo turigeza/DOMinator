@@ -104,6 +104,16 @@ export default function(menu) {
                 toggleClassOnMark(menu, menu.activeMark, options.linkClasses['info'], linkClasses);
             }
         }),
+        new DOMinatorMenuButton ({
+            update: (button) => {
+                updateLinkStyleButton(options.linkClasses['brand'], button, menu);
+            },
+            key: 'link_style_brand',
+            icon: 'paint-brush',
+            action: ()=>{
+                toggleClassOnMark(menu, menu.activeMark, options.linkClasses['brand'], linkClasses);
+            }
+        }),
         new DOMinatorMenuInput ({
             label: 'Link',
             update: (input) => {

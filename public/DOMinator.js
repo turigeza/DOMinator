@@ -21043,6 +21043,16 @@
                   toggleClassOnMark(menu, menu.activeMark, options.linkClasses['info'], linkClasses);
               }
           }),
+          new DOMinatorMenuButton ({
+              update: (button) => {
+                  updateLinkStyleButton(options.linkClasses['brand'], button, menu);
+              },
+              key: 'link_style_brand',
+              icon: 'paint-brush',
+              action: ()=>{
+                  toggleClassOnMark(menu, menu.activeMark, options.linkClasses['brand'], linkClasses);
+              }
+          }),
           new DOMinatorMenuInput ({
               label: 'Link',
               update: (input) => {
@@ -35237,7 +35247,8 @@
                   warning: 'd-button-warning',
                   default: 'd-button-default',
                   danger: 'd-button-danger',
-                  info: 'd-button-info'
+                  info: 'd-button-info',
+                  brand: 'd-button-brand',
               },
               floatClasses: {
                   left: 'pull-left',

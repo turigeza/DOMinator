@@ -129,7 +129,8 @@ window.DOMinator = class DOMinator {
                 warning: 'd-button-warning',
                 default: 'd-button-default',
                 danger: 'd-button-danger',
-                info: 'd-button-info'
+                info: 'd-button-info',
+                brand: 'd-button-brand',
             },
             floatClasses: {
                 left: 'pull-left',
